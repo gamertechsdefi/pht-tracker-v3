@@ -86,10 +86,10 @@ export async function GET(
       lastUpdated: new Date().toISOString(),
     });
 
-  } catch (error: any) {
-    console.error('API Error:', error);
+  } catch {
+    console.error('API Error:');
     return NextResponse.json(
-      { error: 'Failed to fetch token holders', message: error.message },
+      { error: 'Failed to fetch token holders' },
       { status: 500 }
     );
   }

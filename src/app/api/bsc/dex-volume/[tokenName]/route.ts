@@ -74,8 +74,8 @@ export async function GET(_: Request, { params }: Params) {
       lastUpdated: new Date().toISOString(),
     });
 
-  } catch (error: any) {
-    console.error("API Error:", error);
-    return NextResponse.json({ error: "Failed to fetch token data", message: error.message }, { status: 500 });
+  } catch  {
+    console.error("API Error:");
+    return NextResponse.json({ error: "Failed to fetch token data" }, { status: 500 });
   }
 }

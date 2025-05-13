@@ -257,8 +257,8 @@ export async function GET(_: Request, { params }: { params: { tokenName?: string
     updateCache(tokenName, responseData);
 
     return NextResponse.json(responseData);
-  } catch (error: any) {
-    console.error("API Error:", error);
+  } catch {
+    console.error("API Error:");
     
     // If we have stale cached data, return it as a fallback
     try {
@@ -275,8 +275,7 @@ export async function GET(_: Request, { params }: { params: { tokenName?: string
     }
     
     return NextResponse.json({ 
-      error: "Failed to fetch burn data", 
-      message: error.message 
+      error: "Failed to fetch burn data",  
     }, { status: 500 });
   }
 }

@@ -84,10 +84,10 @@ export async function GET(
       liquidity: pair.liquidity?.usd ?? "N/A",
       lastUpdated: new Date().toISOString(),
     });
-  } catch (error: any) {
-    console.error("API Error:", error);
+  } catch {
+    console.error("API Error:");
     return NextResponse.json(
-      { error: "Failed to fetch token data", message: error.message },
+      { error: "Failed to fetch token data" },
       { status: 500 }
     );
   }
