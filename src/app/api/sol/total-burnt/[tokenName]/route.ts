@@ -68,10 +68,6 @@ interface CacheResult {
   fresh: boolean;
 }
 
-interface RouteParams {
-  params: { tokenName?: string };
-}
-
 // Helper function to get cached data from Firebase
 async function getCachedBurnData(tokenName: string): Promise<CacheResult> {
   try {
@@ -109,7 +105,10 @@ async function updateCache(tokenName: string, data: BurnData): Promise<void> {
   }
 }
 
-export async function GET(_: Request, { params }: RouteParams): Promise<NextResponse> {
+export async function GET(_: Request, context: any): Promise<NextResponse> {
+  // Type assertion to safely access params
+  const params = context.params as { tokenName?: string };
+
   try {
     const tokenName = params.tokenName?.toLowerCase();
     const tokenAddress = tokenName ? TOKEN_MAP[tokenName] : undefined;

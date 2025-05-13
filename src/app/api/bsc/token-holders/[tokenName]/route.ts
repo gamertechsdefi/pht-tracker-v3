@@ -37,16 +37,13 @@ interface MoralisHoldersResponse {
   message?: string;
 }
 
-interface Params {
-  params: {
-    tokenName?: string;
-  };
-}
-
 export async function GET(
   _req: NextRequest,
-  { params }: Params
+  context: any
 ): Promise<NextResponse> {
+  // Type assertion to safely access params
+  const params = context.params as { tokenName?: string };
+
   try {
     const tokenName = params.tokenName?.toLowerCase() || '';
     const tokenData = TOKEN_MAP[tokenName];
@@ -86,8 +83,8 @@ export async function GET(
       lastUpdated: new Date().toISOString(),
     });
 
-  } catch {
-    console.error('API Error:');
+  } catch (error) {
+    console.error('API Error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch token holders' },
       { status: 500 }

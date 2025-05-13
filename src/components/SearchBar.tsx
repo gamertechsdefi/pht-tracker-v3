@@ -1,40 +1,53 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
+// Define interfaces for data structures
+interface Token {
+  symbol: string;
+  fullName: string;
+  chain: string;
+  volume24h: number;
+}
+
+interface Suggestion {
+  fullName: string;
+  symbol: string;
+}
+
 // Token list with chain mapping (consistent with TokenPage)
-const TOKEN_LIST = {
-  "pht": "bsc",
-  "wkc": "bsc",
-  "dtg": "bsc",
-  "war": "bsc",
-  "yukan": "bsc",
-  "btcdragon": "bsc",
-  "ocicat": "bsc",
-  "nene": "bsc",
-  "twc": "bsc",
-  "durt": "bsc",
-  "gtan": "bsc",
-  "zedek": "bsc",
-  "tkc": "bsc",
-  "twd": "bsc",
-  "bcat": "bsc",
-  "bengcat": "bsc",
-  "nct": "bsc",
-  "scat": "sol",
-  "nuke": "sol",
-  "petros": "sol",
-  "venus": "sol",
-  "kitsune": "bsc",
-  "bft": "bsc",
-  "crystalstones": "bsc",
-  "cross": "bsc",
-  "thc": "bsc",
+const TOKEN_LIST: { [key: string]: string } = {
+  pht: "bsc",
+  wkc: "bsc",
+  dtg: "bsc",
+  war: "bsc",
+  yukan: "bsc",
+  btcdragon: "bsc",
+  ocicat: "bsc",
+  nene: "bsc",
+  twc: "bsc",
+  durt: "bsc",
+  gtan: "bsc",
+  zedek: "bsc",
+  tkc: "bsc",
+  twd: "bsc",
+  bcat: "bsc",
+  bengcat: "bsc",
+  nct: "bsc",
+  scat: "sol",
+  nuke: "sol",
+  petros: "sol",
+  venus: "sol",
+  kitsune: "bsc",
+  bft: "bsc",
+  crystalstones: "bsc",
+  cross: "bsc",
+  thc: "bsc",
 };
 
 // Full name to symbol mapping for suggestions (lowercase to match TokenPage)
-const FULL_NAME_MAP = {
+const FULL_NAME_MAP: { [key: string]: string } = {
   "Phoenix Token": "pht",
   "WikiCat Coin ": "wkc",
   "Defi Tiger Token": "dtg",
@@ -42,7 +55,7 @@ const FULL_NAME_MAP = {
   "Yukan Token": "yukan",
   "BTC Dragon Token": "btcdragon",
   "OciCat Token": "ocicat",
-  "Nene": "nene",
+  Nene: "nene",
   "TIWI CAT": "twc",
   "The Word Token": "twd",
   "The Kingdom Coin": "tkc",
@@ -53,22 +66,35 @@ const FULL_NAME_MAP = {
   "Bengal Cat Token": "bengcat",
   "New Cat Token": "nct",
   "Baby Simon Cat": "scat",
-  "Nuke": "nuke",
+  Nuke: "nuke",
   "Petros Token": "petros",
   "Two Face Cat": "venus",
   "Kitsune Token": "kitsune",
   "Crystal Stones": "crystalstones",
-  "The Big Five Token": "bft", 
+  "The Big Five Token": "bft",
   "Cross Token": "cross",
   "Transhuman Coin": "thc",
 };
 
-export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClose }) {
-  const [inputValue, setInputValue] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
-  const [trendingTokens, setTrendingTokens] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+// Define props interface
+interface SearchBarPopupProps {
+  setSearch: (value: string) => void;
+  handleSearch: (value: string) => void;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function SearchBarPopup({
+  setSearch,
+  handleSearch,
+  isOpen,
+  onClose,
+}: SearchBarPopupProps) {
+  const [inputValue, setInputValue] = useState<string>("");
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [trendingTokens, setTrendingTokens] = useState<Token[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -80,16 +106,17 @@ export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClos
 
       try {
         const tokenSymbols = Object.keys(TOKEN_LIST);
-        const fetchPromises = tokenSymbols.map(async (symbol) => {
+        const fetchPromises = tokenSymbols.map(async (symbol: string) => {
           try {
             const response = await fetch(`/api/bsc/dex-volume/${symbol}`);
-            const data = await response.json();
+            const data: { volume: string; error?: string } = await response.json();
             if (data.error || data.volume === "N/A") {
               return null;
             }
-            const fullName = Object.keys(FULL_NAME_MAP).find(
-              (name) => FULL_NAME_MAP[name] === symbol
-            ) || symbol.toUpperCase();
+            const fullName =
+              Object.keys(FULL_NAME_MAP).find(
+                (name) => FULL_NAME_MAP[name] === symbol
+              ) || symbol.toUpperCase();
             return {
               symbol,
               fullName,
@@ -104,7 +131,7 @@ export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClos
 
         const results = await Promise.all(fetchPromises);
         const validTokens = results
-          .filter((token) => token !== null && token.volume24h > 0)
+          .filter((token): token is Token => token !== null && token.volume24h > 0)
           .sort((a, b) => b.volume24h - a.volume24h)
           .slice(0, 5); // Top 5 tokens by volume
 
@@ -123,8 +150,8 @@ export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClos
     fetchTrendingTokens();
   }, [isOpen]);
 
-  const onChange = (e) => {
-    const value = e.target.value;
+  const onChange = (e: FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
     setInputValue(value);
 
     if (typeof setSearch === "function") {
@@ -136,9 +163,10 @@ export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClos
 
     if (value.trim()) {
       const filteredSuggestions = Object.entries(FULL_NAME_MAP)
-        .filter(([fullName, symbol]) =>
-          fullName.toUpperCase().includes(value.toUpperCase()) ||
-          symbol.toUpperCase().includes(value.toUpperCase())
+        .filter(
+          ([fullName, symbol]) =>
+            fullName.toUpperCase().includes(value.toUpperCase()) ||
+            symbol.toUpperCase().includes(value.toUpperCase())
         )
         .map(([fullName, symbol]) => ({ fullName, symbol }));
       setSuggestions(filteredSuggestions);
@@ -147,7 +175,7 @@ export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClos
     }
   };
 
-  const onSuggestionClick = (suggestion) => {
+  const onSuggestionClick = (suggestion: Suggestion) => {
     const symbol = suggestion.symbol;
     if (symbol) {
       setInputValue(suggestion.fullName);
@@ -176,7 +204,7 @@ export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClos
     }
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const token = inputValue.trim().toLowerCase();
     if (token) {
@@ -205,7 +233,7 @@ export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClos
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0  flex items-center justify-center z-50">
       <div className="bg-neutral-900 rounded-md shadow-lg w-full max-w-lg p-6 relative border-2 border-orange-500">
         {/* Close Button */}
         <button
@@ -285,14 +313,15 @@ export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClos
           <div className="bg-neutral-800 rounded-md overflow-hidden border-2 border-orange-500">
             {isLoading ? (
               <div className="flex items-center justify-center py-4">
-                <div className="animate-spin inline-block w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full" role="status">
+                <div
+                  className="animate-spin inline-block w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full"
+                  role="status"
+                >
                   <span className="sr-only">Loading...</span>
                 </div>
               </div>
             ) : error ? (
-              <div className="text-center py-4 text-red-500">
-                {error}
-              </div>
+              <div className="text-center py-4 text-red-500">{error}</div>
             ) : trendingTokens.length > 0 ? (
               <table className="w-full text-left text-sm">
                 <thead className="bg-neutral-900">
@@ -311,7 +340,6 @@ export default function SearchBarPopup({ setSearch, handleSearch, isOpen, onClos
                       }
                       className="border-t border-orange-500 hover:bg-neutral-700 cursor-pointer"
                     >
-                      {/* <td className="p-3 text-white">{token.fullName}</td> */}
                       <td className="p-3 text-white">{token.symbol.toUpperCase()}</td>
                       <td className="p-3 text-gray-400">{token.chain.toUpperCase()}</td>
                       <td className="p-3 text-right text-white">

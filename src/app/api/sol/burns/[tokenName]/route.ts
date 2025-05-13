@@ -1,7 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { ethers } from 'ethers';
-import { NextResponse, NextRequest } from 'next/server';
 import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '@/db/firebase'; // Assuming db is exported as Firestore instance
+import { db } from '@/db/firebase';
 
 // Configuration constants
 const RPC_URL = "https://bsc-mainnet.infura.io/v3/de990c1b30544bb680e45aba81204a4c";
@@ -112,172 +112,180 @@ async function updateCache(tokenName: string, data: BurnData): Promise<void> {
 }
 
 // Next.js API route handler
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { tokenName: string } }) {
-  try {
-    const tokenName = params.tokenName?.toLowerCase();
-    if (!tokenName) {
-      return NextResponse.json({ error: "Token name is required" }, { status: 400 });
-    }
+export async function GET(req: NextRequest, context: any): Promise<NextResponse> {
+  // Type assertion to safely access params
+  const params = context.params as { tokenName: string };
 
-    const tokenAddress = TOKEN_MAP[tokenName];
-    if (!tokenAddress) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 400 });
-    }
-
-    // Try to get data from cache first
-    const { data: cachedData, fresh } = await getCachedBurnData(tokenName);
-    
-    // If we have fresh cached data, return it immediately
-    if (cachedData && fresh) {
-      return NextResponse.json(cachedData);
-    }
-
-    // If we reach here, we need to fetch fresh data
-    const provider = new ethers.JsonRpcProvider(RPC_URL);
-    const contract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
-
-    // Get latest block and decimals in parallel
-    const [latestBlock, decimals] = await Promise.all([
-      provider.getBlockNumber(),
-      contract.decimals(),
-    ]);
-
-    const latestBlockData = await provider.getBlock(latestBlock);
-    if (!latestBlockData) {
-      return NextResponse.json({ error: "Failed to fetch latest block data" }, { status: 500 });
-    }
-    const latestTimestamp = latestBlockData.timestamp;
-
-    // Calculate start of today UTC
-    const now = new Date();
-    now.setUTCHours(0, 0, 0, 0);
-    const startOfDayTimestamp = Math.floor(now.getTime() / 1000);
-    const blocksSinceMidnight = Math.floor((latestTimestamp - startOfDayTimestamp) / 3);
-    const startBlock = Math.max(latestBlock - blocksSinceMidnight, 1);
-
-    // Calculate time intervals
-    const intervals: Record<string, number> = {
-      fiveMin: 5 * 60, // 5 minutes
-      fifteenMin: 15 * 60,
-      thirtyMin: 30 * 60,
-      oneHour: 60 * 60, // 1 hour
-      threeHours: 3 * 60 * 60, // 3 hours
-      sixHours: 6 * 60 * 60, // 6 hours
-      twelveHours: 12 * 60 * 60, // 12 hours
-    };
-
-    // Calculate block estimates for each interval
-    const blockEstimates: Record<string, number> = {};
-    for (const [key, seconds] of Object.entries(intervals)) {
-      const timestampAgo = latestTimestamp - seconds;
-      const blockEstimate = Math.floor((latestTimestamp - timestampAgo) / 3);
-      blockEstimates[key] = Math.max(latestBlock - blockEstimate, 1);
-    }
-
-    // Helper: fetch logs in a block range
-    const fetchBurnLogs = async (fromBlock: number, toBlock: number): Promise<bigint> => {
-      // Create a topic for burn addresses
-      const burnAddressesTopics = BURN_ADDRESSES.map(addr => 
-        ethers.zeroPadValue(addr.toLowerCase(), 32)
-      );
-      
-      // Fetch logs using appropriate filter
-      const logs = await provider.getLogs({
-        fromBlock,
-        toBlock,
-        address: tokenAddress,
-        topics: [
-          ethers.id("Transfer(address,address,uint256)"),
-          null,
-          burnAddressesTopics
-        ]
-      });
-
-      let total = BigInt(0);
-      logs.forEach(log => {
-        try {
-          const parsed = contract.interface.parseLog(log);
-          if (parsed && parsed.args) {
-            total += BigInt(parsed.args[2]);
-          }
-        } catch (e) {
-          console.error("Log parsing error:", e);
-        }
-      });
-      return total;
-    };
-
-    // Fetch burn amounts for all intervals in parallel
-    const [
-      totalBurned5min,
-      totalBurned15min, 
-      totalBurned30min,
-      totalBurned1h,
-      totalBurned3h,
-      totalBurned6h,
-      totalBurned12h,
-      totalBurned24h
-    ] = await Promise.all([
-      fetchBurnLogs(blockEstimates.fiveMin, latestBlock),
-      fetchBurnLogs(blockEstimates.fifteenMin, latestBlock),
-      fetchBurnLogs(blockEstimates.thirtyMin, latestBlock),
-      fetchBurnLogs(blockEstimates.oneHour, latestBlock),
-      fetchBurnLogs(blockEstimates.threeHours, latestBlock),
-      fetchBurnLogs(blockEstimates.sixHours, latestBlock),
-      fetchBurnLogs(blockEstimates.twelveHours, latestBlock),
-      fetchBurnLogs(startBlock, latestBlock)
-    ]);
-
-    // Convert to decimal values
-    const divisor = BigInt(10) ** BigInt(decimals);
-    const burn5min = Number(totalBurned5min) / Number(divisor);
-    const burn15min = Number(totalBurned15min) / Number(divisor);
-    const burn30min = Number(totalBurned30min) / Number(divisor);
-    const burn1h = Number(totalBurned1h) / Number(divisor);
-    const burn3h = Number(totalBurned3h) / Number(divisor);
-    const burn6h = Number(totalBurned6h) / Number(divisor);
-    const burn12h = Number(totalBurned12h) / Number(divisor);
-    const burn24h = Number(totalBurned24h) / Number(divisor);
-
-    // Prepare the response data
-    const responseData: BurnData = {
-      address: tokenAddress,
-      burn5min,
-      burn15min,
-      burn30min,
-      burn1h,
-      burn3h,
-      burn6h,
-      burn12h,
-      burn24h,
-      lastUpdated: new Date().toISOString(),
-    };
-
-    // Update the cache asynchronously (don't await)
-    updateCache(tokenName, responseData);
-
-    return NextResponse.json(responseData);
-  } catch {
-    console.error("API Error:");
-    
-    // If we have stale cached data, return it as a fallback
+  return new Promise(async (resolve) => {
     try {
-      const { data: cachedData } = await getCachedBurnData(params.tokenName?.toLowerCase() || '');
-      if (cachedData) {
-        return NextResponse.json({
-          ...cachedData,
-          fromCache: true,
-          cacheTime: cachedData.lastUpdated,
-        });
+      const tokenName = params.tokenName?.toLowerCase();
+      if (!tokenName) {
+        resolve(NextResponse.json({ error: "Token name is required" }, { status: 400 }));
+        return;
       }
-    } catch (e) {
-      console.error("Error getting fallback cache:", e);
+
+      const tokenAddress = TOKEN_MAP[tokenName];
+      if (!tokenAddress) {
+        resolve(NextResponse.json({ error: "Invalid token" }, { status: 400 }));
+        return;
+      }
+
+      // Try to get data from cache first
+      const { data: cachedData, fresh } = await getCachedBurnData(tokenName);
+      
+      // If we have fresh cached data, return it immediately
+      if (cachedData && fresh) {
+        resolve(NextResponse.json(cachedData));
+        return;
+      }
+
+      // Fetch fresh data
+      const provider = new ethers.JsonRpcProvider(RPC_URL);
+      const contract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+
+      // Get latest block and decimals in parallel
+      const [latestBlock, decimals] = await Promise.all([
+        provider.getBlockNumber(),
+        contract.decimals(),
+      ]);
+
+      const latestBlockData = await provider.getBlock(latestBlock);
+      if (!latestBlockData) {
+        resolve(NextResponse.json({ error: "Failed to fetch latest block data" }, { status: 500 }));
+        return;
+      }
+      const latestTimestamp = latestBlockData.timestamp;
+
+      // Calculate start of today UTC
+      const now = new Date();
+      now.setUTCHours(0, 0, 0, 0);
+      const startOfDayTimestamp = Math.floor(now.getTime() / 1000);
+      const blocksSinceMidnight = Math.floor((latestTimestamp - startOfDayTimestamp) / 3);
+      const startBlock = Math.max(latestBlock - blocksSinceMidnight, 1);
+
+      // Calculate time intervals
+      const intervals: Record<string, number> = {
+        fiveMin: 5 * 60, // 5 minutes
+        fifteenMin: 15 * 60,
+        thirtyMin: 30 * 60,
+        oneHour: 60 * 60, // 1 hour
+        threeHours: 3 * 60 * 60, // 3 hours
+        sixHours: 6 * 60 * 60, // 6 hours
+        twelveHours: 12 * 60 * 60, // 12 hours
+      };
+
+      // Calculate block estimates for each interval
+      const blockEstimates: Record<string, number> = {};
+      for (const [key, seconds] of Object.entries(intervals)) {
+        const timestampAgo = latestTimestamp - seconds;
+        const blockEstimate = Math.floor((latestTimestamp - timestampAgo) / 3);
+        blockEstimates[key] = Math.max(latestBlock - blockEstimate, 1);
+      }
+
+      // Helper: fetch logs in a block range
+      const fetchBurnLogs = async (fromBlock: number, toBlock: number): Promise<bigint> => {
+        // Create a topic for burn addresses
+        const burnAddressesTopics = BURN_ADDRESSES.map(addr => 
+          ethers.zeroPadValue(addr.toLowerCase(), 32)
+        );
+        
+        // Fetch logs using appropriate filter
+        const logs = await provider.getLogs({
+          fromBlock,
+          toBlock,
+          address: tokenAddress,
+          topics: [
+            ethers.id("Transfer(address,address,uint256)"),
+            null,
+            burnAddressesTopics
+          ]
+        });
+
+        let total = BigInt(0);
+        logs.forEach(log => {
+          try {
+            const parsed = contract.interface.parseLog(log);
+            if (parsed && parsed.args) {
+              total += BigInt(parsed.args[2]);
+            }
+          } catch (e) {
+            console.error("Log parsing error:", e);
+          }
+        });
+        return total;
+      };
+
+      // Fetch burn amounts for all intervals in parallel
+      const [
+        totalBurned5min,
+        totalBurned15min, 
+        totalBurned30min,
+        totalBurned1h,
+        totalBurned3h,
+        totalBurned6h,
+        totalBurned12h,
+        totalBurned24h
+      ] = await Promise.all([
+        fetchBurnLogs(blockEstimates.fiveMin, latestBlock),
+        fetchBurnLogs(blockEstimates.fifteenMin, latestBlock),
+        fetchBurnLogs(blockEstimates.thirtyMin, latestBlock),
+        fetchBurnLogs(blockEstimates.oneHour, latestBlock),
+        fetchBurnLogs(blockEstimates.threeHours, latestBlock),
+        fetchBurnLogs(blockEstimates.sixHours, latestBlock),
+        fetchBurnLogs(blockEstimates.twelveHours, latestBlock),
+        fetchBurnLogs(startBlock, latestBlock)
+      ]);
+
+      // Convert to decimal values
+      const divisor = BigInt(10) ** BigInt(decimals);
+      const burn5min = Number(totalBurned5min) / Number(divisor);
+      const burn15min = Number(totalBurned15min) / Number(divisor);
+      const burn30min = Number(totalBurned30min) / Number(divisor);
+      const burn1h = Number(totalBurned1h) / Number(divisor);
+      const burn3h = Number(totalBurned3h) / Number(divisor);
+      const burn6h = Number(totalBurned6h) / Number(divisor);
+      const burn12h = Number(totalBurned12h) / Number(divisor);
+      const burn24h = Number(totalBurned24h) / Number(divisor);
+
+      // Prepare the response data
+      const responseData: BurnData = {
+        address: tokenAddress,
+        burn5min,
+        burn15min,
+        burn30min,
+        burn1h,
+        burn3h,
+        burn6h,
+        burn12h,
+        burn24h,
+        lastUpdated: new Date().toISOString(),
+      };
+
+      // Update the cache asynchronously (don't await)
+      updateCache(tokenName, responseData).catch(err => console.error("Cache update failed:", err));
+
+      resolve(NextResponse.json(responseData));
+    } catch (error) {
+      console.error("API Error:", error);
+      
+      // Try fallback to cached data
+      try {
+        const { data: cachedData } = await getCachedBurnData(params.tokenName?.toLowerCase() || '');
+        if (cachedData) {
+          resolve(NextResponse.json({
+            ...cachedData,
+            fromCache: true,
+            cacheTime: cachedData.lastUpdated,
+          }));
+          return;
+        }
+      } catch (e) {
+        console.error("Error getting fallback cache:", e);
+      }
+      
+      resolve(NextResponse.json({ 
+        error: "Failed to fetch burn data",  
+      }, { status: 500 }));
     }
-    
-    return NextResponse.json({ 
-      error: "Failed to fetch burn data",  
-    }, { status: 500 });
-  }
+  });
 }

@@ -28,7 +28,10 @@ const TOKEN_MAP: TokenMap = {
 // Solana "Burn Address" (equivalent to `0x000...dEaD` on Ethereum)
 const DEAD_ADDRESS = new PublicKey('11111111111111111111111111111111');
 
-export async function GET(_: Request, { params }: { params: { tokenName?: string } }) {
+export async function GET(_: Request, context: any): Promise<NextResponse> {
+  // Type assertion to safely access params
+  const params = context.params as { tokenName?: string };
+
   try {
     const tokenName = params.tokenName?.toLowerCase();
     const mintAddress = tokenName ? TOKEN_MAP[tokenName] : undefined;

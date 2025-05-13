@@ -41,7 +41,10 @@ const TOKEN_MAP: TokenMap = {
   nuke: { address: 'NUKEB18Z7r2o9dT15uu5sjpcvsMKCsUAwJN1xch48JR' },
 };
 
-export async function GET(_: Request, { params }: { params: { tokenName?: string } }) {
+export async function GET(_: Request, context: any): Promise<NextResponse> {
+  // Type assertion to safely access params
+  const params = context.params as { tokenName?: string };
+
   try {
     const tokenName = params.tokenName?.toLowerCase();
     const tokenData = tokenName ? TOKEN_MAP[tokenName] : undefined;

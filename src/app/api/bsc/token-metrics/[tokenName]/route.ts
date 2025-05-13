@@ -29,7 +29,7 @@ const TOKEN_MAP: Record<string, string> = {
   kitsune: "0xb6623B503d269f415B9B5c60CDDa3Aa4fE34Fd22",
   crystalstones: "0xe252FCb1Aa2E0876E9B5f3eD1e15B9b4d11A0b00",
   bft: "0x4b87F578d6FaBf381f43bd2197fBB2A877da6ef8",
-  cross: "0x72928a49c4E88F382b0b6f3E561F56Dd75485F9",
+  cross: "0x72928a49c4E88F382b0b6fF3E561F56Dd75485F9",
   thc: "0x56083560594E314b5cDd1680eC6a493bb851BBd8",
 };
 
@@ -58,11 +58,10 @@ interface TokenMetrics {
 const tokenCache: Map<string, CacheEntry> = new Map();
 const CACHE_TTL: number = 60 * 1000; // 1 minute cache
 
-interface RouteParams {
-  params: { tokenName?: string };
-}
+export async function GET(_: Request, context: any): Promise<NextResponse> {
+  // Type assertion to safely access params
+  const params = context.params as { tokenName?: string };
 
-export async function GET(_: Request, { params }: RouteParams): Promise<NextResponse> {
   try {
     const tokenName = params.tokenName?.toLowerCase() || 'myToken';
     const tokenAddress = TOKEN_MAP[tokenName] || DEFAULT_TOKEN_ADDRESS;
