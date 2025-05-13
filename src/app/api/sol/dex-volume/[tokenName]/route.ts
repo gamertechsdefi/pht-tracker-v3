@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { useState } from 'react';
 
 const DEXSCREENER_API_URL = "https://api.dexscreener.com/latest/dex/tokens";
 
@@ -46,6 +47,8 @@ interface Params {
 }
 
 export async function GET(_: Request, { params }: Params) {
+
+  const [error, setError] = useState("");
   try {
     const tokenName = params.tokenName?.toLowerCase();
     const tokenData = TOKEN_MAP[tokenName || ''];
@@ -59,6 +62,7 @@ export async function GET(_: Request, { params }: Params) {
 
     if (!response.ok) {
       throw new Error(`Failed to fetch data from DexScreener: ${response.statusText}`);
+      setError(error);
     }
 
     const data: DexScreenerResponse = await response.json();
@@ -74,8 +78,8 @@ export async function GET(_: Request, { params }: Params) {
       lastUpdated: new Date().toISOString(),
     });
 
-  } catch (error: any) {
-    console.error("API Error:", error);
-    return NextResponse.json({ error: "Failed to fetch token data", message: error.message }, { status: 500 });
+  } catch (error) {
+    console.log("API Error:", error);
+    return NextResponse.json({ error: "Failed to fetch token data" }, { status: 500 });
   }
 }

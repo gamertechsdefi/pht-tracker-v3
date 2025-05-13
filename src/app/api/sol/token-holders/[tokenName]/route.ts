@@ -14,10 +14,6 @@ interface MoralisResponse {
   message?: string;
 }
 
-// Define environment variable type
-interface Env {
-  MORALIS_API_KEY: string;
-}
 
 const MORALIS_API_URL = "https://solana-gateway.moralis.io/token/mainnet/holders";
 const MORALIS_API_KEY = process.env.MORALIS_API_KEY as string;
