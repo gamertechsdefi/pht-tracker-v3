@@ -42,16 +42,16 @@ type FormattedTransaction = {
     transactionHash: string;
 };
 
-type ApiResponse = {
-    token: string;
-    latestBurnTransactions: FormattedTransaction[];
-    lastUpdated: string;
-};
+// type ApiResponse = {
+//     token: string;
+//     latestBurnTransactions: FormattedTransaction[];
+//     lastUpdated: string;
+// };
 
-type ApiErrorResponse = {
-    error: string;
-    message: string;
-};
+// type ApiErrorResponse = {
+//     error: string;
+//     message: string;
+// };
 
 // Environment variables should be properly typed
 const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY as string;
