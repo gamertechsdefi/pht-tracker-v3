@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
-import { collection } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/db/firebase'; // Assuming db is exported as Firestore instance
 
 // Configuration constants
@@ -74,11 +74,12 @@ interface CachedData {
 // Helper function to get cached data from Firebase
 async function getCachedBurnData(tokenName: string): Promise<CachedData> {
   try {
-    const docRef = collection(db, 'burnData').doc(tokenName);
-    const doc = await docRef.get();
+    const burnDataCollection = collection(db, 'burnData');
+    const docRef = doc(burnDataCollection, tokenName);
+    const docSnap = await getDoc(docRef);
     
-    if (doc.exists) {
-      const data = doc.data() as BurnData;
+    if (docSnap.exists()) {
+      const data = docSnap.data() as BurnData;
       const now = Date.now();
       const lastUpdated = new Date(data.lastUpdated).getTime();
 
@@ -98,7 +99,9 @@ async function getCachedBurnData(tokenName: string): Promise<CachedData> {
 // Helper function to update cache
 async function updateCache(tokenName: string, data: BurnData): Promise<void> {
   try {
-    await collection(db, 'burnData').doc(tokenName).set({
+    const burnDataCollection = collection(db, 'burnData');
+    const docRef = doc(burnDataCollection, tokenName);
+    await setDoc(docRef, {
       ...data,
       lastUpdated: new Date().toISOString()
     });
@@ -254,8 +257,8 @@ export async function GET(_: Request, { params }: { params: { tokenName?: string
     updateCache(tokenName, responseData);
 
     return NextResponse.json(responseData);
-  } catch (error: any) {
-    console.error("API Error:", error);
+  } catch {
+    console.error("API Error:");
     
     // If we have stale cached data, return it as a fallback
     try {
@@ -272,8 +275,7 @@ export async function GET(_: Request, { params }: { params: { tokenName?: string
     }
     
     return NextResponse.json({ 
-      error: "Failed to fetch burn data", 
-      message: error.message 
+      error: "Failed to fetch burn data",  
     }, { status: 500 });
   }
 }
