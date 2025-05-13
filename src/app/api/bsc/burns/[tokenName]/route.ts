@@ -71,13 +71,19 @@ interface CachedData {
   fresh: boolean;
 }
 
+interface RouteParams {
+  params: {
+    tokenName: string;
+  };
+}
+
 // Helper function to get cached data from Firebase
 async function getCachedBurnData(tokenName: string): Promise<CachedData> {
   try {
     const burnDataCollection = collection(db, 'burnData');
     const docRef = doc(burnDataCollection, tokenName);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
       const data = docSnap.data() as BurnData;
       const now = Date.now();
@@ -112,13 +118,11 @@ async function updateCache(tokenName: string, data: BurnData): Promise<void> {
 }
 
 // Next.js API route handler
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { tokenName: string } }) {
+export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     const tokenName = params.tokenName?.toLowerCase();
     if (!tokenName) {
-      return NextResponse.json({ error: "Token name is required" }, { status: 400 });
+      return NextResponse.json({ error: 'Token name is required' }, { status: 400 });
     }
 
     const tokenAddress = TOKEN_MAP[tokenName];
@@ -128,7 +132,7 @@ export async function GET(
 
     // Try to get data from cache first
     const { data: cachedData, fresh } = await getCachedBurnData(tokenName);
-    
+
     // If we have fresh cached data, return it immediately
     if (cachedData && fresh) {
       return NextResponse.json(cachedData);
@@ -179,10 +183,10 @@ export async function GET(
     // Helper: fetch logs in a block range
     const fetchBurnLogs = async (fromBlock: number, toBlock: number): Promise<bigint> => {
       // Create a topic for burn addresses
-      const burnAddressesTopics = BURN_ADDRESSES.map(addr => 
+      const burnAddressesTopics = BURN_ADDRESSES.map(addr =>
         ethers.zeroPadValue(addr.toLowerCase(), 32)
       );
-      
+
       // Fetch logs using appropriate filter
       const logs = await provider.getLogs({
         fromBlock,
@@ -212,7 +216,7 @@ export async function GET(
     // Fetch burn amounts for all intervals in parallel
     const [
       totalBurned5min,
-      totalBurned15min, 
+      totalBurned15min,
       totalBurned30min,
       totalBurned1h,
       totalBurned3h,
@@ -259,9 +263,9 @@ export async function GET(
     updateCache(tokenName, responseData);
 
     return NextResponse.json(responseData);
-  } catch {
-    console.error("API Error:");
-    
+  } catch (error) {
+    console.error('API Error:', error);
+
     // If we have stale cached data, return it as a fallback
     try {
       const { data: cachedData } = await getCachedBurnData(params.tokenName?.toLowerCase() || '');
@@ -273,11 +277,12 @@ export async function GET(
         });
       }
     } catch (e) {
-      console.error("Error getting fallback cache:", e);
+      console.error('Error getting fallback cache:', e);
     }
-    
-    return NextResponse.json({ 
-      error: "Failed to fetch burn data",  
-    }, { status: 500 });
+
+    return NextResponse.json(
+      { error: 'Failed to fetch burn data' },
+      { status: 500 }
+    );
   }
 }
