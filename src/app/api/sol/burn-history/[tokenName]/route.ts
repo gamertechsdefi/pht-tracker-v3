@@ -1,0 +1,105 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
+const BSCSCAN_API_URL = "https://api.bscscan.com/api";
+
+type TokenInfo = {
+  address: string;
+  burnAddress: string;
+};
+
+const TOKEN_MAP: Record<string, TokenInfo> = {
+  pht: { address: "0x885c99a787BE6b41cbf964174C771A9f7ec48e04", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  wkc: { address: "0x6Ec90334d89dBdc89E08A133271be3d104128Edb", burnAddress: "0x0000000000000000000000000000000000000000" },
+  war: { address: "0x57bfe2af99aeb7a3de3bc0c42c22353742bfd20d", burnAddress: "0x0000000000000000000000000000000000000000" },
+  dtg: { address: "0xb1957BDbA889686EbdE631DF970ecE6A7571A1B6", burnAddress: "0x0000000000000000000000000000000000000000" },
+  yukan: { address: "0xd086B849a71867731D74D6bB5Df4f640de900171", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  btcdragon: { address: "0x1ee8a2f28586e542af677eb15fd00430f98d8fd8", burnAddress: "0x0000000000000000000000000000000000000000" },
+  ocicat: { address: "0xE53D384Cf33294C1882227ae4f90D64cF2a5dB70", burnAddress: "0x0000000000000000000000000000000000000000" },
+  nene: { address: "0x551877C1A3378c3A4b697bE7f5f7111E88Ab4Af3", burnAddress: "0x0000000000000000000000000000000000000000" },
+  twc: { address: "0xDA1060158F7D593667cCE0a15DB346BB3FfB3596", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  bnb: { address: "0xDA1060158F7D593667cCE0a15DB346BB3FfB3596", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  tkc: { address: "0x06Dc293c250e2fB2416A4276d291803fc74fb9B5", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  durt: { address: "0x48a510A3394C2A07506d10910EBEFf3E25b7a3f1", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  twd: { address: "0xf00cD9366A13e725AB6764EE6FC8Bd21dA22786e", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  gtan: { address: "0xbD7909318b9Ca4ff140B840F69bB310a785d1095", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  zedek: { address: "0xCbEaaD74dcB3a4227D0E6e67302402E06c119271", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  bengcat: { address: "0xD000815DB567372C3C3d7070bEF9fB7a9532F9e8", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  bcat: { address: "0x47a9B109Cfb8f89D16e8B34036150eE112572435", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  ncat: { address: "0x9F1f27179fB25F11e1F8113Be830cfF5926C4605", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  kitsune: { address: "0xb6623B503d269f415B9B5c60CDDa3Aa4fE34Fd22", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  crystalstones: { address: "0xe252FCb1Aa2E0876E9B5f3eD1e15B9b4d11A0b00", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  bft: { address: "0x4b87F578d6FaBf381f43bd2197fBB2A877da6ef8", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  cross: { address: "0x72928a49c4E88F382b0b6fF3E561F56Dd75485F9", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+  thc: { address: "0x56083560594E314b5cDd1680eC6a493bb851BBd8", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+};
+
+function formatTimeAgo(timestamp: Date): string {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - timestamp.getTime()) / 1000);
+
+  const intervals = [
+    { label: "year", seconds: 31536000 },
+    { label: "month", seconds: 2592000 },
+    { label: "week", seconds: 604800 },
+    { label: "day", seconds: 86400 },
+    { label: "hour", seconds: 3600 },
+    { label: "minute", seconds: 60 },
+    { label: "second", seconds: 1 },
+  ];
+
+  for (const interval of intervals) {
+    const count = Math.floor(diffInSeconds / interval.seconds);
+    if (count >= 1) {
+      return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
+    }
+  }
+
+  return "just now";
+}
+
+export async function GET(
+  req: NextRequest,
+  context: { params: { tokenName: string } }
+): Promise<NextResponse> {
+  try {
+    const tokenName = context.params.tokenName?.toLowerCase();
+    const tokenData = TOKEN_MAP[tokenName];
+    if (!tokenData) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 400 });
+    }
+
+    const { address: tokenAddress, burnAddress } = tokenData;
+
+    const url = `${BSCSCAN_API_URL}?module=account&action=tokentx&contractaddress=${tokenAddress}&address=${burnAddress}&sort=desc&offset=50&page=1&apikey=${BSCSCAN_API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status !== "1") {
+      return NextResponse.json(
+        { error: "Failed to fetch burn transactions", message: data.message },
+        { status: 500 }
+      );
+    }
+
+    const transactions = data.result.map((tx: any) => ({
+      from: tx.from,
+      to: tx.to,
+      amount: Number(tx.value) / 10 ** Number(tx.tokenDecimal),
+      timestamp: formatTimeAgo(new Date(Number(tx.timeStamp) * 1000)),
+      transactionHash: tx.hash,
+    }));
+
+    return NextResponse.json({
+      token: tokenAddress,
+      latestBurnTransactions: transactions,
+      lastUpdated: new Date().toISOString(),
+    });
+  } catch (error: any) {
+    console.error("API Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch burn transactions", message: error.message },
+      { status: 500 }
+    );
+  }
+}
