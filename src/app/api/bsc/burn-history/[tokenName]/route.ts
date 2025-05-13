@@ -127,7 +127,7 @@ function formatTimeAgo(timestamp: Date): string {
 export async function GET(
     req: NextRequest,
     { params }: { params: { tokenName: string } }
-): Promise<NextResponse<ApiResponse | ApiErrorResponse>> {
+): Promise<NextResponse> {
     try {
         // Ensure tokenName exists and is lowercase
         const tokenName = params.tokenName?.toLowerCase();
