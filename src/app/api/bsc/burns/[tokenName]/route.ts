@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/db/firebase'; // Assuming db is exported as Firestore instance
 
@@ -23,7 +23,7 @@ const TOKEN_MAP: Record<string, string> = {
   twc: "0xDA1060158F7D593667cCE0a15DB346BB3FfB3596",
   tkc: "0x06Dc293c250e2fB2416A4276d291803fc74fb9B5",
   durt: "0x48a510A3394C2A07506d10910EBEFf3E25b7a3f1",
-  twd: "0xf00cD9366A13e725AB6764EE6FC8Bd21", // Note: Incomplete address
+  twd: "0xf00cD9366A13e725AB6764EE6FC8Bd21dA22786e",
   gtan: "0xbD7909318b9Ca4ff140B840F69bB310a785d1095",
   zedek: "0xCbEaaD74dcB3a4227D0E6e67302402E06c119271",
   bengcat: "0xD000815DB567372C3C3d7070bEF9fB7a9532F9e8",
@@ -112,9 +112,11 @@ async function updateCache(tokenName: string, data: BurnData): Promise<void> {
 }
 
 // Next.js API route handler
-export async function GET(request: Request, context: { params: { tokenName: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { tokenName: string } }) {
   try {
-    const tokenName = context.params.tokenName?.toLowerCase();
+    const tokenName = params.tokenName?.toLowerCase();
     if (!tokenName) {
       return NextResponse.json({ error: "Token name is required" }, { status: 400 });
     }
@@ -262,7 +264,7 @@ export async function GET(request: Request, context: { params: { tokenName: stri
     
     // If we have stale cached data, return it as a fallback
     try {
-      const { data: cachedData } = await getCachedBurnData(context.params.tokenName?.toLowerCase() || '');
+      const { data: cachedData } = await getCachedBurnData(params.tokenName?.toLowerCase() || '');
       if (cachedData) {
         return NextResponse.json({
           ...cachedData,
