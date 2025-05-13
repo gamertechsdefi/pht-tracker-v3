@@ -112,9 +112,9 @@ async function updateCache(tokenName: string, data: BurnData): Promise<void> {
 }
 
 // Next.js API route handler
-export async function GET(_: Request, { params }: { params: { tokenName?: string } }) {
+export async function GET(request: Request, context: { params: { tokenName: string } }) {
   try {
-    const tokenName = params.tokenName?.toLowerCase();
+    const tokenName = context.params.tokenName?.toLowerCase();
     if (!tokenName) {
       return NextResponse.json({ error: "Token name is required" }, { status: 400 });
     }
@@ -262,7 +262,7 @@ export async function GET(_: Request, { params }: { params: { tokenName?: string
     
     // If we have stale cached data, return it as a fallback
     try {
-      const { data: cachedData } = await getCachedBurnData(params.tokenName?.toLowerCase() || '');
+      const { data: cachedData } = await getCachedBurnData(context.params.tokenName?.toLowerCase() || '');
       if (cachedData) {
         return NextResponse.json({
           ...cachedData,
