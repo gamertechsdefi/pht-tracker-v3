@@ -124,13 +124,10 @@ function formatTimeAgo(timestamp: Date): string {
  * @param context - Context containing route parameters
  * @returns NextResponse with transaction data or error
  */
-export async function GET(
-    req: NextRequest,
-    { params }: { params: { tokenName: string } }
-): Promise<NextResponse> {
+export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
-        // Ensure tokenName exists and is lowercase
-        const tokenName = params.tokenName?.toLowerCase();
+        const { pathname } = req.nextUrl;
+        const tokenName = pathname.split('/').pop()?.toLowerCase();
 
         if (!tokenName) {
             return NextResponse.json(
@@ -146,6 +143,8 @@ export async function GET(
                 { status: 400 }
             );
         }
+
+        // The rest of your existing code...
 
         const { address: tokenAddress, burnAddress } = tokenData;
 
