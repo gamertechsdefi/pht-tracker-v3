@@ -12,11 +12,11 @@ interface CovalentResponse {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { tokenName?: string } }
+  context: { params: { tokenName: string } }
 ): Promise<NextResponse> {
   try {
     console.log('API Key:', API_KEY ? 'Set' : 'Missing');
-    const tokenName = params.tokenName?.toLowerCase();
+    const tokenName = context.params.tokenName?.toLowerCase();
     if (!tokenName || tokenName !== 'pht') {
       return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
     }
