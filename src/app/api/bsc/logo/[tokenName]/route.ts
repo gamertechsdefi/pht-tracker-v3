@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { join } from "path";
 import { existsSync, readFileSync } from "fs";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { tokenName: string } }
-) {
-  const tokenName = params.tokenName.toLowerCase();
+export async function GET(request: Request) {
+  // Extract tokenName from the URL
+  const url = new URL(request.url);
+  const paths = url.pathname.split("/");
+  const tokenName = paths[paths.length - 1].toLowerCase();
+
   const fileExtensions = [".png", ".jpg", ".jpeg", ".webp"];
   let filePath: string | null = null;
 
