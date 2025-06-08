@@ -3,7 +3,6 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import DataCard from "@/components/DataCard";
-import SearchBarPopup from "@/components/SearchBar";
 import BurnsDisplay from "@/components/BurnHistory";
 import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
@@ -131,7 +130,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const router = useRouter();
     const [chain, setChain] = useState<string | null>(null);
     const [tokenName, setTokenName] = useState<string | null>(null);
-    const [search, setSearch] = useState<string>("");
+    const [search] = useState<string>("");
     const [tokenData, setTokenData] = useState<TokenData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -313,18 +312,18 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
         }
     };
 
-    const handleSearch = (tokenFromSearchBar: string = search): void => {
-        const token = tokenFromSearchBar.trim().toLowerCase();
-        console.log("handleSearch called with:", token);
-        if (token && TOKEN_LIST[token]) {
-            const chain = TOKEN_LIST[token];
-            console.log("Navigating to:", { chain, token });
-            router.push(`/${chain}/${token}`);
-        } else {
-            console.log("Search token not found in TOKEN_LIST:", token);
-            setError(`Token "${token}" not found`);
-        }
-    };
+    // const handleSearch = (tokenFromSearchBar: string = search): void => {
+    //     const token = tokenFromSearchBar.trim().toLowerCase();
+    //     console.log("handleSearch called with:", token);
+    //     if (token && TOKEN_LIST[token]) {
+    //         const chain = TOKEN_LIST[token];
+    //         console.log("Navigating to:", { chain, token });
+    //         router.push(`/${chain}/${token}`);
+    //     } else {
+    //         console.log("Search token not found in TOKEN_LIST:", token);
+    //         setError(`Token "${token}" not found`);
+    //     }
+    // };
 
     const handleIntervalChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
         setSelectedBurnInterval(e.target.value as BurnIntervalKey);

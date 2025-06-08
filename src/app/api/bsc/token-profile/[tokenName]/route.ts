@@ -111,7 +111,7 @@ async function fetchCoinGeckoImage(tokenAddress: string): Promise<string | undef
     if (!coin) return undefined;
 
     const coinDetailsUrl = `${COINGECKO_API_URL}/${coin.id}`;
-    const detailsResponse = await fetch(coinDetailsUrl);
+    // const detailsResponse = await fetch(coinDetailsUrl);
     const details = await response.json() as CoinGeckoResponse;
 
     return details.image?.large || details.image?.small || details.image?.thumb;
