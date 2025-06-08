@@ -1,73 +1,50 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import axios, { AxiosResponse } from 'axios';
 
-// Define interfaces for the token map and API response
-interface TokenData {
-  address: string;
+const API_KEY = process.env.COVALENT_API_KEY ?? '';
+const CHAIN_ID = '56';
+
+interface CovalentResponse {
+  data: { items: any[]; pagination: { total_count: number } };
+  error?: boolean;
+  error_message?: string;
 }
 
-interface TokenMap {
-  [key: string]: TokenData;
-}
-
-interface MoralisResponse {
-  totalHolders?: number;
-  message?: string;
-}
-
-const MORALIS_API_URL = "https://solana-gateway.moralis.io/token/mainnet/holders";
-const MORALIS_API_KEY = process.env.MORALIS_API_KEY as string;
-
-const TOKEN_MAP: TokenMap = {
-  scat: { address: "2NNkCSrbQtrc9tgEJHt4MQUH3ySaxTRAAXt9cUgCkycB" },
-  petros: { address: "Ck1fkTAPVjXUbBVhtv7E6FC451i8Hu8oXovaGuRUpump" },
-  venus: { address: "Ck1fkTAPVjXUbBVhtv7E6FC451i8Hu8oXovaGuRUpump" },
-  nuke: { address: "NUKEB18Z7r2o9dT15uu5sjpcvsMKCsUAwJN1xch48JR" },
-};
-
-export async function GET(_: Request, context: any): Promise<NextResponse> {
-  // Type assertion to safely access params
-  const params = context.params as { tokenName?: string };
-
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { tokenName?: string } }
+): Promise<NextResponse> {
   try {
+    console.log('API Key:', API_KEY ? 'Set' : 'Missing');
     const tokenName = params.tokenName?.toLowerCase();
-    const tokenData = tokenName ? TOKEN_MAP[tokenName] : undefined;
-
-    if (!tokenName || !tokenData) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 400 });
+    if (!tokenName || tokenName !== 'pht') {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
     }
 
-    const { address: tokenAddress } = tokenData;
-    const url = `${MORALIS_API_URL}/${tokenAddress}`;
+    const tokenAddress = '0x885c99a787BE6b41cbf964174C771A9f7ec48e04';
+    const url = `https://api.covalenthq.com/v1/${CHAIN_ID}/tokens/${tokenAddress}/token_holders/?page-size=10`;
 
-    console.log("Fetching from:", url);
-
-    const response = await fetch(url, {
-      method: "GET",
+    const response: AxiosResponse<CovalentResponse> = await axios.get(url, {
       headers: {
-        accept: "application/json",
-        "X-API-Key": MORALIS_API_KEY,
+        Authorization: `Basic ${Buffer.from(`${API_KEY}:`).toString('base64')}`,
       },
     });
 
-    const data: MoralisResponse = await response.json();
-    console.log("Response Data:", data);
-
-    if (!data || data.totalHolders === undefined) {
-      console.error("Error fetching holders:", data);
-      return NextResponse.json(
-        { error: "Failed to fetch holders", message: data?.message || "Unknown error" },
-        { status: 500 }
-      );
-    }
-
+    const totalHolders = response.data.data.pagination.total_count;
     return NextResponse.json({
       token: tokenAddress,
-      totalHolders: data.totalHolders,
+      totalHolders,
       lastUpdated: new Date().toISOString(),
     });
-  } catch (error: unknown) {
-    console.error("API Error:", error);
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: "Failed to fetch token holders", message }, { status: 500 });
+  } catch (error: any) {
+    console.error('Error:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    return NextResponse.json(
+      { error: 'Failed to fetch token holders', message: error.message },
+      { status: 500 }
+    );
   }
 }

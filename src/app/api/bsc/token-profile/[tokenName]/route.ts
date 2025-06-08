@@ -11,9 +11,6 @@ interface TokenMap {
 
 interface PriceChange {
   h24?: string;
-  h6?: string;
-  h3?: string,
-  h1?: string,
 }
 
 interface Volume {
@@ -30,23 +27,36 @@ interface TokenPair {
   volume?: Volume;
   priceChange?: PriceChange;
   liquidity?: Liquidity;
+  info?: {
+    imageUrl?: string;
+    websites?: { url: string }[];
+    socials?: { type: string; url: string }[];
+  };
 }
 
 interface DexScreenerResponse {
   pairs?: TokenPair[];
 }
 
-interface TokenPriceResponse {
+interface CoinGeckoResponse {
+  image?: {
+    thumb?: string;
+    small?: string;
+    large?: string;
+  };
+}
+
+interface TokenProfileResponse {
   token: string;
   price: string;
   marketCap: string;
   volume: string;
-  change24h: string;
-  change6h: string,
-  change3h: string,
-  change1h: string,
+  change: string;
   liquidity: string;
   lastUpdated: string;
+  profileImage?: string;
+  headerImage?: string;
+  relatedProfiles?: { type: string; url: string }[];
 }
 
 interface ErrorResponse {
@@ -55,6 +65,7 @@ interface ErrorResponse {
 }
 
 const DEXSCREENER_API_URL = "https://api.dexscreener.com/latest/dex/tokens";
+const COINGECKO_API_URL = "https://api.coingecko.com/api/v3/coins";
 
 // Token mapping with contract addresses
 const TOKEN_MAP: TokenMap = {
@@ -69,7 +80,7 @@ const TOKEN_MAP: TokenMap = {
   "twc": { address: "0xDA1060158F7D593667cCE0a15DB346BB3FfB3596" },
   "tkc": { address: "0x06Dc293c250e2fB2416A4276d291803fc74fb9B5" },
   "durt": { address: "0x48a510A3394C2A07506d10910EBEFf3E25b7a3f1" },
-  "twd": { address: "0xf00cD9366A13e725AB6764EE6FC8Bd21dA22786e" },
+  "twd": { address: "0xf00cD9366A13e725AB6764EE6Fc8Bd21dA22786e" },
   "gtan": { address: "0xbD7909318b9Ca4ff140B840F69bB310a785d1095" },
   "zedek": { address: "0xCbEaaD74dcB3a4227D0E6e67302402E06c119271" },
   "bengcat": { address: "0xD000815DB567372C3C3d7070bEF9fB7a9532F9e8" },
@@ -82,10 +93,38 @@ const TOKEN_MAP: TokenMap = {
   "thc": { address: "0x56083560594E314b5cDd1680eC6a493bb851BBd8" },
 };
 
+async function fetchCoinGeckoImage(tokenAddress: string): Promise<string | undefined> {
+  try {
+    // Note: CoinGecko requires a token ID, not just an address. For simplicity, we try a search.
+    const searchUrl = `${COINGECKO_API_URL}/list`;
+    const response = await fetch(searchUrl);
+    const coins = await response.json() as { id: string; symbol: string; name: string }[];
+    
+    // Find a coin by matching address (simplified, may need more robust mapping)
+    const tokenName = Object.keys(TOKEN_MAP).find(
+      (key) => TOKEN_MAP[key].address.toLowerCase() === tokenAddress.toLowerCase()
+    );
+    
+    if (!tokenName) return undefined;
+
+    const coin = coins.find((c) => c.symbol.toLowerCase() === tokenName.toLowerCase());
+    if (!coin) return undefined;
+
+    const coinDetailsUrl = `${COINGECKO_API_URL}/${coin.id}`;
+    const detailsResponse = await fetch(coinDetailsUrl);
+    const details = await response.json() as CoinGeckoResponse;
+
+    return details.image?.large || details.image?.small || details.image?.thumb;
+  } catch (error) {
+    console.error("CoinGecko API Error:", error);
+    return undefined;
+  }
+}
+
 export async function GET(
   request: NextRequest,
   context: any
-): Promise<NextResponse<TokenPriceResponse | ErrorResponse>> {
+): Promise<NextResponse<TokenProfileResponse | ErrorResponse>> {
   // Type assertion to safely access params
   const params = context.params as { tokenName: string };
 
@@ -116,17 +155,26 @@ export async function GET(
 
     const pair = data.pairs[0]; // Get the first pair for simplicity
 
+    // Fetch profile image from CoinGecko as a fallback (DexScreener may not provide images)
+    const profileImage = pair.info?.imageUrl || await fetchCoinGeckoImage(tokenAddress);
+
+    // Extract related profiles from socials or websites
+    const relatedProfiles = [
+      ...(pair.info?.socials || []),
+      ...(pair.info?.websites?.map((w) => ({ type: "website", url: w.url })) || []),
+    ];
+
     return NextResponse.json({
       token: tokenAddress,
       price: pair.priceUsd || "N/A",
       marketCap: pair.fdv || "N/A",
       volume: pair.volume?.h24 || "N/A",
-      change24h: pair.priceChange?.h24 || "N/A",
-      change6h: pair.priceChange?.h6 || "N/A",
-      change3h: pair.priceChange?.h3 || "N/A",
-      change1h: pair.priceChange?.h1 || "N/A",
+      change: pair.priceChange?.h24 || "N/A",
       liquidity: pair.liquidity?.usd || "N/A",
       lastUpdated: new Date().toISOString(),
+      profileImage: profileImage || "N/A",
+      headerImage: "N/A", // DexScreener doesn't provide header images; could scrape token page if needed
+      relatedProfiles: relatedProfiles.length > 0 ? relatedProfiles : [],
     });
   } catch (error) {
     console.error("API Error:", error);
