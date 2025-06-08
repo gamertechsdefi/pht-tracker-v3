@@ -110,7 +110,7 @@ async function fetchCoinGeckoImage(tokenAddress: string): Promise<string | undef
     const coin = coins.find((c) => c.symbol.toLowerCase() === tokenName.toLowerCase());
     if (!coin) return undefined;
 
-    const coinDetailsUrl = `${COINGECKO_API_URL}/${coin.id}`;
+    // const coinDetailsUrl = `${COINGECKO_API_URL}/${coin.id}`;
     // const detailsResponse = await fetch(coinDetailsUrl);
     const details = await response.json() as CoinGeckoResponse;
 

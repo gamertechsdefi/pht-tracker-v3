@@ -130,7 +130,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const router = useRouter();
     const [chain, setChain] = useState<string | null>(null);
     const [tokenName, setTokenName] = useState<string | null>(null);
-    const [search] = useState<string>("");
+    
     const [tokenData, setTokenData] = useState<TokenData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
