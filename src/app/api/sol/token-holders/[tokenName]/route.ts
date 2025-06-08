@@ -26,7 +26,9 @@ export async function GET(
 
     const response: AxiosResponse<CovalentResponse> = await axios.get(url, {
       headers: {
-        Authorization: `Basic ${Buffer.from(`${API_KEY}:`).toString('base64')}`,
+        Authorization: `Basic ${typeof window === 'undefined'
+          ? Buffer.from(`${API_KEY}:`).toString('base64')
+          : btoa(`${API_KEY}:`)}`,
       },
     });
 
