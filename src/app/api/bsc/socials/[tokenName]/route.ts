@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  req: NextRequest,
-  context: { params: { tokenName: string } }
-) {
-  const tokenName = context.params.tokenName.toLowerCase();
+export async function GET(request: NextRequest){
+    const { pathname } = request.nextUrl;
+    const parts = pathname.split("/");
+    const tokenName = parts[parts.length - 1].toLowerCase();
 
-  const tokenSocialMapping: Record<
-    string,
-    { website: string; twitter: string; telegram: string; bscscan: string }
-  > = {
-     pht: {
+    const tokenSocialMapping: Record<
+        string,
+        { website: string; twitter: string; telegram: string; bscscan: string }
+    > = {
+        pht: {
             website: "https://phoenixtoken.community",
             twitter: "https://x.com/PhoenixToken0",
             telegram: "https://t.me/PhoenixToken0",
