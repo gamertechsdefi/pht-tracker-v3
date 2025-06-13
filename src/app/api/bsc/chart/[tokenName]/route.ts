@@ -1,9 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
 
 // Define the type for the dynamic route params
-type Params = {
-  tokenName: string;
-};
+// type Params = {
+//   tokenName: string;
+// };
 
 export async function GET(request: NextRequest, context: { params: Record<string, string> }) {
   // Mapping of token names to GeckoTerminal pool addresses
