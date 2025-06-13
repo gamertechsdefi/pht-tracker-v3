@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  request: Request,
-  context: { params: { tokenName: string } }
+    req: NextRequest,
+    { params }: { params: { tokenName: string } }
 ) {
-  const { tokenName } = context.params;
+    const tokenName = params.tokenName.toLowerCase();
 
-  const tokenSocialMapping: Record<
-    string,
-    { website: string; twitter: string; telegram: string; bscscan: string }
-  > = {
+    const tokenSocialMapping: Record<
+        string,
+        { website: string; twitter: string; telegram: string; bscscan: string }
+    > = {
         pht: {
             website: "https://phoenixtoken.community",
             twitter: "https://x.com/PhoenixToken0",
@@ -144,12 +144,12 @@ export async function GET(
         }
     };
 
-    const socialLinks = tokenSocialMapping[tokenName] || {
+    const socialLinks = tokenSocialMapping[tokenName] ?? {
         website: "https://example.com",
         twitter: "https://twitter.com",
         telegram: "https://t.me",
         bscscan: "https://bscscan.com"
-    }; // Default to generic URLs if token not found
+    };
 
     return NextResponse.json(socialLinks);
 }
