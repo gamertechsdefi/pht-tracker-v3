@@ -60,13 +60,13 @@ export async function GET(
         },
         twc: {
             website: "https://tiwiecosystem.io",
-            twitter: "https://twitter.com/TiwiEcosystem",
+            twitter: "https://x.com/TiwiEcosystem",
             telegram: "https://t.me/twc_token",
             bscscan: "https://bscscan.com/token/0xda1060158f7d593667cce0a15db346bb3ffb3596"
         },
         durt: {
             website: "https://example.com/durt",
-            twitter: "https://twitter.com/durt_token",
+            twitter: "https://x.com/durt_token",
             telegram: "https://t.me/durt_token",
             bscscan: "https://bscscan.com/token/0x48a510a3394c2a07506d10910ebeff3e25b7a3f1"
         },
@@ -146,7 +146,7 @@ export async function GET(
 
     const socialLinks = tokenSocialMapping[tokenName] ?? {
         website: "https://example.com",
-        twitter: "https://twitter.com",
+        twitter: "https://x.com",
         telegram: "https://t.me",
         bscscan: "https://bscscan.com"
     };
