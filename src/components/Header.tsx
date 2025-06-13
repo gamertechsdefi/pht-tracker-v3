@@ -1,80 +1,73 @@
 'use client'
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 // Define interfaces for data structures
 interface Token {
-  symbol: string;
-  fullName: string;
-  chain: string;
-  volume24h: number;
+    symbol: string;
+    fullName: string;
+    chain: string;
+    volume24h: number;
 }
 
 interface Suggestion {
-  fullName: string;
-  symbol: string;
+    fullName: string;
+    symbol: string;
 }
 
 // Token list with chain mapping
 const TOKEN_LIST: { [key: string]: string } = {
-  pht: "bsc",
-  wkc: "bsc",
-  dtg: "bsc",
-  war: "bsc",
-  yukan: "bsc",
-  btcdragon: "bsc",
-  ocicat: "bsc",
-  nene: "bsc",
-  twc: "bsc",
-  durt: "bsc",
-  gtan: "bsc",
-  zedek: "bsc",
-  tkc: "bsc",
-  twd: "bsc",
-  bcat: "bsc",
-  bengcat: "bsc",
-  nct: "bsc",
-  scat: "sol",
-  nuke: "sol",
-  petros: "sol",
-  venus: "sol",
-  kitsune: "bsc",
-  bft: "bsc",
-  crystalstones: "bsc",
-  cross: "bsc",
-  thc: "bsc",
+    pht: "bsc",
+    wkc: "bsc",
+    dtg: "bsc",
+    war: "bsc",
+    yukan: "bsc",
+    btcdragon: "bsc",
+    ocicat: "bsc",
+    nene: "bsc",
+    twc: "bsc",
+    durt: "bsc",
+    gtan: "bsc",
+    zedek: "bsc",
+    tkc: "bsc",
+    twd: "bsc",
+    bcat: "bsc",
+    bengcat: "bsc",
+    nct: "bsc",
+    kitsune: "bsc",
+    bft: "bsc",
+    crystalstones: "bsc",
+    cross: "bsc",
+    thc: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
 const FULL_NAME_MAP: { [key: string]: string } = {
-  "Phoenix Token": "pht",
-  "WikiCat Coin ": "wkc",
-  "Defi Tiger Token": "dtg",
-  "Water Rabbit Token": "war",
-  "Yukan Token": "yukan",
-  "BTC Dragon Token": "btcdragon",
-  "OciCat Token": "ocicat",
-  Nene: "nene",
-  "TIWI CAT": "twc",
-  "The Word Token": "twd",
-  "The Kingdom Coin": "tkc",
-  "Dutch Rabbit": "durt",
-  "Giant Token": "gtan",
-  "Zedek Token": "zedek",
-  "Billicat Token ": "bcat",
-  "Bengal Cat Token": "bengcat",
-  "New Cat Token": "nct",
-  "Baby Simon Cat": "scat",
-  Nuke: "nuke",
-  "Petros Token": "petros",
-  "Two Face Cat": "venus",
-  "Kitsune Token": "kitsune",
-  "Crystal Stones": "crystalstones",
-  "The Big Five Token": "bft",
-  "Cross Token": "cross",
-  "Transhuman Coin": "thc",
+    "Phoenix Token": "pht",
+    "WikiCat Coin ": "wkc",
+    "Defi Tiger Token": "dtg",
+    "Water Rabbit Token": "war",
+    "Yukan Token": "yukan",
+    "BTC Dragon Token": "btcdragon",
+    "OciCat Token": "ocicat",
+    "Nene": "nene",
+    "TIWI CAT": "twc",
+    "The Word Token": "twd",
+    "The Kingdom Coin": "tkc",
+    "Dutch Rabbit": "durt",
+    "Giant Token": "gtan",
+    "Zedek Token": "zedek",
+    "Billicat Token ": "bcat",
+    "Bengal Cat Token": "bengcat",
+    "New Cat Token": "nct",
+    "Kitsune Token": "kitsune",
+    "Crystal Stones": "crystalstones",
+    "The Big Five Token": "bft",
+    "Cross Token": "cross",
+    "Transhuman Coin": "thc",
 };
 
 export default function Header() {
@@ -188,9 +181,19 @@ export default function Header() {
     }, [isSearchOpen]);
 
     return (
-        <header className="sticky top-4 z-50 mx-4 px-4 py-4 rounded-md bg-white text-neutral-900">
+        <header className="sticky top-4 z-50 mx-4 px-4 py-2 rounded-md bg-white text-neutral-900">
             <nav className="flex flex-row justify-between items-center">
-                <Link href="/" className="font-bold">FIRE SCREENER</Link>
+                
+                <Link href="/" className="font-bold flex flex-row items-center">
+                    <Image
+                        src="/logo-fixed.png"
+                        alt="FireScreener Logo"
+                        width={25}
+                        height={25}
+                        className="mr-2"
+                    />
+                    FIRESCREENER
+                </Link>
 
                 {/* Desktop Menu */}
                 <div className="hidden md:flex flex-row gap-8 items-center">
@@ -221,7 +224,7 @@ export default function Header() {
 
                 {/* Mobile Menu Button */}
                 <button
-                    className="md:hidden flex items-center p-2 border border-neutral-300 rounded text-neutral-700"
+                    className="md:hidden flex items-center p-2 border border-neutral-300 rounded text-neutral-900"
                     onClick={toggleMenu}
                     aria-label="Toggle menu"
                 >
@@ -244,7 +247,7 @@ export default function Header() {
 
             {/* Mobile Menu */}
             <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} bg-white border-t border-neutral-200 mt-2`}>
-                <div className="px-2 pt-2 pb-3 space-y-1">
+                <div className="">
                     <Link
                         href="#"
                         className="block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"

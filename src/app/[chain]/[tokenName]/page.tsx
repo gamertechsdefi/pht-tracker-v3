@@ -130,7 +130,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const router = useRouter();
     const [chain, setChain] = useState<string | null>(null);
     const [tokenName, setTokenName] = useState<string | null>(null);
-    
+
     const [tokenData, setTokenData] = useState<TokenData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -529,8 +529,17 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 )}
 
                                 {activeTab === "chart" && (
-                                    <div className="flex items-center justify-center mt-8 h-64">
-                                        <p className="text-gray-500">Chart content will be available soon.</p>
+                                    <div className="h-[48rem] mb-16 -mx-6">
+                                        <iframe
+                                            height="100%"
+                                            width="100%"
+                                            id="geckoterminal-embed"
+                                            title="GeckoTerminal Embed"
+                                            src={`/api/${chain}/chart/${tokenName}`}
+                                            frameBorder="0"
+                                            allow="clipboard-write"
+                                            allowFullScreen
+                                        ></iframe>
                                     </div>
                                 )}
                             </div>
@@ -685,8 +694,17 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     </div>
                                 </section>
 
-                                <div className="flex items-center justify-center mt-8 h-64 mb-16">
-                                    <p className="text-gray-500">Chart content will be available soon.</p>
+                                <div className="mt-8 h-[36rem] mb-16 -mx-8">
+                                    <iframe
+                                        height="100%"
+                                        width="100%"
+                                        id="geckoterminal-embed"
+                                        title="GeckoTerminal Embed"
+                                        src={`/api/${chain}/chart/${tokenName}`}
+                                        frameBorder="0"
+                                        allow="clipboard-write"
+                                        allowFullScreen
+                                    ></iframe>
                                 </div>
                             </div>
                         </>

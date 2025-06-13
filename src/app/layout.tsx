@@ -6,12 +6,15 @@ import "./globals.css";
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
-  display: "swap", // optional but recommended
+  weight: ["400", "500", "700"],
+  display: "swap",
+
+
 });
 
 export const metadata: Metadata = {
-  title: "Phoenix Tracker",
-  description: "Track token details all in one dashboard",
+  title: "FireScreener",
+  description: "The meme tracker",
 };
 
 export default function RootLayout({
@@ -22,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${spaceGrotesk.variable} antialiased`}
+        className={spaceGrotesk.className}
       >
         {children}
       </body>
