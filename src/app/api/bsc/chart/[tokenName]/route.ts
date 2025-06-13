@@ -1,9 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 
-// No additional imports or code needed here
+export async function GET(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const parts = pathname.split("/");
+  const tokenName = parts[parts.length - 1].toLowerCase();
 
-export async function GET(request: NextRequest, context: { params: Record<string, string> }) {
-  // Mapping of token names to GeckoTerminal pool addresses
   const tokenPoolMapping: Record<string, string> = {
     pht: "0x8a2328b2c8e6a6f56668a0e26081efc250a8d6c0",
     wkc: "0x933477eba23726ca95a957cb85dbb1957267ef85",
@@ -29,9 +30,8 @@ export async function GET(request: NextRequest, context: { params: Record<string
     thc: "0x62be1533f3a78de99ca297ebbe489a3fb7253bef",
   };
 
-  const tokenName = context.params.tokenName.toLowerCase();
   const poolAddress =
-    tokenPoolMapping[tokenName] || "0x8a2328b2c8e6a6f56668a0e26081efc250a8d6c0";
+    tokenPoolMapping[tokenName] || tokenPoolMapping["pht"];
 
   const iframeHtml = `<iframe height="100%" width="100%" id="geckoterminal-embed" title="GeckoTerminal Embed" src="https://www.geckoterminal.com/bsc/pools/${poolAddress}?embed=1&info=0&swaps=1&grayscale=0&light_chart=0&chart_type=price&resolution=15m" frameborder="0" allow="clipboard-write" allowfullscreen></iframe>`;
 

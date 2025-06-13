@@ -147,9 +147,10 @@ export async function GET(_: Request, context: any): Promise<NextResponse> {
     // Calculate start of today UTC
     const now = new Date();
     now.setUTCHours(0, 0, 0, 0);
-    const startOfDayTimestamp = Math.floor(now.getTime() / 1000);
-    const blocksSinceMidnight = Math.floor((latestTimestamp - startOfDayTimestamp) / 3);
-    const startBlock = Math.max(latestBlock - blocksSinceMidnight, 1);
+    const twentyFourHoursAgo = latestTimestamp - 24 * 60 * 60;
+    const blocksSince24h = Math.floor((latestTimestamp - twentyFourHoursAgo) / 3);
+    const block24h = Math.max(latestBlock - blocksSince24h, 1);
+
 
     // Calculate time intervals
     const intervals: Record<string, number> = {
@@ -224,7 +225,7 @@ export async function GET(_: Request, context: any): Promise<NextResponse> {
       fetchBurnLogs(blockEstimates.threeHours, latestBlock),
       fetchBurnLogs(blockEstimates.sixHours, latestBlock),
       fetchBurnLogs(blockEstimates.twelveHours, latestBlock),
-      fetchBurnLogs(startBlock, latestBlock),
+      fetchBurnLogs(block24h, latestBlock),
     ]);
 
     // Convert to decimal values
