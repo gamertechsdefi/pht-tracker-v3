@@ -5,7 +5,7 @@ type Params = {
   tokenName: string;
 };
 
-export async function GET(request: NextRequest, context: { params: Params }) {
+export async function GET(request: NextRequest, context: { params: Record<string, string> }) {
   // Mapping of token names to GeckoTerminal pool addresses
   const tokenPoolMapping: Record<string, string> = {
     pht: "0x8a2328b2c8e6a6f56668a0e26081efc250a8d6c0",
