@@ -427,7 +427,7 @@ setSocialLinks(socialData || null);
                                                 </h1>
                                             </div>
 
-                                            <div className="mt-4 grid grid-cols-2 gap-4">
+                                            <div className="mt-4 grid grid-cols-3 gap-4">
                                                 <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                     <h1>MarketCap:</h1>
                                                     <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
@@ -440,10 +440,10 @@ setSocialLinks(socialData || null);
                                                     <h1>Volume:</h1>
                                                     <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.volume)}</h1>
                                                 </div>
-                                                <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                {/* <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                     <h1>Holders:</h1>
                                                     <h1 className="font-medium text-xl">{formatWholeNumber(tokenData.holders)}</h1>
-                                                </div>
+                                                </div> */}
                                             </div>
                                             <div className="mt-4 flex flex-row bg-neutral-900 justify-between gap-2 items-center border-2 border-orange-500 rounded-md p-4">
                                                 <div className="flex flex-col items-center">
@@ -615,7 +615,7 @@ setSocialLinks(socialData || null);
                                             </h1>
                                         </div>
 
-                                        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>MarketCap:</h1>
                                                 <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
@@ -628,10 +628,10 @@ setSocialLinks(socialData || null);
                                                 <h1>Volume:</h1>
                                                 <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.volume)}</h1>
                                             </div>
-                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                            {/* <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>Holders:</h1>
                                                 <h1 className="font-medium text-xl">{formatWholeNumber(tokenData.holders)}</h1>
-                                            </div>
+                                            </div> */}
                                         </div>
                                         <div className="mt-4 flex flex-row justify-center items-center gap-4 border-2 border-orange-500 rounded-md p-4">
                                             <div className="flex flex-col items-center">
