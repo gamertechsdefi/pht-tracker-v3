@@ -3,9 +3,12 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import DataCard from "@/components/DataCard";
-import SearchBarPopup from "@/components/SearchBar";
 import BurnsDisplay from "@/components/BurnHistory";
+import { FaGlobe, FaTelegramPlane } from "react-icons/fa";
+import { SiX } from "react-icons/si";
+import { MdOutlineLibraryBooks } from "react-icons/md";
 import styles from '../styles.module.css';
+import Footer from "@/components/Footer";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -25,8 +28,12 @@ interface TokenData {
     burn12h: string | number;
     burn24h: string | number;
     totalburnt: string | number;
-    priceChange: string | number;
+    priceChange24h: string | number;
+    priceChange6h: string | number;
+    priceChange3h: string | number;
+    priceChange1h: string | number;
     liquidity: string | number;
+    profile: string;
 }
 
 interface BurnInterval {
@@ -75,6 +82,36 @@ const TOKEN_LIST: Record<string, string> = {
     thc: "bsc",
 };
 
+// Token abbreviation to full name mapping
+const TOKEN_FULL_NAMES: Record<string, string> = {
+    pht: "Phoenix Token",
+    wkc: "WikiCat Coin",
+    war: "Water Rabbit Token",
+    dtg: "Defi Tiger Token",
+    yukan: "Yukan Token",
+    btcdragon: "BTCDragon Token",
+    ocicat: "Ocicat Token",
+    nene: "Nene Token",
+    twc: "TiwiCat Coin",
+    durt: "Dutch Rabbit Token",
+    gtan: "Giant Token",
+    zedek: "Zedek Token",
+    tkc: "The Kingdom Coin",
+    twd: "The Word Token",
+    bcat: "BilliCat Token",
+    nct: "New Cat Token",
+    kitsune: "Kitsune Token",
+    bengcat: "Bengal Cat Token",
+    scat: "Solana Cat Token",
+    petros: "Petros Token",
+    nuke: "Nuke Token",
+    venus: "Two Face Cat",
+    crystalstones: "Crystal Stones",
+    bft: "Big Five Token",
+    cross: "Cross Token",
+    thc: "Transhuman Coin",
+};
+
 // Define burn interval options
 const BURN_INTERVALS: BurnInterval[] = [
     { value: "burn5min", label: "5 Minutes" },
@@ -96,12 +133,13 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const router = useRouter();
     const [chain, setChain] = useState<string | null>(null);
     const [tokenName, setTokenName] = useState<string | null>(null);
-    const [search, setSearch] = useState<string>("");
-    const [tokenData, setTokenData] = useState<TokenData | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-    const [selectedBurnInterval, setSelectedBurnInterval] = useState<BurnIntervalKey>("burn24h");
-    const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+
+const [tokenData, setTokenData] = useState<TokenData | null>(null);
+const [socialLinks, setSocialLinks] = useState<{ website: string; twitter: string; telegram: string; bscscan: string } | null>(null);
+const [loading, setLoading] = useState<boolean>(true);
+const [error, setError] = useState<string | null>(null);
+const [selectedBurnInterval, setSelectedBurnInterval] = useState<BurnIntervalKey>("burn24h");
+const [activeTab, setActiveTab] = useState<string>("info");
 
     useEffect(() => {
         if (paramsPromise) {
@@ -145,13 +183,15 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
             console.log("Validation passed, fetching data for:", { chain: chainLower, token });
 
             try {
-                const apiEndpoints = [
-                    `/api/${chainLower}/token-metrics/${token}`,
-                    `/api/${chainLower}/token-holders/${token}`,
-                    `/api/${chainLower}/token-price/${token}`,
-                    `/api/${chainLower}/burns/${token}`,
-                ];
-                console.log("API endpoints:", apiEndpoints);
+const apiEndpoints = [
+    `/api/${chainLower}/token-metrics/${token}`,
+    `/api/${chainLower}/token-holders/${token}`,
+    `/api/${chainLower}/token-price/${token}`,
+    `/api/${chainLower}/burns/${token}`,
+    `/api/${chainLower}/token-profile/${token}`,
+    `/api/${chainLower}/socials/${token}`,
+];
+console.log("API endpoints:", apiEndpoints);
 
                 const responses = await Promise.all(
                     apiEndpoints.map((endpoint) =>
@@ -161,30 +201,33 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     )
                 );
 
-                const [metricsData, holdersData, priceData, burnsData] = responses;
+const [metricsData, holdersData, priceData, burnsData, profileData, socialData] = responses;
 
-                console.log("Fetched data:", { metricsData, holdersData, priceData, burnsData });
-
-                setTokenData({
-                    price: priceData?.price || "N/A",
-                    totalSupply: metricsData?.totalSupply || "N/A",
-                    cSupply: metricsData?.circulatingSupply || "N/A",
-                    lSupply: metricsData?.lockedSupply || "N/A",
-                    holders: holdersData?.totalHolders || "N/A",
-                    marketCap: priceData?.marketCap || "N/A",
-                    volume: priceData?.volume || "N/A",
-                    burn5min: burnsData?.burn5min || "No burns",
-                    burn15min: burnsData?.burn15min || "No burns",
-                    burn30min: burnsData?.burn30min || "No burns",
-                    burn1h: burnsData?.burn1h || "No burns",
-                    burn3h: burnsData?.burn3h || "No burns",
-                    burn6h: burnsData?.burn6h || "No burns",
-                    burn12h: burnsData?.burn12h || "No burns",
-                    burn24h: burnsData?.burn24h || "No burns",
-                    totalburnt: metricsData?.totalBurnt || "N/A",
-                    priceChange: priceData?.change || "N/A",
-                    liquidity: priceData?.liquidity || "N/A",
-                });
+setTokenData({
+    price: priceData?.price || "N/A",
+    totalSupply: metricsData?.totalSupply || "N/A",
+    cSupply: metricsData?.circulatingSupply || "N/A",
+    lSupply: metricsData?.lockedSupply || "N/A",
+    holders: holdersData?.totalHolders || "N/A",
+    marketCap: priceData?.marketCap || "N/A",
+    volume: priceData?.volume || "N/A",
+    burn5min: burnsData?.burn5min || "No burns",
+    burn15min: burnsData?.burn15min || "No burns",
+    burn30min: burnsData?.burn30min || "No burns",
+    burn1h: burnsData?.burn1h || "No burns",
+    burn3h: burnsData?.burn3h || "No burns",
+    burn6h: burnsData?.burn6h || "No burns",
+    burn12h: burnsData?.burn12h || "No burns",
+    burn24h: burnsData?.burn24h || "No burns",
+    totalburnt: metricsData?.totalBurnt || "N/A",
+    priceChange24h: priceData?.change24h || "N/A",
+    priceChange6h: priceData?.change6h || "N/A",
+    priceChange3h: priceData?.change3h || "N/A",
+    priceChange1h: priceData?.change1h || "N/A",
+    liquidity: priceData?.liquidity || "N/A",
+    profile: profileData?.profileImage || "N/A",
+});
+setSocialLinks(socialData || null);
             } catch (err: unknown) {
                 const errorMessage = err instanceof Error ? err.message : "Failed to fetch token data";
                 console.error("Error fetching token data:", errorMessage);
@@ -275,18 +318,18 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
         }
     };
 
-    const handleSearch = (tokenFromSearchBar: string = search): void => {
-        const token = tokenFromSearchBar.trim().toLowerCase();
-        console.log("handleSearch called with:", token);
-        if (token && TOKEN_LIST[token]) {
-            const chain = TOKEN_LIST[token];
-            console.log("Navigating to:", { chain, token });
-            router.push(`/${chain}/${token}`);
-        } else {
-            console.log("Search token not found in TOKEN_LIST:", token);
-            setError(`Token "${token}" not found`);
-        }
-    };
+    // const handleSearch = (tokenFromSearchBar: string = search): void => {
+    //     const token = tokenFromSearchBar.trim().toLowerCase();
+    //     console.log("handleSearch called with:", token);
+    //     if (token && TOKEN_LIST[token]) {
+    //         const chain = TOKEN_LIST[token];
+    //         console.log("Navigating to:", { chain, token });
+    //         router.push(`/${chain}/${token}`);
+    //     } else {
+    //         console.log("Search token not found in TOKEN_LIST:", token);
+    //         setError(`Token "${token}" not found`);
+    //     }
+    // };
 
     const handleIntervalChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
         setSelectedBurnInterval(e.target.value as BurnIntervalKey);
@@ -302,41 +345,10 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
         return interval ? interval.label : "24 Hours";
     };
 
-    const searchBarProps = {
-        setSearch,
-        handleSearch,
-        isOpen: isSearchOpen,
-        onClose: () => setIsSearchOpen(false),
-    };
-
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="px-6 md:px-8 mt-8">
-                <div className="flex justify-end mb-6">
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="flex items-center bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition duration-200"
-                    >
-                        <svg
-                            className="h-5 w-5 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                        </svg>
-                        Search Tokens
-                    </button>
-                </div>
-
-                <SearchBarPopup {...searchBarProps} />
+            <main className="flex-1 px-6 md:px-8 mt-8">
 
                 {loading ? (
                     <div className="flex items-center justify-center mt-8">
@@ -365,113 +377,381 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                 ) : (
                     tokenData && (
                         <>
-                            <section className="">
-                                <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                    <h1>{tokenName?.toUpperCase()} Price:</h1>
-                                    <h1 className="flex items-center gap-2">
-                                        <span className="font-medium text-xl">
-                                            ${" "}
-                                            {(() => {
-                                                const { display, isExponential } = formatPrice(tokenData.price);
-                                                if (!isExponential) return display;
-                                                const [prefix, exponent, value] = display.split(" ");
-                                                return (
-                                                    <>
-                                                        {prefix}
-                                                        <sup className={styles.superscript}>{exponent}</sup> {value}
-                                                    </>
-                                                );
-                                            })()}
-                                        </span>
-                                        <span
-                                            className={`px-2 py-1 rounded text-white ${String(tokenData.priceChange).startsWith("-") ? "bg-red-600" : "bg-green-600"
-                                                }`}
-                                        >
-                                            {tokenData.priceChange}%
-                                        </span>
-                                    </h1>
-                                </div>
+                            <div className="md:hidden">
+                                {activeTab === "info" && (
+                                    <>
+                                        <section className="">
+<div className="flex flex-row items-center bg-black gap-2 rounded-md p-4 mb-4 flex-wrap">
+    <img
+        src={`/api/${chain}/logo/${tokenName}`}
+        alt={`${tokenName?.toUpperCase()} Logo`}
+        className="w-15 h-15 mb-2 rounded-md object-contain"
+        onError={(e) => {
+            (e.target as HTMLImageElement).src = '/file.svg';
+            (e.target as HTMLImageElement).alt = 'Default Logo';
+        }}
+    />
+    <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
+    {socialLinks && (
+        <div className="flex flex-row gap-4 mt-2 w-full">
+            <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <FaGlobe className="h-6 w-6" />
+            </a>
+            <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <SiX className="h-6 w-6" />
+            </a>
+            <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <FaTelegramPlane className="h-6 w-6" />
+            </a>
+            <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <MdOutlineLibraryBooks className="h-6 w-6" />
+            </a>
+        </div>
+    )}
+</div>
+                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>Price:</h1>
+                                                <h1 className="font-medium text-xl">
+                                                    ${" "}
+                                                    {(() => {
+                                                        const { display, isExponential } = formatPrice(tokenData.price);
+                                                        if (!isExponential) return display;
+                                                        const [prefix, exponent, value] = display.split(" ");
+                                                        return (
+                                                            <>
+                                                                {prefix}
+                                                                <sup className={styles.superscript}>{exponent}</sup> {value}
+                                                            </>
+                                                        );
+                                                    })()}
+                                                </h1>
+                                            </div>
 
-                                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                        <h1>MarketCap:</h1>
-                                        <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
-                                    </div>
-                                    <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                        <h1>Liquidity:</h1>
-                                        <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.liquidity)}</h1>
-                                    </div>
-                                    <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                        <h1>Volume:</h1>
-                                        <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.volume)}</h1>
-                                    </div>
-                                    <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                        <h1>Holders:</h1>
-                                        <h1 className="font-medium text-xl">{formatWholeNumber(tokenData.holders)}</h1>
-                                    </div>
-                                </div>
-                            </section>
+                                            <div className="mt-4 grid grid-cols-3 gap-4">
+                                                <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                    <h1>MarketCap:</h1>
+                                                    <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
+                                                </div>
+                                                <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                    <h1>Liquidity:</h1>
+                                                    <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.liquidity)}</h1>
+                                                </div>
+                                                <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                    <h1>Volume:</h1>
+                                                    <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.volume)}</h1>
+                                                </div>
+                                                {/* <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                    <h1>Holders:</h1>
+                                                    <h1 className="font-medium text-xl">{formatWholeNumber(tokenData.holders)}</h1>
+                                                </div> */}
+                                            </div>
+                                            <div className="mt-4 flex flex-row bg-neutral-900 justify-between gap-2 items-center border-2 border-orange-500 rounded-md p-4">
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-xs text-gray-400">1h</span>
+                                                    <span
+                                                        className={`px-2 py-1 rounded ${String(tokenData.priceChange1h).startsWith("-") ? "text-red-400" : "text-green-400"}`}
+                                                    >
+                                                        {tokenData.priceChange1h}%
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-xs text-gray-400">3h</span>
+                                                    <span
+                                                        className={`px-2 py-1 rounded ${String(tokenData.priceChange3h).startsWith("-") ? "text-red-500" : "text-green-500"}`}
+                                                    >
+                                                        {tokenData.priceChange3h}%
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-xs text-gray-400">6h</span>
+                                                    <span
+                                                        className={`px-2 py-1 rounded ${String(tokenData.priceChange6h).startsWith("-") ? "text-red-600" : "text-green-600"}`}
+                                                    >
+                                                        {tokenData.priceChange6h}%
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-xs text-gray-400">24h</span>
+                                                    <span
+                                                        className={`px-2 py-1 rounded ${String(tokenData.priceChange24h).startsWith("-") ? "text-red-700" : "text-green-700"}`}
+                                                    >
+                                                        {tokenData.priceChange24h}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </section>
 
-                            <section className="mt-8 md:mt-16 flex flex-col md:flex-row md:gap-16">
-                                <div className="flex-1">
-                                    <div className="bg-neutral-900 border-2 border-neutral-600 p-4 rounded-lg shadow-lg">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h1 className="text-white">{getIntervalDisplayName()} Burns</h1>
-                                            <select
-                                                value={selectedBurnInterval}
-                                                onChange={handleIntervalChange}
-                                                className="bg-neutral-800 text-white border border-neutral-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                            >
-                                                {BURN_INTERVALS.map((interval) => (
-                                                    <option key={interval.value} value={interval.value}>
-                                                        {interval.label}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                        <section className="mt-8 flex flex-col my-16">
+                                            <div className="flex-1">
+                                                <div className="my-8 space-y-4">
+                                                    <DataCard
+                                                        title="Total Supply"
+                                                        value={formatWholeNumber(tokenData.totalSupply)}
+                                                        bg="bg-white text-black"
+                                                        image="/tSupply.png"
+                                                    />
+                                                    <DataCard
+                                                        title="Total Locked"
+                                                        value={formatWholeNumber(tokenData.lSupply)}
+                                                        bg="bg-blue-600"
+                                                        image="/lock-bg.png"
+                                                    />
+                                                    <DataCard
+                                                        title="Circulatory Supply"
+                                                        value={formatWholeNumber(tokenData.cSupply)}
+                                                        bg="bg-green-600"
+                                                        image="/cSupply-bg.png"
+                                                    />
+                                                    <DataCard
+                                                        title="Total Burnt"
+                                                        value={formatWholeNumber(tokenData.totalburnt)}
+                                                        bg="bg-white text-black"
+                                                        image="/burn-bg.png"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </>
+                                )}
+
+                                {activeTab === "burns" && (
+                                    <section className="mt-8 flex flex-col">
+                                        <div className="flex-1">
+                                            <div className="bg-neutral-900 border-2 border-neutral-600 p-4 rounded-lg shadow-lg">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <h1 className="text-white">{getIntervalDisplayName()} Burns</h1>
+                                                    <select
+                                                        value={selectedBurnInterval}
+                                                        onChange={handleIntervalChange}
+                                                        className="bg-neutral-800 text-white border border-neutral-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    >
+                                                        {BURN_INTERVALS.map((interval) => (
+                                                            <option key={interval.value} value={interval.value}>
+                                                                {interval.label}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <h1 className="text-3xl font-bold text-red-500">
+                                                    {getSelectedBurnValue() === "No burns atm"
+                                                        ? "No burns atm"
+                                                        : formatWholeNumber(getSelectedBurnValue())}
+                                                </h1>
+                                                <p className="text-xs text-gray-400 mt-1">
+                                                    Last updated: {new Date().toLocaleTimeString()}
+                                                </p>
+                                            </div>
+
+                                            <div className="my-8 space-y-4">
+
+                                            </div>
                                         </div>
-                                        <h1 className="text-3xl font-bold text-red-500">
-                                            {getSelectedBurnValue() === "No burns atm"
-                                                ? "No burns atm"
-                                                : formatWholeNumber(getSelectedBurnValue())}
-                                        </h1>
-                                        <p className="text-xs text-gray-400 mt-1">
-                                            Last updated: {new Date().toLocaleTimeString()}
-                                        </p>
+                                        {tokenName && chain && <BurnsDisplay tokenName={tokenName} chain={chain} />}
+                                    </section>
+                                )}
+
+                                {activeTab === "chart" && (
+                                    <div className="h-[48rem] mb-16 -mx-6">
+                                        <iframe
+                                            height="100%"
+                                            width="100%"
+                                            id="geckoterminal-embed"
+                                            title="GeckoTerminal Embed"
+                                            src={`/api/${chain}/chart/${tokenName}`}
+                                            frameBorder="0"
+                                            allow="clipboard-write"
+                                            allowFullScreen
+                                        ></iframe>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="hidden md:block">
+                                <section className="md:grid md:grid-cols-2 md:gap-8 mb-16">
+                                    <div>
+<div className="flex flex-row items-center gap-2 bg-black rounded-md p-4 mb-4 flex-wrap">
+    <img
+        src={`/api/${chain}/logo/${tokenName}`}
+        alt={`${tokenName?.toUpperCase()} Logo`}
+        className="w-18 h-18 mb-2 rounded-md object-contain"
+        onError={(e) => {
+            (e.target as HTMLImageElement).src = '/file.svg';
+            (e.target as HTMLImageElement).alt = 'Default Logo';
+        }}
+    />
+    <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
+    {socialLinks && (
+        <div className="flex flex-row gap-4 mt-2 w-full">
+            <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <FaGlobe className="h-6 w-6" />
+            </a>
+            <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <SiX className="h-6 w-6" />
+            </a>
+            <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <FaTelegramPlane className="h-6 w-6" />
+            </a>
+            <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <MdOutlineLibraryBooks className="h-6 w-6" />
+            </a>
+        </div>
+    )}
+</div>
+                                        <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                            <h1>Price:</h1>
+                                            <h1 className="font-medium text-xl">
+                                                ${" "}
+                                                {(() => {
+                                                    const { display, isExponential } = formatPrice(tokenData.price);
+                                                    if (!isExponential) return display;
+                                                    const [prefix, exponent, value] = display.split(" ");
+                                                    return (
+                                                        <>
+                                                            {prefix}
+                                                            <sup className={styles.superscript}>{exponent}</sup> {value}
+                                                        </>
+                                                    );
+                                                })()}
+                                            </h1>
+                                        </div>
+
+                                        <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>MarketCap:</h1>
+                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
+                                            </div>
+                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>Liquidity:</h1>
+                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.liquidity)}</h1>
+                                            </div>
+                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>Volume:</h1>
+                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.volume)}</h1>
+                                            </div>
+                                            {/* <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>Holders:</h1>
+                                                <h1 className="font-medium text-xl">{formatWholeNumber(tokenData.holders)}</h1>
+                                            </div> */}
+                                        </div>
+                                        <div className="mt-4 flex flex-row justify-center items-center gap-4 border-2 border-orange-500 rounded-md p-4">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">1h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange1h).startsWith("-") ? "text-red-400" : "text-green-400"}`}
+                                                >
+                                                    {tokenData.priceChange1h}%
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">3h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange3h).startsWith("-") ? "text-red-500" : "text-green-500"}`}
+                                                >
+                                                    {tokenData.priceChange3h}%
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">6h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange6h).startsWith("-") ? "text-red-600" : "text-green-600"}`}
+                                                >
+                                                    {tokenData.priceChange6h}%
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">24h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange24h).startsWith("-") ? "text-red-700" : "text-green-700"}`}
+                                                >
+                                                    {tokenData.priceChange24h}%
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-8 space-y-4">
+                                            <DataCard
+                                                title="Total Supply"
+                                                value={formatWholeNumber(tokenData.totalSupply)}
+                                                bg="bg-white text-black"
+                                                image="/tSupply.png"
+                                            />
+                                            <DataCard
+                                                title="Total Locked"
+                                                value={formatWholeNumber(tokenData.lSupply)}
+                                                bg="bg-blue-600"
+                                                image="/lock-bg.png"
+                                            />
+                                            <DataCard
+                                                title="Circulatory Supply"
+                                                value={formatWholeNumber(tokenData.cSupply)}
+                                                bg="bg-green-600"
+                                                image="/cSupply-bg.png"
+                                            />
+                                            <DataCard
+                                                title="Total Burnt"
+                                                value={formatWholeNumber(tokenData.totalburnt)}
+                                                bg="bg-white text-black"
+                                                image="/burn-bg.png"
+                                            />
+                                        </div>
                                     </div>
 
-                                    <div className="my-8 space-y-4">
-                                        <DataCard
-                                            title="Total Burnt"
-                                            value={formatWholeNumber(tokenData.totalburnt)}
-                                            bg="bg-white text-black"
-                                            image="/burn-bg.png"
-                                        />
-                                        <DataCard
-                                            title="Total Supply"
-                                            value={formatWholeNumber(tokenData.totalSupply)}
-                                            bg="bg-white text-black"
-                                            image="/tSupply.png"
-                                        />
-                                        <DataCard
-                                            title="Total Locked"
-                                            value={formatWholeNumber(tokenData.lSupply)}
-                                            bg="bg-blue-600"
-                                            image="/lock-bg.png"
-                                        />
-                                        <DataCard
-                                            title="Circulatory Supply"
-                                            value={formatWholeNumber(tokenData.cSupply)}
-                                            bg="bg-green-600"
-                                            image="/cSupply-bg.png"
-                                        />
+                                    <div>
+                                        <div className="bg-neutral-900 border-2 border-neutral-600 p-4 rounded-lg shadow-lg">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h1 className="text-white">{getIntervalDisplayName()} Burns</h1>
+                                                <select
+                                                    value={selectedBurnInterval}
+                                                    onChange={handleIntervalChange}
+                                                    className="bg-neutral-800 text-white border border-neutral-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                >
+                                                    {BURN_INTERVALS.map((interval) => (
+                                                        <option key={interval.value} value={interval.value}>
+                                                            {interval.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <h1 className="text-3xl font-bold text-red-500">
+                                                {getSelectedBurnValue() === "No burns atm"
+                                                    ? "No burns atm"
+                                                    : formatWholeNumber(getSelectedBurnValue())}
+                                            </h1>
+                                            <p className="text-xs text-gray-400 mt-1">
+                                                Last updated: {new Date().toLocaleTimeString()}
+                                            </p>
+                                        </div>
+
+                                        <div className="mt-8 space-y-4">
+
+                                        </div>
+
+                                        <div className="mt-8">
+                                            {tokenName && chain && <BurnsDisplay tokenName={tokenName} chain={chain} />}
+                                        </div>
                                     </div>
+                                </section>
+
+                                <div className="mt-8 h-[36rem] mb-16 -mx-8">
+                                    <iframe
+                                        height="100%"
+                                        width="100%"
+                                        id="geckoterminal-embed"
+                                        title="GeckoTerminal Embed"
+                                        src={`/api/${chain}/chart/${tokenName}`}
+                                        frameBorder="0"
+                                        allow="clipboard-write"
+                                        allowFullScreen
+                                    ></iframe>
                                 </div>
-                                {tokenName && chain && <BurnsDisplay tokenName={tokenName} chain={chain} />}
-                            </section>
+                            </div>
                         </>
                     )
                 )}
             </main>
+            <div className="md:hidden">
+                <Footer onTabChange={setActiveTab} activeTab={activeTab} />
+            </div>
         </div>
     );
 }

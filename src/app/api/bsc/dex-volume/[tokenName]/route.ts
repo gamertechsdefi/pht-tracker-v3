@@ -20,7 +20,7 @@ const TOKEN_MAP: Record<string, TokenMapEntry> = {
   durt: { address: "0x48a510A3394C2A07506d10910EBEFf3E25b7a3f1" },
   twd: { address: "0xf00cD9366A13e725AB6764EE6FC8Bd21dA22786e" },
   gtan: { address: "0xbD7909318b9Ca4ff140B840F69bB310a785d1095" },
-  zedek: { address: "0xCbEaaD74dcB3a4227D0E6e67302402E06c119271" },
+  zedek: { address: "  " },
   bengcat: { address: "0xD000815DB567372C3C3d7070bEF9fB7a9532F9e8" },
   bcat: { address: "0x47a9B109Cfb8f89D16e8B34036150eE112572435" },
   nct: { address: "0x9F1f27179fB25F11e1F8113Be830cfF5926C4605" },
