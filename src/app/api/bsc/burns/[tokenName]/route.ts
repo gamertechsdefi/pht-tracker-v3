@@ -77,8 +77,8 @@ async function getBlockFromTimestamp(timestamp: number): Promise<number> {
   const latest = await provider.getBlock("latest");
   if (!latest) throw new Error("Cannot get latest block");
   const current = latest.number;
-  const lower = current - 5000;
-  const upper = current;
+  let lower = current - 5000;
+  let upper = current;
 
   while (lower <= upper) {
     const mid = Math.floor((lower + upper) / 2);
