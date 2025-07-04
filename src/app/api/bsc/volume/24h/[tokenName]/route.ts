@@ -33,8 +33,8 @@ const TOKEN_MAP: Record<string, TokenMapEntry> = {
 
 interface DexScreenerResponse {
   pairs: Array<{
-    volume?: {
-      h24?: string;
+    priceChange?: {
+        h24?: string;
     };
   }>;
 }
@@ -67,8 +67,9 @@ export async function GET(_: Request, context: any): Promise<NextResponse> {
     const pair = data.pairs[0];
 
     return NextResponse.json({
-      volume: pair.volume?.h24 || "N/A",
+      priceChange24h: pair.priceChange?.h24,
       lastUpdated: new Date().toISOString(),
+    
     });
 
   } catch (error) {

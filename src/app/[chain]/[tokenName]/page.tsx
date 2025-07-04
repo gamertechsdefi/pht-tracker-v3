@@ -134,12 +134,12 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const [chain, setChain] = useState<string | null>(null);
     const [tokenName, setTokenName] = useState<string | null>(null);
 
-const [tokenData, setTokenData] = useState<TokenData | null>(null);
-const [socialLinks, setSocialLinks] = useState<{ website: string; twitter: string; telegram: string; bscscan: string } | null>(null);
-const [loading, setLoading] = useState<boolean>(true);
-const [error, setError] = useState<string | null>(null);
-const [selectedBurnInterval, setSelectedBurnInterval] = useState<BurnIntervalKey>("burn24h");
-const [activeTab, setActiveTab] = useState<string>("info");
+    const [tokenData, setTokenData] = useState<TokenData | null>(null);
+    const [socialLinks, setSocialLinks] = useState<{ website: string; twitter: string; telegram: string; bscscan: string } | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [selectedBurnInterval, setSelectedBurnInterval] = useState<BurnIntervalKey>("burn24h");
+    const [activeTab, setActiveTab] = useState<string>("info");
 
     useEffect(() => {
         if (paramsPromise) {
@@ -183,15 +183,15 @@ const [activeTab, setActiveTab] = useState<string>("info");
             console.log("Validation passed, fetching data for:", { chain: chainLower, token });
 
             try {
-const apiEndpoints = [
-    `/api/${chainLower}/token-metrics/${token}`,
-    `/api/${chainLower}/token-holders/${token}`,
-    `/api/${chainLower}/token-price/${token}`,
-    `/api/${chainLower}/burns/${token}`,
-    `/api/${chainLower}/token-profile/${token}`,
-    `/api/${chainLower}/socials/${token}`,
-];
-console.log("API endpoints:", apiEndpoints);
+                const apiEndpoints = [
+                    `/api/${chainLower}/token-metrics/${token}`,
+                    `/api/${chainLower}/token-holders/${token}`,
+                    `/api/${chainLower}/token-price/${token}`,
+                    `/api/${chainLower}/burns/${token}`,
+                    `/api/${chainLower}/token-profile/${token}`,
+                    `/api/${chainLower}/socials/${token}`,
+                ];
+                console.log("API endpoints:", apiEndpoints);
 
                 const responses = await Promise.all(
                     apiEndpoints.map((endpoint) =>
@@ -201,33 +201,33 @@ console.log("API endpoints:", apiEndpoints);
                     )
                 );
 
-const [metricsData, holdersData, priceData, burnsData, profileData, socialData] = responses;
+                const [metricsData, holdersData, priceData, burnsData, profileData, socialData] = responses;
 
-setTokenData({
-    price: priceData?.price || "N/A",
-    totalSupply: metricsData?.totalSupply || "N/A",
-    cSupply: metricsData?.circulatingSupply || "N/A",
-    lSupply: metricsData?.lockedSupply || "N/A",
-    holders: holdersData?.totalHolders || "N/A",
-    marketCap: priceData?.marketCap || "N/A",
-    volume: priceData?.volume || "N/A",
-    burn5min: burnsData?.burn5min || "No burns",
-    burn15min: burnsData?.burn15min || "No burns",
-    burn30min: burnsData?.burn30min || "No burns",
-    burn1h: burnsData?.burn1h || "No burns",
-    burn3h: burnsData?.burn3h || "No burns",
-    burn6h: burnsData?.burn6h || "No burns",
-    burn12h: burnsData?.burn12h || "No burns",
-    burn24h: burnsData?.burn24h || "No burns",
-    totalburnt: metricsData?.totalBurnt || "N/A",
-    priceChange24h: priceData?.change24h || "N/A",
-    priceChange6h: priceData?.change6h || "N/A",
-    priceChange3h: priceData?.change3h || "N/A",
-    priceChange1h: priceData?.change1h || "N/A",
-    liquidity: priceData?.liquidity || "N/A",
-    profile: profileData?.profileImage || "N/A",
-});
-setSocialLinks(socialData || null);
+                setTokenData({
+                    price: priceData?.price || "N/A",
+                    totalSupply: metricsData?.totalSupply || "N/A",
+                    cSupply: metricsData?.circulatingSupply || "N/A",
+                    lSupply: metricsData?.lockedSupply || "N/A",
+                    holders: holdersData?.totalHolders || "N/A",
+                    marketCap: priceData?.marketCap || "N/A",
+                    volume: priceData?.volume || "N/A",
+                    burn5min: burnsData?.burn5min || "No burns",
+                    burn15min: burnsData?.burn15min || "No burns",
+                    burn30min: burnsData?.burn30min || "No burns",
+                    burn1h: burnsData?.burn1h || "No burns",
+                    burn3h: burnsData?.burn3h || "No burns",
+                    burn6h: burnsData?.burn6h || "No burns",
+                    burn12h: burnsData?.burn12h || "No burns",
+                    burn24h: burnsData?.burn24h || "No burns",
+                    totalburnt: metricsData?.totalBurnt || "N/A",
+                    priceChange24h: priceData?.change24h || "N/A",
+                    priceChange6h: priceData?.change6h || "N/A",
+                    priceChange3h: priceData?.change3h || "N/A",
+                    priceChange1h: priceData?.change1h || "N/A",
+                    liquidity: priceData?.liquidity || "N/A",
+                    profile: profileData?.profileImage || "N/A",
+                });
+                setSocialLinks(socialData || null);
             } catch (err: unknown) {
                 const errorMessage = err instanceof Error ? err.message : "Failed to fetch token data";
                 console.error("Error fetching token data:", errorMessage);
@@ -381,34 +381,34 @@ setSocialLinks(socialData || null);
                                 {activeTab === "info" && (
                                     <>
                                         <section className="">
-<div className="flex flex-row items-center bg-black gap-2 rounded-md p-4 mb-4 flex-wrap">
-    <img
-        src={`/api/${chain}/logo/${tokenName}`}
-        alt={`${tokenName?.toUpperCase()} Logo`}
-        className="w-15 h-15 mb-2 rounded-md object-contain"
-        onError={(e) => {
-            (e.target as HTMLImageElement).src = '/file.svg';
-            (e.target as HTMLImageElement).alt = 'Default Logo';
-        }}
-    />
-    <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
-    {socialLinks && (
-        <div className="flex flex-row gap-4 mt-2 w-full">
-            <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <FaGlobe className="h-6 w-6" />
-            </a>
-            <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <SiX className="h-6 w-6" />
-            </a>
-            <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <FaTelegramPlane className="h-6 w-6" />
-            </a>
-            <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <MdOutlineLibraryBooks className="h-6 w-6" />
-            </a>
-        </div>
-    )}
-</div>
+                                            <div className="flex flex-row items-center bg-black gap-2 rounded-md p-4 mb-4 flex-wrap">
+                                                <img
+                                                    src={`/api/${chain}/logo/${tokenName}`}
+                                                    alt={`${tokenName?.toUpperCase()} Logo`}
+                                                    className="w-15 h-15 mb-2 rounded-md object-contain"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = '/file.svg';
+                                                        (e.target as HTMLImageElement).alt = 'Default Logo';
+                                                    }}
+                                                />
+                                                <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
+                                                {socialLinks && (
+                                                    <div className="flex flex-row gap-4 mt-2 w-full">
+                                                        <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                            <FaGlobe className="h-6 w-6" />
+                                                        </a>
+                                                        <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                            <SiX className="h-6 w-6" />
+                                                        </a>
+                                                        <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                            <FaTelegramPlane className="h-6 w-6" />
+                                                        </a>
+                                                        <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                            <MdOutlineLibraryBooks className="h-6 w-6" />
+                                                        </a>
+                                                    </div>
+                                                )}
+                                            </div>
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>Price:</h1>
                                                 <h1 className="font-medium text-xl">
@@ -569,34 +569,34 @@ setSocialLinks(socialData || null);
                             <div className="hidden md:block">
                                 <section className="md:grid md:grid-cols-2 md:gap-8 mb-16">
                                     <div>
-<div className="flex flex-row items-center gap-2 bg-black rounded-md p-4 mb-4 flex-wrap">
-    <img
-        src={`/api/${chain}/logo/${tokenName}`}
-        alt={`${tokenName?.toUpperCase()} Logo`}
-        className="w-18 h-18 mb-2 rounded-md object-contain"
-        onError={(e) => {
-            (e.target as HTMLImageElement).src = '/file.svg';
-            (e.target as HTMLImageElement).alt = 'Default Logo';
-        }}
-    />
-    <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
-    {socialLinks && (
-        <div className="flex flex-row gap-4 mt-2 w-full">
-            <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <FaGlobe className="h-6 w-6" />
-            </a>
-            <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <SiX className="h-6 w-6" />
-            </a>
-            <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <FaTelegramPlane className="h-6 w-6" />
-            </a>
-            <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                <MdOutlineLibraryBooks className="h-6 w-6" />
-            </a>
-        </div>
-    )}
-</div>
+                                        <div className="flex flex-row items-center gap-2 bg-black rounded-md p-4 mb-4 flex-wrap">
+                                            <img
+                                                src={`/api/${chain}/logo/${tokenName}`}
+                                                alt={`${tokenName?.toUpperCase()} Logo`}
+                                                className="w-18 h-18 mb-2 rounded-md object-contain"
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src = '/file.svg';
+                                                    (e.target as HTMLImageElement).alt = 'Default Logo';
+                                                }}
+                                            />
+                                            <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
+                                            {socialLinks && (
+                                                <div className="flex flex-row gap-4 mt-2 w-full">
+                                                    <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                        <FaGlobe className="h-6 w-6" />
+                                                    </a>
+                                                    <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                        <SiX className="h-6 w-6" />
+                                                    </a>
+                                                    <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                        <FaTelegramPlane className="h-6 w-6" />
+                                                    </a>
+                                                    <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                        <MdOutlineLibraryBooks className="h-6 w-6" />
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </div>
                                         <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                             <h1>Price:</h1>
                                             <h1 className="font-medium text-xl">

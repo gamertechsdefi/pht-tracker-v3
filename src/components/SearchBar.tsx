@@ -108,7 +108,7 @@ export default function SearchBarPopup({
         const tokenSymbols = Object.keys(TOKEN_LIST);
         const fetchPromises = tokenSymbols.map(async (symbol: string) => {
           try {
-            const response = await fetch(`/api/bsc/dex-volume/${symbol}`);
+            const response = await fetch(`/api/bsc/volume/dex/${symbol}`);
             const data: { volume: string; error?: string } = await response.json();
             if (data.error || data.volume === "N/A") {
               return null;

@@ -11,6 +11,7 @@ interface Token {
     fullName: string;
     chain: string;
     volume24h: number;
+    priceChange24h: string | undefined; // Keep as string | undefined to match API
 }
 
 interface Suggestion {
@@ -79,6 +80,7 @@ export default function Header() {
     const [trendingTokens, setTrendingTokens] = useState<Token[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [sortMetric, setSortMetric] = useState<"volume" | "priceChange">("volume");
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -138,8 +140,8 @@ export default function Header() {
                 const tokenSymbols = Object.keys(TOKEN_LIST);
                 const fetchPromises = tokenSymbols.map(async (symbol: string) => {
                     try {
-                        const response = await fetch(`/api/bsc/dex-volume/${symbol}`);
-                        const data: { volume: string; error?: string } = await response.json();
+                        const response = await fetch(`/api/bsc/volume/dex/${symbol}`);
+                        const data: { volume: string; priceChange24h?: string; error?: string } = await response.json();
                         if (data.error || data.volume === "N/A") {
                             return null;
                         }
@@ -152,6 +154,7 @@ export default function Header() {
                             fullName,
                             chain: TOKEN_LIST[symbol],
                             volume24h: parseFloat(data.volume) || 0,
+                            priceChange24h: data.priceChange24h, // Keep as string | undefined
                         };
                     } catch (err) {
                         console.error(`Failed to fetch data for ${symbol}:`, err);
@@ -162,12 +165,20 @@ export default function Header() {
                 const results = await Promise.all(fetchPromises);
                 const validTokens = results
                     .filter((token): token is Token => token !== null && token.volume24h > 0)
-                    .sort((a, b) => b.volume24h - a.volume24h)
-                    .slice(0, 5); // Top 5 tokens by volume
+                    .sort((a, b) => {
+                        if (sortMetric === "volume") {
+                            return b.volume24h - a.volume24h;
+                        } else {
+                            const aChange = parseFloat(a.priceChange24h || "0") || 0;
+                            const bChange = parseFloat(b.priceChange24h || "0") || 0;
+                            return bChange - aChange;
+                        }
+                    })
+                    .slice(0, 5); // Top 5 tokens
 
                 setTrendingTokens(validTokens);
                 if (validTokens.length === 0) {
-                    setError("No volume data available for trending tokens");
+                    setError("No data available for trending tokens");
                 }
             } catch (err) {
                 console.error("Error fetching trending tokens:", err);
@@ -178,12 +189,11 @@ export default function Header() {
         }
 
         fetchTrendingTokens();
-    }, [isSearchOpen]);
+    }, [isSearchOpen, sortMetric]);
 
     return (
         <header className="sticky top-4 z-50 mx-4 px-4 py-2 rounded-md bg-white text-neutral-900">
             <nav className="flex flex-row justify-between items-center">
-                
                 <Link href="/" className="font-bold flex flex-row items-center">
                     <Image
                         src="/logo-fixed.png"
@@ -344,11 +354,21 @@ export default function Header() {
                             </ul>
                         )}
 
-                        {/* Trading Volume Ranking */}
+                        {/* Trading Volume/Price Change Ranking */}
                         <div>
-                            <h3 className="text-lg font-semibold text-white mb-3">
-                                Top Tokens by 24h Trading Volume
-                            </h3>
+                            <div className="flex justify-between items-center mb-3">
+                                <h3 className="text-lg font-semibold text-white">
+                                    Top Tokens by {sortMetric === "volume" ? "24h Trading Volume" : "24h Price Change"}
+                                </h3>
+                                <select
+                                    value={sortMetric}
+                                    onChange={(e) => setSortMetric(e.target.value as "volume" | "priceChange")}
+                                    className="bg-neutral-800 text-white border-2 border-orange-500 rounded-md p-1 focus:outline-none"
+                                >
+                                    <option value="volume">24h Volume</option>
+                                    <option value="priceChange">24h Price Change</option>
+                                </select>
+                            </div>
                             <div className="bg-neutral-800 rounded-md overflow-hidden border-2 border-orange-500">
                                 {isLoading ? (
                                     <div className="flex items-center justify-center py-4">
@@ -367,7 +387,9 @@ export default function Header() {
                                             <tr>
                                                 <th className="p-3 text-white">Symbol</th>
                                                 <th className="p-3 text-white">Chain</th>
-                                                <th className="p-3 text-right text-white">24h Volume</th>
+                                                <th className="p-3 text-right text-white">
+                                                    {sortMetric === "volume" ? "24h Volume" : "24h Price Change"}
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -382,7 +404,9 @@ export default function Header() {
                                                     <td className="p-3 text-white">{token.symbol.toUpperCase()}</td>
                                                     <td className="p-3 text-gray-400">{token.chain.toUpperCase()}</td>
                                                     <td className="p-3 text-right text-white">
-                                                        ${token.volume24h.toLocaleString()}
+                                                        {sortMetric === "volume"
+                                                            ? `$${token.volume24h.toLocaleString()}`
+                                                            : `${token.priceChange24h || "N/A"}%`}
                                                     </td>
                                                 </tr>
                                             ))}
