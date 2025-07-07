@@ -43,6 +43,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     crystalstones: "bsc",
     cross: "bsc",
     thc: "bsc",
+    bbft: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -69,6 +70,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "The Big Five Token": "bft",
     "Cross Token": "cross",
     "Transhuman Coin": "thc",
+    "Baby BFT": "bbft",
 };
 
 export default function Header() {

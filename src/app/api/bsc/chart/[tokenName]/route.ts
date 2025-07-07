@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
     bft: "0x99c2d5977b94bdfdf91ee36f613e330e8102e326",
     cross: "0x3e93fec6e3ae5940dac4869acf5178bd30f4fc04",
     thc: "0x62be1533f3a78de99ca297ebbe489a3fb7253bef",
+    bbft: "0xfB69e2d3d673A8DB9Fa74ffc036A8Cf641255769",
   };
 
   const poolAddress =

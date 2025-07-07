@@ -31,6 +31,7 @@ const TOKEN_MAP: Record<string, string> = {
   bft: "0x4b87F578d6FaBf381f43bd2197fBB2A877da6ef8",
   cross: "0x72928a49c4E88F382b0b6fF3E561F56Dd75485F9",
   thc: "0x56083560594E314b5cDd1680eC6a493bb851BBd8",
+  bbft: "0xfB69e2d3d673A8DB9Fa74ffc036A8Cf641255769",
 };
 
 // ERC-20 ABI for required functions

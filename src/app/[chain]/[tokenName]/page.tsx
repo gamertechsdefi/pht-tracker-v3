@@ -80,6 +80,7 @@ const TOKEN_LIST: Record<string, string> = {
     bft: "bsc",
     cross: "bsc",
     thc: "bsc",
+    bbft: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -110,6 +111,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     bft: "Big Five Token",
     cross: "Cross Token",
     thc: "Transhuman Coin",
+    bbft: "Baby BFT"
 };
 
 // Define burn interval options
@@ -381,19 +383,21 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 {activeTab === "info" && (
                                     <>
                                         <section className="">
-                                            <div className="flex flex-row items-center bg-black gap-2 rounded-md p-4 mb-4 flex-wrap">
-                                                <img
-                                                    src={`/api/${chain}/logo/${tokenName}`}
-                                                    alt={`${tokenName?.toUpperCase()} Logo`}
-                                                    className="w-15 h-15 mb-2 rounded-md object-contain"
-                                                    onError={(e) => {
-                                                        (e.target as HTMLImageElement).src = '/file.svg';
-                                                        (e.target as HTMLImageElement).alt = 'Default Logo';
-                                                    }}
-                                                />
-                                                <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
+                                            <div className="flex flex-row justify-end w-full ">
+                                                <div className="flex flex-row items-center bg-black gap-2 rounded-md p-4 mb-4 flex-wrap">
+                                                    <img
+                                                        src={`/api/${chain}/logo/${tokenName}`}
+                                                        alt={`${tokenName?.toUpperCase()} Logo`}
+                                                        className="w-15 h-15 mb-2 rounded-md object-contain"
+                                                        onError={(e) => {
+                                                            (e.target as HTMLImageElement).src = '/file.svg';
+                                                            (e.target as HTMLImageElement).alt = 'Default Logo';
+                                                        }}
+                                                    />
+                                                    <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
+                                                </div>
                                                 {socialLinks && (
-                                                    <div className="flex flex-row gap-4 mt-2 w-full">
+                                                    <div className="grid grid-cols-2 md:grid-cols-1 space-x-4 space-y-4">
                                                         <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                             <FaGlobe className="h-6 w-6" />
                                                         </a>
@@ -409,6 +413,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     </div>
                                                 )}
                                             </div>
+
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>Price:</h1>
                                                 <h1 className="font-medium text-xl">
@@ -426,6 +431,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     })()}
                                                 </h1>
                                             </div>
+
 
                                             <div className="mt-4 grid grid-cols-3 gap-4">
                                                 <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">

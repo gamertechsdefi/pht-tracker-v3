@@ -140,6 +140,12 @@ export async function GET(request: NextRequest){
             twitter: "https://x.com/transhumancoin",
             telegram: "https://t.me/buytranshumancoin",
             bscscan: "https://bscscan.com/token/0x56083560594e314b5cdd1680ec6a493bb851bbd8"
+        },
+        bbft: {
+            website: "",
+            twitter: "",
+            telegram: "",
+            bscscan: "",
         }
     };
 
