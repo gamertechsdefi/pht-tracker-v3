@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers } from "ethers";
 import { NextResponse } from 'next/server';
 import { db } from "@/db/firebase";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";

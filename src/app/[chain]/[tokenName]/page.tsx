@@ -383,8 +383,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 {activeTab === "info" && (
                                     <>
                                         <section className="">
-                                            <div className="flex flex-row justify-end w-full ">
-                                                <div className="flex flex-row items-center bg-black gap-2 rounded-md p-4 mb-4 flex-wrap">
+                                            <div className="flex flex-row bg-black rounded-lg p-4 mb-2 justify-between items-center w-full ">
+                                                <div className="flex flex-row items-center gap-2 flex-wrap">
                                                     <img
                                                         src={`/api/${chain}/logo/${tokenName}`}
                                                         alt={`${tokenName?.toUpperCase()} Logo`}
@@ -397,7 +397,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
                                                 </div>
                                                 {socialLinks && (
-                                                    <div className="grid grid-cols-2 md:grid-cols-1 space-x-4 space-y-4">
+                                                    <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
                                                         <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                             <FaGlobe className="h-6 w-6" />
                                                         </a>
