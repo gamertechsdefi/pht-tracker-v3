@@ -3,11 +3,11 @@ import { getCachedBurnData } from '@/lib/cron-burn-service';
 import { ethers } from 'ethers';
 
 // Configure for BNB Chain
-const RPC_URL: string = "https://bsc-mainnet.infura.io/v3/5f0483aac11a4c98a31ae0a8fc8105b5";
-const BURN_ADDRESSES: string[] = [
-  "0x000000000000000000000000000000000000dEaD",
-  "0x0000000000000000000000000000000000000000",
-];
+// const RPC_URL: string = "https://bsc-mainnet.infura.io/v3/5f0483aac11a4c98a31ae0a8fc8105b5";
+// const BURN_ADDRESSES: string[] = [
+//   "0x000000000000000000000000000000000000dEaD",
+//   "0x0000000000000000000000000000000000000000",
+// ];
 
 const TOKEN_MAP: Record<string, string> = {
   pht: "0x885c99a787BE6b41cbf964174C771A9f7ec48e04",
@@ -35,25 +35,25 @@ const TOKEN_MAP: Record<string, string> = {
   bbft: "0xfB69e2d3d673A8DB9Fa74ffc036A8Cf641255769",
 };
 
-const ERC20_ABI: ethers.InterfaceAbi = [
-  "event Transfer(address indexed from, address indexed to, uint256 value)",
-  "function decimals() view returns (uint8)",
-];
+// const ERC20_ABI: ethers.InterfaceAbi = [
+//   "event Transfer(address indexed from, address indexed to, uint256 value)",
+//   "function decimals() view returns (uint8)",
+// ];
 
 // Interface
-interface BurnData {
-  address: string;
-  burn5min: number;
-  burn15min: number;
-  burn30min: number;
-  burn1h: number;
-  burn3h: number;
-  burn6h: number;
-  burn12h: number;
-  burn24h: number;
-  lastUpdated: string;
-  fromCache?: boolean;
-}
+// interface BurnData {
+//   address: string;
+//   burn5min: number;
+//   burn15min: number;
+//   burn30min: number;
+//   burn1h: number;
+//   burn3h: number;
+//   burn6h: number;
+//   burn12h: number;
+//   burn24h: number;
+//   lastUpdated: string;
+//   fromCache?: boolean;
+// }
 
 // Rate limiting and retry configuration for fallback
 const RATE_LIMIT_DELAY = 100; // 100ms between requests
@@ -90,37 +90,37 @@ async function retryWithBackoff<T>(
 }
 
 // Helper function to find block by timestamp (approximate) with rate limiting
-async function findBlockByTimestamp(provider: ethers.Provider, targetTimestamp: number, latestBlock: number): Promise<number> {
-  return retryWithBackoff(async () => {
-    // Use binary search to find the closest block
-    let left = 1;
-    let right = latestBlock;
-    let closestBlock = latestBlock;
+// async function findBlockByTimestamp(provider: ethers.Provider, targetTimestamp: number, latestBlock: number): Promise<number> {
+//   return retryWithBackoff(async () => {
+//     // Use binary search to find the closest block
+//     let left = 1;
+//     let right = latestBlock;
+//     let closestBlock = latestBlock;
 
-    while (left <= right) {
-      const mid = Math.floor((left + right) / 2);
-      try {
-        const block = await provider.getBlock(mid);
-        await delay(RATE_LIMIT_DELAY); // Rate limiting
+//     while (left <= right) {
+//       const mid = Math.floor((left + right) / 2);
+//       try {
+//         const block = await provider.getBlock(mid);
+//         await delay(RATE_LIMIT_DELAY); // Rate limiting
         
-        if (block) {
-          if (block.timestamp <= targetTimestamp) {
-            closestBlock = mid;
-            left = mid + 1;
-          } else {
-            right = mid - 1;
-          }
-        } else {
-          right = mid - 1;
-        }
-      } catch (error) {
-        right = mid - 1;
-      }
-    }
+//         if (block) {
+//           if (block.timestamp <= targetTimestamp) {
+//             closestBlock = mid;
+//             left = mid + 1;
+//           } else {
+//             right = mid - 1;
+//           }
+//         } else {
+//           right = mid - 1;
+//         }
+//       } catch (error) {
+//         right = mid - 1;
+//       }
+//     }
 
-    return Math.max(closestBlock, 1);
-  });
-}
+//     return Math.max(closestBlock, 1);
+//   });
+// }
 
 function getBaseUrl() {
   return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';

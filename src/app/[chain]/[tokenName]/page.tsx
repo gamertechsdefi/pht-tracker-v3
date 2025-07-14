@@ -116,16 +116,16 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
 };
 
 // Define burn interval options
-const BURN_INTERVALS: BurnInterval[] = [
-    { value: "burn5min", label: "5 Minutes" },
-    { value: "burn15min", label: "15 Minutes" },
-    { value: "burn30min", label: "30 Minutes" },
-    { value: "burn1h", label: "1 Hour" },
-    { value: "burn3h", label: "3 Hours" },
-    { value: "burn6h", label: "6 Hours" },
-    { value: "burn12h", label: "12 Hours" },
-    { value: "burn24h", label: "24 Hours" },
-];
+// const BURN_INTERVALS: BurnInterval[] = [
+//     { value: "burn5min", label: "5 Minutes" },
+//     { value: "burn15min", label: "15 Minutes" },
+//     { value: "burn30min", label: "30 Minutes" },
+//     { value: "burn1h", label: "1 Hour" },
+//     { value: "burn3h", label: "3 Hours" },
+//     { value: "burn6h", label: "6 Hours" },
+//     { value: "burn12h", label: "12 Hours" },
+//     { value: "burn24h", label: "24 Hours" },
+// ];
 
 // Define props interface
 interface TokenPageProps {

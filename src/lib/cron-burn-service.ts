@@ -312,9 +312,9 @@ export async function processAllTokens(): Promise<void> {
       
       // Add delay between tokens to avoid overwhelming the API
       await delay(RATE_LIMIT_DELAY * 5);
-    } catch (error) {
-      console.error(`Error processing ${tokenName}:`, error);
-      results.push({ tokenName, success: false, error: error.message });
+    } catch {
+      console.error(`Error processing ${tokenName}`);
+      results.push({ tokenName, success: false });
     }
   }
 

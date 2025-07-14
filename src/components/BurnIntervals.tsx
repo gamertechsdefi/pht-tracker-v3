@@ -46,7 +46,6 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
   useEffect(() => {
     if (!tokenName) return;
     let isMounted = true;
-    let intervalId: NodeJS.Timeout;
 
     const fetchData = () => {
       setLoading(true);
@@ -72,7 +71,7 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
     };
 
     fetchData();
-    intervalId = setInterval(fetchData, 60000); // 60 seconds
+    const intervalId = setInterval(fetchData, 60000); // 60 seconds
 
     return () => {
       isMounted = false;
