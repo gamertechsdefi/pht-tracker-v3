@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import DataCard from "@/components/DataCard";
 import BurnsDisplay from "@/components/BurnHistory";
+import BurnIntervals from "@/components/BurnIntervals";
 import { FaGlobe, FaTelegramPlane } from "react-icons/fa";
 import { SiX } from "react-icons/si";
 import { MdOutlineLibraryBooks } from "react-icons/md";
@@ -140,7 +141,6 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const [socialLinks, setSocialLinks] = useState<{ website: string; twitter: string; telegram: string; bscscan: string } | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedBurnInterval, setSelectedBurnInterval] = useState<BurnIntervalKey>("burn24h");
     const [activeTab, setActiveTab] = useState<string>("info");
 
     useEffect(() => {
@@ -333,20 +333,6 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     //     }
     // };
 
-    const handleIntervalChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-        setSelectedBurnInterval(e.target.value as BurnIntervalKey);
-    };
-
-    const getSelectedBurnValue = (): string => {
-        if (!tokenData) return "No burns atm";
-        return (tokenData[selectedBurnInterval] as string | number).toString() || "No burns atm";
-    };
-
-    const getIntervalDisplayName = (): string => {
-        const interval = BURN_INTERVALS.find((item) => item.value === selectedBurnInterval);
-        return interval ? interval.label : "24 Hours";
-    };
-
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
@@ -380,181 +366,155 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     tokenData && (
                         <>
                             <div className="md:hidden">
-                                {activeTab === "info" && (
-                                    <>
-                                        <section className="">
-                                            <div className="flex flex-row bg-black rounded-lg p-4 mb-2 justify-between items-center w-full ">
-                                                <div className="flex flex-row items-center gap-2 flex-wrap">
-                                                    <img
-                                                        src={`/api/${chain}/logo/${tokenName}`}
-                                                        alt={`${tokenName?.toUpperCase()} Logo`}
-                                                        className="w-15 h-15 mb-2 rounded-md object-contain"
-                                                        onError={(e) => {
-                                                            (e.target as HTMLImageElement).src = '/file.svg';
-                                                            (e.target as HTMLImageElement).alt = 'Default Logo';
-                                                        }}
-                                                    />
-                                                    <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
-                                                </div>
-                                                {socialLinks && (
-                                                    <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
-                                                        <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                            <FaGlobe className="h-6 w-6" />
-                                                        </a>
-                                                        <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                            <SiX className="h-6 w-6" />
-                                                        </a>
-                                                        <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                            <FaTelegramPlane className="h-6 w-6" />
-                                                        </a>
-                                                        <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                            <MdOutlineLibraryBooks className="h-6 w-6" />
-                                                        </a>
-                                                    </div>
-                                                )}
+                                {/* Info Tab */}
+                                <div className={activeTab === "info" ? "" : "hidden"}>
+                                    <section className="">
+                                        <div className="flex flex-row bg-black rounded-lg p-4 mb-2 justify-between items-center w-full ">
+                                            <div className="flex flex-row items-center gap-2 flex-wrap">
+                                                <img
+                                                    src={`/api/${chain}/logo/${tokenName}`}
+                                                    alt={`${tokenName?.toUpperCase()} Logo`}
+                                                    className="w-15 h-15 mb-2 rounded-md object-contain"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = '/file.svg';
+                                                        (e.target as HTMLImageElement).alt = 'Default Logo';
+                                                    }}
+                                                />
+                                                <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
                                             </div>
+                                            {socialLinks && (
+                                                <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
+                                                    <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                        <FaGlobe className="h-6 w-6" />
+                                                    </a>
+                                                    <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                        <SiX className="h-6 w-6" />
+                                                    </a>
+                                                    <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                        <FaTelegramPlane className="h-6 w-6" />
+                                                    </a>
+                                                    <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                        <MdOutlineLibraryBooks className="h-6 w-6" />
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </div>
 
+                                        <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                            <h1>Price:</h1>
+                                            <h1 className="font-medium text-xl">
+                                                ${" "}
+                                                {(() => {
+                                                    const { display, isExponential } = formatPrice(tokenData.price);
+                                                    if (!isExponential) return display;
+                                                    const [prefix, exponent, value] = display.split(" ");
+                                                    return (
+                                                        <>
+                                                            {prefix}
+                                                            <sup className={styles.superscript}>{exponent}</sup> {value}
+                                                        </>
+                                                    );
+                                                })()}
+                                            </h1>
+                                        </div>
+
+
+                                        <div className="mt-4 grid grid-cols-3 gap-4">
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                <h1>Price:</h1>
-                                                <h1 className="font-medium text-xl">
-                                                    ${" "}
-                                                    {(() => {
-                                                        const { display, isExponential } = formatPrice(tokenData.price);
-                                                        if (!isExponential) return display;
-                                                        const [prefix, exponent, value] = display.split(" ");
-                                                        return (
-                                                            <>
-                                                                {prefix}
-                                                                <sup className={styles.superscript}>{exponent}</sup> {value}
-                                                            </>
-                                                        );
-                                                    })()}
-                                                </h1>
+                                                <h1>MarketCap:</h1>
+                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
                                             </div>
-
-
-                                            <div className="mt-4 grid grid-cols-3 gap-4">
-                                                <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                    <h1>MarketCap:</h1>
-                                                    <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
-                                                </div>
-                                                <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                    <h1>Liquidity:</h1>
-                                                    <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.liquidity)}</h1>
-                                                </div>
-                                                <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                    <h1>Volume:</h1>
-                                                    <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.volume)}</h1>
-                                                </div>
-                                                {/* <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                    <h1>Holders:</h1>
-                                                    <h1 className="font-medium text-xl">{formatWholeNumber(tokenData.holders)}</h1>
-                                                </div> */}
+                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>Liquidity:</h1>
+                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.liquidity)}</h1>
                                             </div>
-                                            <div className="mt-4 flex flex-row bg-neutral-900 justify-between gap-2 items-center border-2 border-orange-500 rounded-md p-4">
-                                                <div className="flex flex-col items-center">
-                                                    <span className="text-xs text-gray-400">1h</span>
-                                                    <span
-                                                        className={`px-2 py-1 rounded ${String(tokenData.priceChange1h).startsWith("-") ? "text-red-400" : "text-green-400"}`}
-                                                    >
-                                                        {tokenData.priceChange1h}%
-                                                    </span>
-                                                </div>
-                                                <div className="flex flex-col items-center">
-                                                    <span className="text-xs text-gray-400">3h</span>
-                                                    <span
-                                                        className={`px-2 py-1 rounded ${String(tokenData.priceChange3h).startsWith("-") ? "text-red-500" : "text-green-500"}`}
-                                                    >
-                                                        {tokenData.priceChange3h}%
-                                                    </span>
-                                                </div>
-                                                <div className="flex flex-col items-center">
-                                                    <span className="text-xs text-gray-400">6h</span>
-                                                    <span
-                                                        className={`px-2 py-1 rounded ${String(tokenData.priceChange6h).startsWith("-") ? "text-red-600" : "text-green-600"}`}
-                                                    >
-                                                        {tokenData.priceChange6h}%
-                                                    </span>
-                                                </div>
-                                                <div className="flex flex-col items-center">
-                                                    <span className="text-xs text-gray-400">24h</span>
-                                                    <span
-                                                        className={`px-2 py-1 rounded ${String(tokenData.priceChange24h).startsWith("-") ? "text-red-700" : "text-green-700"}`}
-                                                    >
-                                                        {tokenData.priceChange24h}%
-                                                    </span>
-                                                </div>
+                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>Volume:</h1>
+                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.volume)}</h1>
                                             </div>
-                                        </section>
-
-                                        <section className="mt-8 flex flex-col my-16">
-                                            <div className="flex-1">
-                                                <div className="my-8 space-y-4">
-                                                    <DataCard
-                                                        title="Total Supply"
-                                                        value={formatWholeNumber(tokenData.totalSupply)}
-                                                        bg="bg-white text-black"
-                                                        image="/tSupply.png"
-                                                    />
-                                                    <DataCard
-                                                        title="Total Locked"
-                                                        value={formatWholeNumber(tokenData.lSupply)}
-                                                        bg="bg-blue-600"
-                                                        image="/lock-bg.png"
-                                                    />
-                                                    <DataCard
-                                                        title="Circulatory Supply"
-                                                        value={formatWholeNumber(tokenData.cSupply)}
-                                                        bg="bg-green-600"
-                                                        image="/cSupply-bg.png"
-                                                    />
-                                                    <DataCard
-                                                        title="Total Burnt"
-                                                        value={formatWholeNumber(tokenData.totalburnt)}
-                                                        bg="bg-white text-black"
-                                                        image="/burn-bg.png"
-                                                    />
-                                                </div>
+                                            {/* <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>Holders:</h1>
+                                                <h1 className="font-medium text-xl">{formatWholeNumber(tokenData.holders)}</h1>
+                                            </div> */}
+                                        </div>
+                                        <div className="mt-4 flex flex-row bg-neutral-900 justify-between gap-2 items-center border-2 border-orange-500 rounded-md p-4">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">1h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange1h).startsWith("-") ? "text-red-400" : "text-green-400"}`}
+                                                >
+                                                    {tokenData.priceChange1h}%
+                                                </span>
                                             </div>
-                                        </section>
-                                    </>
-                                )}
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">3h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange3h).startsWith("-") ? "text-red-500" : "text-green-500"}`}
+                                                >
+                                                    {tokenData.priceChange3h}%
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">6h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange6h).startsWith("-") ? "text-red-600" : "text-green-600"}`}
+                                                >
+                                                    {tokenData.priceChange6h}%
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">24h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange24h).startsWith("-") ? "text-red-700" : "text-green-700"}`}
+                                                >
+                                                    {tokenData.priceChange24h}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </section>
 
-                                {activeTab === "burns" && (
+                                    <section className="mt-8 flex flex-col my-16">
+                                        <div className="flex-1">
+                                            <div className="my-8 space-y-4">
+                                                <DataCard
+                                                    title="Total Supply"
+                                                    value={formatWholeNumber(tokenData.totalSupply)}
+                                                    bg="bg-white text-black"
+                                                    image="/tSupply.png"
+                                                />
+                                                <DataCard
+                                                    title="Total Locked"
+                                                    value={formatWholeNumber(tokenData.lSupply)}
+                                                    bg="bg-blue-600"
+                                                    image="/lock-bg.png"
+                                                />
+                                                <DataCard
+                                                    title="Circulatory Supply"
+                                                    value={formatWholeNumber(tokenData.cSupply)}
+                                                    bg="bg-green-600"
+                                                    image="/cSupply-bg.png"
+                                                />
+                                                <DataCard
+                                                    title="Total Burnt"
+                                                    value={formatWholeNumber(tokenData.totalburnt)}
+                                                    bg="bg-white text-black"
+                                                    image="/burn-bg.png"
+                                                />
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                                {/* Burns Tab */}
+                                <div className={activeTab === "burns" ? "" : "hidden"}>
                                     <section className="mt-8 flex flex-col">
                                         <div className="flex-1">
-                                            <div className="bg-neutral-900 border-2 border-neutral-600 p-4 rounded-lg shadow-lg">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <h1 className="text-white">{getIntervalDisplayName()} Burns</h1>
-                                                    <select
-                                                        value={selectedBurnInterval}
-                                                        onChange={handleIntervalChange}
-                                                        className="bg-neutral-800 text-white border border-neutral-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                                    >
-                                                        {BURN_INTERVALS.map((interval) => (
-                                                            <option key={interval.value} value={interval.value}>
-                                                                {interval.label}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                                <h1 className="text-3xl font-bold text-red-500">
-                                                    {getSelectedBurnValue() === "No burns atm"
-                                                        ? "No burns atm"
-                                                        : formatWholeNumber(getSelectedBurnValue())}
-                                                </h1>
-                                                <p className="text-xs text-gray-400 mt-1">
-                                                    Last updated: {new Date().toLocaleTimeString()}
-                                                </p>
-                                            </div>
-
-                                            <div className="my-8 space-y-4">
-
-                                            </div>
+                                            {/* Remove burn interval select and value display */}
+                                            {/* Place BurnIntervals here for burns tab */}
+                                            {tokenName && <BurnIntervals tokenName={tokenName} />}
                                         </div>
                                         {tokenName && chain && <BurnsDisplay tokenName={tokenName} chain={chain} />}
                                     </section>
-                                )}
+                                </div>
 
                                 {activeTab === "chart" && (
                                     <div className="h-[48rem] mb-16 -mx-6">
@@ -704,28 +664,9 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
                                     <div>
                                         <div className="bg-neutral-900 border-2 border-neutral-600 p-4 rounded-lg shadow-lg">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <h1 className="text-white">{getIntervalDisplayName()} Burns</h1>
-                                                <select
-                                                    value={selectedBurnInterval}
-                                                    onChange={handleIntervalChange}
-                                                    className="bg-neutral-800 text-white border border-neutral-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                                >
-                                                    {BURN_INTERVALS.map((interval) => (
-                                                        <option key={interval.value} value={interval.value}>
-                                                            {interval.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <h1 className="text-3xl font-bold text-red-500">
-                                                {getSelectedBurnValue() === "No burns atm"
-                                                    ? "No burns atm"
-                                                    : formatWholeNumber(getSelectedBurnValue())}
-                                            </h1>
-                                            <p className="text-xs text-gray-400 mt-1">
-                                                Last updated: {new Date().toLocaleTimeString()}
-                                            </p>
+                                            {/* Remove burn interval select and value display */}
+                                            {/* Place BurnIntervals here for desktop */}
+                                            {tokenName && <BurnIntervals tokenName={tokenName} />}
                                         </div>
 
                                         <div className="mt-8 space-y-4">
