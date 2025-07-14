@@ -56,7 +56,7 @@ const TOKEN_MAP: Record<string, string> = {
 // }
 
 // Rate limiting and retry configuration for fallback
-const RATE_LIMIT_DELAY = 100; // 100ms between requests
+// const RATE_LIMIT_DELAY = 100; // 100ms between requests
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
@@ -64,30 +64,30 @@ const RETRY_DELAY = 1000; // 1 second
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Helper function to retry with exponential backoff
-async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  maxRetries: number = MAX_RETRIES
-): Promise<T> {
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error: any) {
-      const isLastAttempt = attempt === maxRetries;
-      const isRateLimitError = error?.message?.includes('rate limit') || 
-                              error?.message?.includes('too many requests') ||
-                              error?.code === 429;
+// async function retryWithBackoff<T>(
+//   fn: () => Promise<T>,
+//   maxRetries: number = MAX_RETRIES
+// ): Promise<T> {
+//   for (let attempt = 0; attempt <= maxRetries; attempt++) {
+//     try {
+//       return await fn();
+//     } catch (error: any) {
+//       const isLastAttempt = attempt === maxRetries;
+//       const isRateLimitError = error?.message?.includes('rate limit') || 
+//                               error?.message?.includes('too many requests') ||
+//                               error?.code === 429;
 
-      if (isLastAttempt || !isRateLimitError) {
-        throw error;
-      }
+//       if (isLastAttempt || !isRateLimitError) {
+//         throw error;
+//       }
 
-      const backoffDelay = RETRY_DELAY * Math.pow(2, attempt);
-      console.log(`Rate limited, retrying in ${backoffDelay}ms (attempt ${attempt + 1}/${maxRetries + 1})`);
-      await delay(backoffDelay);
-    }
-  }
-  throw new Error('Max retries exceeded');
-}
+//       const backoffDelay = RETRY_DELAY * Math.pow(2, attempt);
+//       console.log(`Rate limited, retrying in ${backoffDelay}ms (attempt ${attempt + 1}/${maxRetries + 1})`);
+//       await delay(backoffDelay);
+//     }
+//   }
+//   throw new Error('Max retries exceeded');
+// }
 
 // Helper function to find block by timestamp (approximate) with rate limiting
 // async function findBlockByTimestamp(provider: ethers.Provider, targetTimestamp: number, latestBlock: number): Promise<number> {

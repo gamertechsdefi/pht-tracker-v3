@@ -37,10 +37,10 @@ interface TokenData {
     profile: string;
 }
 
-interface BurnInterval {
-    value: BurnIntervalKey;
-    label: string;
-}
+// interface BurnInterval {
+//     value: BurnIntervalKey;
+//     label: string;
+// }
 
 
 type BurnIntervalKey =

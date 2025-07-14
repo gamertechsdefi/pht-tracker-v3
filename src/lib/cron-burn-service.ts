@@ -112,7 +112,7 @@ async function findBlockByTimestamp(provider: ethers.Provider, targetTimestamp: 
         } else {
           right = mid - 1;
         }
-      } catch (error) {
+      } catch {
         right = mid - 1;
       }
     }
