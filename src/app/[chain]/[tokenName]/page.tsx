@@ -43,15 +43,15 @@ interface TokenData {
 // }
 
 
-type BurnIntervalKey =
-    | "burn5min"
-    | "burn15min"
-    | "burn30min"
-    | "burn1h"
-    | "burn3h"
-    | "burn6h"
-    | "burn12h"
-    | "burn24h";
+// type BurnIntervalKey =
+//     | "burn5min"
+//     | "burn15min"
+//     | "burn30min"
+//     | "burn1h"
+//     | "burn3h"
+//     | "burn6h"
+//     | "burn12h"
+//     | "burn24h";
 
 // Token-to-chain mapping
 const TOKEN_LIST: Record<string, string> = {
