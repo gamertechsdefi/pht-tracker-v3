@@ -9,6 +9,8 @@ const BURN_ADDRESSES: string[] = [
   "0x0000000000000000000000000000000000000000",
 ];
 
+//fix
+
 const TOKEN_MAP: Record<string, string> = {
   pht: "0x885c99a787BE6b41cbf964174C771A9f7ec48e04",
   wkc: "0x6Ec90334d89dBdc89E08A133271be3d104128Edb",
