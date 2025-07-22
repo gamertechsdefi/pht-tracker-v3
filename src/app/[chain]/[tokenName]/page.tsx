@@ -7,7 +7,6 @@ import BurnsDisplay from "@/components/BurnHistory";
 import BurnIntervals from "@/components/BurnIntervals";
 import { FaGlobe, FaTelegramPlane } from "react-icons/fa";
 import { SiX } from "react-icons/si";
-import { MdOutlineLibraryBooks } from "react-icons/md";
 import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
 import Image from "next/image";
