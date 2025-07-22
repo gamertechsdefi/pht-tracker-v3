@@ -10,6 +10,7 @@ import { SiX } from "react-icons/si";
 import { MdOutlineLibraryBooks } from "react-icons/md";
 import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
+import Image from "next/image";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -82,6 +83,9 @@ const TOKEN_LIST: Record<string, string> = {
     cross: "bsc",
     thc: "bsc",
     bbft: "bsc",
+    surv: "bsc",
+    bob: "bsc",
+    tut: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -112,7 +116,10 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     bft: "Big Five Token",
     cross: "Cross Token",
     thc: "Transhuman Coin",
-    bbft: "Baby BFT"
+    bbft: "Baby BFT",
+    surv: "Survarium",
+    bob: "Build on BNB",
+    tut: "Tutorial Token",
 };
 
 // Define burn interval options
@@ -394,7 +401,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                         <FaTelegramPlane className="h-6 w-6" />
                                                     </a>
                                                     <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <MdOutlineLibraryBooks className="h-6 w-6" />
+                                                        <Image src="/bscscan.png" alt="BscScan Logo" width={10} height={10} className="h-6 w-6" />
                                                     </a>
                                                 </div>
                                             )}
@@ -558,7 +565,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                         <FaTelegramPlane className="h-6 w-6" />
                                                     </a>
                                                     <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <MdOutlineLibraryBooks className="h-6 w-6" />
+                                                        <Image src="/bscscan.png" alt="BscScan Logo" width={10} height={10} className="h-6 w-6" />
                                                     </a>
                                                 </div>
                                             )}

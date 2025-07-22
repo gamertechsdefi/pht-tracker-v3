@@ -142,10 +142,28 @@ export async function GET(request: NextRequest){
             bscscan: "https://bscscan.com/token/0x56083560594e314b5cdd1680ec6a493bb851bbd8"
         },
         bbft: {
-            website: "",
-            twitter: "",
-            telegram: "",
-            bscscan: "",
+            website: "https://babybft.com/",
+            twitter: "https://x.com/BabyBft",
+            telegram: "https://t.me/babybft",
+            bscscan: "https://bscscan.com/address/0xfb69e2d3d673a8db9fa74ffc036a8cf641255769",
+        },
+        bob: {
+            website: "https://buildonbnb.com/",
+            twitter: "https://x.com/BuildOnBNBBOB",
+            telegram: "https://t.me/BuildOnBNBBOB",
+            bscscan: "https://bscscan.com/token/0x51363f073b1e4920fda7aa9e9d84ba97ede1560e"
+        },
+        surv: {
+            website: "https://survariumbsc.com/",
+            twitter: "https://x.com/SurvariumBSC",
+            telegram: "https://t.me/survarium_chat",
+            bscscan: "https://bscscan.com/token/0xaff713b62e642b25898e24d5be6561f863582144"
+        },
+        tut: {
+            website: "https://tutorialtoken.com/",
+            twitter: "https://x.com/tutorialtoken",
+            telegram: "https://t.me/TUTPortal",
+            bscscan: "https://bscscan.com/token/0xcaae2a2f939f51d97cdfa9a86e79e3f085b799f3"
         }
     };
 

@@ -44,6 +44,9 @@ const TOKEN_LIST: { [key: string]: string } = {
     cross: "bsc",
     thc: "bsc",
     bbft: "bsc",
+    surv: "bsc",
+    bob: "bsc",
+    tut: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -71,6 +74,9 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "Cross Token": "cross",
     "Transhuman Coin": "thc",
     "Baby BFT": "bbft",
+    "Survarium": "surv",
+    "Build on BNB": "bob",
+    "Tutorial Token": "tut",
 };
 
 export default function Header() {
