@@ -3,7 +3,7 @@ import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "@/db/firebase";
 
 // Configure for BNB Chain
-const RPC_URL: string = "https://bsc-mainnet.infura.io/v3/c8b8404619e14e5385a48fbbdd1bca4f";
+const RPC_URL = process.env.INFRA_RPC_URL;
 const BURN_ADDRESSES: string[] = [
   "0x000000000000000000000000000000000000dEaD",
   "0x0000000000000000000000000000000000000000",
