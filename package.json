@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test-cron": "curl -H 'Authorization: Bearer ${process.env.CRON_SECRET}' http://localhost:3000/api/cron/burn-update?interval=short"
   },
   "dependencies": {
     "@google-cloud/firestore": "^7.11.0",
