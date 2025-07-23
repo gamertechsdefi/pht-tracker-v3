@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getCachedBurnData } from '@/lib/cron-burn-service';
-
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/db/firebase';
 
 const TOKEN_MAP: Record<string, string> = {
   pht: "0x885c99a787BE6b41cbf964174C771A9f7ec48e04",
@@ -28,59 +28,91 @@ const TOKEN_MAP: Record<string, string> = {
   bbft: "0xfB69e2d3d673A8DB9Fa74ffc036A8Cf641255769",
 };
 
-
-
-
-// Helper function to find block by timestamp (approximate) with rate limiting
-
-
-function getBaseUrl() {
-  return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+interface BurnData {
+  tokenName: string;
+  tokenAddress: string;
+  burn5min: number;
+  burn15min: number;
+  burn30min: number;
+  burn1h: number;
+  burn3h: number;
+  burn6h: number;
+  burn12h: number;
+  burn24h: number;
+  lastUpdated: string;
+  lastProcessedBlock: number;
+  computationTime: number;
 }
 
-export async function GET(_: Request, context: any): Promise<NextResponse> {
-  const params = context.params as { tokenName?: string };
-  const tokenName = params.tokenName?.toLowerCase();
-  const tokenAddress = tokenName ? TOKEN_MAP[tokenName] : undefined;
-
-  if (!tokenName  || !tokenAddress) {
-    return NextResponse.json({ error: "Invalid token" }, { status: 400 });
-  }
-
-  const cachedData = await getCachedBurnData(tokenName);
-  const now = new Date();
-  let nextUpdate: Date | null = null;
-  if (cachedData && cachedData.nextUpdate) {
-    nextUpdate = new Date(cachedData.nextUpdate);
-  }
-
-  // Always return cached data instantly
-  if (cachedData) {
-    // If cache is stale, trigger background update (do not await)
-    if (nextUpdate && now >= nextUpdate) {
-      fetch(`${getBaseUrl()}/api/cron/calculate-burns/${tokenName}`, { method: 'POST' })
-        .catch(console.error);
+export async function GET(_: Request, context: { params: { tokenName?: string } }): Promise<NextResponse> {
+  try {
+    const { tokenName: rawTokenName } = context.params;
+    const tokenName = rawTokenName?.toLowerCase();
+    
+    if (!tokenName) {
+      return NextResponse.json(
+        { error: "Token name is required" }, 
+        { status: 400 }
+      );
     }
-    return NextResponse.json({ ...cachedData, fromCache: true, stale: nextUpdate ? now >= nextUpdate : true });
+
+    const tokenAddress = TOKEN_MAP[tokenName];
+    if (!tokenAddress) {
+      return NextResponse.json(
+        { error: `Token '${tokenName}' is not supported` }, 
+        { status: 404 }
+      );
+    }
+
+    // Fetch data from Firestore
+    const docRef = doc(db, 'burnData', tokenName);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      return NextResponse.json(
+        { 
+          error: "No burn data available",
+          message: `No burn data found for token ${tokenName}`
+        },
+        { status: 404 }
+      );
+    }
+
+    const burnData = docSnap.data() as BurnData;
+    
+    // Return the burn data with cache info
+    return NextResponse.json({
+      ...burnData,
+      fromCache: true,
+      stale: false,
+      message: "Using cached data from Firestore"
+    });
+
+  } catch (error) {
+    console.error(`Error in GET /api/bsc/total-burnt/[tokenName]:`, error);
+    return NextResponse.json(
+      { 
+        error: "Failed to fetch burn data", 
+        details: error instanceof Error ? error.message : 'Unknown error',
+        message: "An error occurred while fetching burn data"
+      },
+      { status: 500 }
+    );
   }
+}
 
-  // If no cache, trigger background update and return placeholder
-  fetch(`${getBaseUrl()}/api/cron/calculate-burns/${tokenName}`, { method: 'POST' })
-    .catch(console.error);
-
-  return NextResponse.json({
-    address: tokenAddress,
-    burn5min: 0,
-    burn15min: 0,
-    burn30min: 0,
-    burn1h: 0,
-    burn3h: 0,
-    burn6h: 0,
-    burn12h: 0,
-    burn24h: 0,
-    lastUpdated: null,
-    fromCache: false,
-    stale: true,
-    message: "No cached data yet, updating in background."
-  });
+// Helper function to get burn data (for internal use)
+async function getCachedBurnData(tokenName: string): Promise<BurnData | null> {
+  try {
+    const docRef = doc(db, 'burnData', tokenName.toLowerCase());
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return docSnap.data() as BurnData;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting cached burn data:', error);
+    return null;
+  }
 }

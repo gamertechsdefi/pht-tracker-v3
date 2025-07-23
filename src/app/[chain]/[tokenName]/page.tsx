@@ -195,7 +195,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     `/api/${chainLower}/token-metrics/${token}`,
                     `/api/${chainLower}/token-holders/${token}`,
                     `/api/${chainLower}/token-price/${token}`,
-                    `/api/${chainLower}/burns/${token}`,
+                    `/api/${chainLower}/total-burnt/${token}`,
                     `/api/${chainLower}/token-profile/${token}`,
                     `/api/${chainLower}/socials/${token}`,
                 ];
