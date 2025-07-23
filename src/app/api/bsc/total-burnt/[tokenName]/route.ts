@@ -102,17 +102,17 @@ export async function GET(_: Request, context: { params: { tokenName?: string } 
 }
 
 // Helper function to get burn data (for internal use)
-async function getCachedBurnData(tokenName: string): Promise<BurnData | null> {
-  try {
-    const docRef = doc(db, 'burnData', tokenName.toLowerCase());
-    const docSnap = await getDoc(docRef);
+// async function getCachedBurnData(tokenName: string): Promise<BurnData | null> {
+//   try {
+//     const docRef = doc(db, 'burnData', tokenName.toLowerCase());
+//     const docSnap = await getDoc(docRef);
     
-    if (docSnap.exists()) {
-      return docSnap.data() as BurnData;
-    }
-    return null;
-  } catch (error) {
-    console.error('Error getting cached burn data:', error);
-    return null;
-  }
-}
+//     if (docSnap.exists()) {
+//       return docSnap.data() as BurnData;
+//     }
+//     return null;
+//   } catch (error) {
+//     console.error('Error getting cached burn data:', error);
+//     return null;
+//   }
+// }
