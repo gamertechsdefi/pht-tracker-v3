@@ -342,7 +342,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-1 px-6 md:px-8 mt-8">
+            <main className="flex-1 px-3 md:px-8 mt-8">
 
                 {loading ? (
                     <div className="flex items-center justify-center mt-8">
