@@ -75,7 +75,7 @@ export async function GET(_: Request, context: any): Promise<NextResponse> {
     const contract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
 
     // Fetch supply, burn, and locked data
-    const [totalSupply, decimals, burnAddressBalance] = await Promise.all([
+    const [totalSupply, decimals] = await Promise.all([
       contract.totalSupply() as Promise<bigint>,
       contract.decimals() as Promise<number>,
       contract.balanceOf(DEAD_ADDRESS) as Promise<bigint>,
