@@ -102,7 +102,7 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
 
   return (
     <div className="bg-neutral-900 border-2 border-neutral-600 rounded-lg p-4">
-      <h2 className="text-xl font-bold mb-2">Burn Interval</h2>
+      <h2 className="text-xl font-bold mb-2">{tokenName.toUpperCase()} Burn Interval</h2>
       <div className="flex flex-col items-start gap-4 mb-2">
         <select
           value={selectedInterval}
