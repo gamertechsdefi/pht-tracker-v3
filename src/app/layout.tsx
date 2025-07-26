@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Nunito } from "next/font/google";
+import {  Nunito } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next"
 
