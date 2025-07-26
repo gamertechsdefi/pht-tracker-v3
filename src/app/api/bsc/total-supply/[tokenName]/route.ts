@@ -84,7 +84,7 @@ export async function GET(_: Request, context: any): Promise<NextResponse> {
 
     const divisor = BigInt(10) ** BigInt(decimals);
     const totalBurnt = burnAddressBalance;
-    const circulatingSupply = totalSupply - totalBurnt - lockedSupply;
+    // const circulatingSupply = totalSupply - totalBurnt - lockedSupply;
 
     const result: TokenMetrics = {
       totalSupply: formatTokenAmount(totalSupply, divisor),
