@@ -47,6 +47,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     surv: "bsc",
     bob: "bsc",
     tut: "bsc",
+    puffcat: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -77,6 +78,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "Survarium": "surv",
     "Build on BNB": "bob",
     "Tutorial Token": "tut",
+    "PuffCat Token": "puffcat",
 };
 
 export default function Header() {

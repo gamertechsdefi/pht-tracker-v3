@@ -164,7 +164,13 @@ export async function GET(request: NextRequest){
             twitter: "https://x.com/tutorialtoken",
             telegram: "https://t.me/TUTPortal",
             bscscan: "https://bscscan.com/token/0xcaae2a2f939f51d97cdfa9a86e79e3f085b799f3"
-        }
+        },
+        puffcat: {
+            website: "https://www.puffcattoken.com/",
+            twitter: "https://x.com/puff_cattoken",
+            telegram: "https://t.me/puffcatchannel",
+            bscscan: "https://bscscan.com/token/0x14a8d0ac8fc456899f2dd33c3f4e32403a78126c"
+        },
     };
 
     const socialLinks = tokenSocialMapping[tokenName] ?? {
