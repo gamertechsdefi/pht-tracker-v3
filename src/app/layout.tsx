@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import {  Nunito } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next"
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+// const spaceGrotesk = Space_Grotesk({
+//   variable: "--font-space-grotesk",
+//   subsets: ["latin"],
+//   display: "swap", 
+// });
+
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
-  display: "swap", // optional but recommended
+  weight: ["300", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -22,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${spaceGrotesk.variable} antialiased`}
+        className={`${nunito.variable} antialiased`}
       >
         {children}
       </body>

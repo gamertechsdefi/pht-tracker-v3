@@ -344,7 +344,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-1 px-6 md:px-8 mt-8">
+            <main className="flex-1 px-3 md:px-8 mt-8">
 
                 {loading ? (
                     <div className="flex items-center justify-center mt-8">
@@ -377,18 +377,18 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 {/* Info Tab */}
                                 <div className={activeTab === "info" ? "" : "hidden"}>
                                     <section className="">
-                                        <div className="flex flex-row bg-black rounded-lg p-4 mb-2 justify-between items-center w-full ">
-                                            <div className="flex flex-row items-center gap-2 flex-wrap">
+                                        <div className="flex flex-row bg-black rounded-lg p-4 mb-2 justify-between items-start w-full">
+                                            <div className="flex flex-row items-center gap-2 flex-1 min-w-0">
                                                 <img
                                                     src={`/api/${chain}/logo/${tokenName}`}
                                                     alt={`${tokenName?.toUpperCase()} Logo`}
-                                                    className="w-15 h-15 mb-2 rounded-md object-contain"
+                                                    className="w-15 h-15 rounded-md object-contain flex-shrink-0"
                                                     onError={(e) => {
                                                         (e.target as HTMLImageElement).src = '/file.svg';
                                                         (e.target as HTMLImageElement).alt = 'Default Logo';
                                                     }}
                                                 />
-                                                <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
+                                                <h1 className="text-2xl font-bold break-words">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
                                             </div>
                                             {socialLinks && (
                                                 <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
@@ -543,17 +543,17 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                             <div className="hidden md:block">
                                 <section className="md:grid md:grid-cols-2 md:gap-8 mb-16">
                                     <div>
-                                        <div className="flex flex-row items-center gap-2 bg-black rounded-md p-4 mb-4 flex-wrap">
+                                        <div className="flex flex-row items-center gap-2 bg-black rounded-md p-4 mb-4">
                                             <img
                                                 src={`/api/${chain}/logo/${tokenName}`}
                                                 alt={`${tokenName?.toUpperCase()} Logo`}
-                                                className="w-18 h-18 mb-2 rounded-md object-contain"
+                                                className="w-18 h-18 rounded-md object-contain flex-shrink-0"
                                                 onError={(e) => {
                                                     (e.target as HTMLImageElement).src = '/file.svg';
                                                     (e.target as HTMLImageElement).alt = 'Default Logo';
                                                 }}
                                             />
-                                            <h1 className="text-2xl font-bold">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
+                                            <h1 className="text-2xl font-bold break-words">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
                                             {socialLinks && (
                                                 <div className="flex flex-row gap-4 mt-2 w-full">
                                                     <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
