@@ -29,6 +29,11 @@ interface BurnData {
   lastUpdated: string;
 }
 
+interface TokenPriceData {
+  price: string;
+  lastUpdated: string;
+}
+
 function formatBurnValue(value: number): string {
   if (value === null || value === undefined || isNaN(value)) return "N/A";
   if (Math.abs(value) < 1) {
@@ -37,8 +42,17 @@ function formatBurnValue(value: number): string {
   return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function formatUSDValue(value: number): string {
+  if (value === null || value === undefined || isNaN(value)) return "N/A";
+  if (value < 0.01) {
+    return `$${value.toFixed(6)}`;
+  }
+  return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
   const [data, setData] = useState<BurnData | null>(null);
+  const [tokenPrice, setTokenPrice] = useState<TokenPriceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedInterval, setSelectedInterval] = useState<IntervalKey>("burn24h");
@@ -51,6 +65,7 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
       setLoading(true);
       setError(null);
 
+      // Fetch burn data
       fetch(`/api/bsc/total-burnt/${encodeURIComponent(tokenName)}`)
         .then((res) => {
           if (!res.ok) throw new Error("Failed to fetch burn intervals");
@@ -59,12 +74,33 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
         .then((json) => {
           if (isMounted) {
             setData(json);
-            setLoading(false);
           }
         })
         .catch((err) => {
           if (isMounted) {
             setError(err.message);
+          }
+        });
+
+      // Fetch token price
+      fetch(`/api/bsc/token-price/${encodeURIComponent(tokenName)}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch token price");
+          return res.json();
+        })
+        .then((json) => {
+          if (isMounted) {
+            setTokenPrice(json);
+          }
+        })
+        .catch((err) => {
+          if (isMounted) {
+            console.error("Failed to fetch token price:", err);
+            // Don't set error for price fetch failure, just log it
+          }
+        })
+        .finally(() => {
+          if (isMounted) {
             setLoading(false);
           }
         });
@@ -99,15 +135,30 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
   if (!data) return null;
 
   const value = data[selectedInterval];
+  
+  // Calculate USD value
+  const calculateUSDValue = () => {
+    if (!tokenPrice || !tokenPrice.price || tokenPrice.price === "N/A" || !value || isNaN(value)) {
+      return "N/A";
+    }
+    
+    const price = parseFloat(tokenPrice.price);
+    if (isNaN(price)) return "N/A";
+    
+    const usdValue = value * price;
+    return formatUSDValue(usdValue);
+  };
+
+  const usdValue = calculateUSDValue();
 
   return (
     <div className="bg-neutral-900 border-2 border-neutral-600 rounded-lg p-4">
       <h2 className="text-xl font-bold mb-2">{tokenName.toUpperCase()} Burn Interval</h2>
-      <div className="flex flex-col items-start gap-4 mb-2">
+      <div className="flex flex-col items-start mb-2">
         <select
           value={selectedInterval}
           onChange={handleChange}
-          className="bg-neutral-800 text-white border border-neutral-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="bg-neutral-800 mb-2 text-white border border-neutral-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
         >
           {INTERVALS.map((interval) => (
             <option key={interval.key} value={interval.key}>
@@ -115,9 +166,15 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
             </option>
           ))}
         </select>
-        <span className="text-3xl font-bold text-red-500">
+        <span className="text-4xl font-bold text-red-500">
           {typeof value === 'number' ? formatBurnValue(value) : "N/A"}
         </span>
+        <p className="flex gap-2 items-center text-red-100 mb-2">
+          <span className="text-md">USD Value: </span>
+          <span className="font-semibold text-xl text-red-500">
+            {usdValue}
+          </span>
+        </p>
       </div>
       <div className="text-xs text-gray-500 mt-2">
         Last updated: {new Date(data.lastUpdated).toLocaleString()}

@@ -541,7 +541,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                             </div>
 
                             <div className="hidden md:block">
-                                <section className="md:grid md:grid-cols-2 md:gap-8 mb-16">
+                                <section className="md:grid  md:grid-cols-2 md:gap-8 mb-16">
                                     <div>
                                         <div className="flex flex-row items-center gap-2 bg-black rounded-md p-4 mb-4">
                                             <img
@@ -671,7 +671,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     </div>
 
                                     <div>
-                                        <div className="bg-neutral-900 border-2 border-neutral-600 p-4 rounded-lg shadow-lg">
+                                        <div className=" p-4 rounded-lg shadow-lg">
                                             {/* Remove burn interval select and value display */}
                                             {/* Place BurnIntervals here for desktop */}
                                             {tokenName && <BurnIntervals tokenName={tokenName} />}
