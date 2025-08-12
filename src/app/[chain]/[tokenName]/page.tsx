@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import DataCard from "@/components/DataCard";
 import BurnsDisplay from "@/components/BurnHistory";
 import BurnIntervals from "@/components/BurnIntervals";
-import { FaGlobe, FaTelegramPlane } from "react-icons/fa";
+import { FaCopy, FaGlobe, FaTelegramPlane } from "react-icons/fa";
 import { SiX } from "react-icons/si";
 import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
@@ -35,6 +35,7 @@ interface TokenData {
     priceChange1h: string | number;
     liquidity: string | number;
     profile: string;
+    contract: string;
 }
 
 // interface BurnInterval {
@@ -200,6 +201,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     `/api/${chainLower}/total-burnt/${token}`,
                     `/api/${chainLower}/token-profile/${token}`,
                     `/api/${chainLower}/socials/${token}`,
+                    `/api/${chainLower}/ca/${token}`,
                 ];
                 console.log("API endpoints:", apiEndpoints);
 
@@ -211,7 +213,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     )
                 );
 
-                const [metricsData, holdersData, priceData, burnsData, profileData, socialData] = responses;
+                const [metricsData, holdersData, priceData, burnsData, profileData, socialData, contractData] = responses;
 
                 setTokenData({
                     price: priceData?.price || "N/A",
@@ -236,6 +238,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     priceChange1h: priceData?.change1h || "N/A",
                     liquidity: priceData?.liquidity || "N/A",
                     profile: profileData?.profileImage || "N/A",
+                    contract: contractData?.address || "Not found",
                 });
                 setSocialLinks(socialData || null);
             } catch (err: unknown) {
@@ -340,6 +343,43 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     //         setError(`Token "${token}" not found`);
     //     }
     // };
+
+    function formatEvmAddress(address: string, shorten: boolean = true, chars: number = 5): string {
+        // Normalize to lowercase and remove '0x' prefix if present
+        let normalized = address.toLowerCase().replace(/^0x/i, '');
+        if (normalized.length !== 40 || !/^[0-9a-f]{40}$/.test(normalized)) {
+            throw new Error("Invalid EVM address. Must be 40 hexadecimal characters.");
+        }
+
+        // Basic checksum: alternate case for readability (not full EIP-55, which requires Keccak-256)
+        let checksum = '0x';
+        for (let i = 0; i < normalized.length; i++) {
+            // Simple rule: uppercase every even-indexed character (0-based)
+            checksum += i % 2 === 0 ? normalized[i].toUpperCase() : normalized[i];
+        }
+
+        // Shorten if requested
+        if (shorten) {
+            if (chars < 1) throw new Error("Number of characters must be at least 1.");
+            return checksum.slice(0, 2 + chars) + '...' + checksum.slice(-chars);
+        }
+
+        return checksum;
+    }
+
+    // Function to copy the token address to the clipboard
+    async function copyAddress(address: string): Promise<void> {
+        try {
+            await navigator.clipboard.writeText(address);
+            console.log('Address copied to clipboard:', address);
+            // Optionally, you can show a user notification here (e.g., toast or alert)
+            alert('Address copied to clipboard!');
+        } catch (error) {
+            console.error('Failed to copy address:', error);
+            // Optionally, show an error notification
+            alert('Failed to copy address. Please try again.');
+        }
+    }
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -478,6 +518,15 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     {tokenData.priceChange24h}%
                                                 </span>
                                             </div>
+                                        </div>
+
+                                        <div className="flex flex-col gap-2 bg-neutral-900 border-2 border-neutral-600 p-4 mt-4 rounded-xl">
+
+                                            <p className="text-md">Contract Address</p>
+                                            <h1 className="text-2xl font-bold text-orange-500 flex gap-2">
+                                                <span>{formatEvmAddress(tokenData.contract)}</span>
+                                                <button onClick={()=> copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
+                                            </h1>
                                         </div>
                                     </section>
 
@@ -640,6 +689,15 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     {tokenData.priceChange24h}%
                                                 </span>
                                             </div>
+                                        </div>
+
+                                        <div className="flex flex-col gap-2 bg-neutral-900 border-2 border-neutral-600 p-4 mt-4 rounded-xl">
+
+                                            <p className="text-md">Contract Address</p>
+                                            <h1 className="text-2xl font-bold text-orange-500 flex gap-2">
+                                                <span>{tokenData.contract}</span>
+                                                <button><FaCopy size={20} fill="#ffffff" /></button>
+                                            </h1>
                                         </div>
 
                                         <div className="mt-8 space-y-4">
