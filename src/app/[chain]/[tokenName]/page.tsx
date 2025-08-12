@@ -346,7 +346,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
     function formatEvmAddress(address: string, shorten: boolean = true, chars: number = 5): string {
         // Normalize to lowercase and remove '0x' prefix if present
-        let normalized = address.toLowerCase().replace(/^0x/i, '');
+        const normalized = address.toLowerCase().replace(/^0x/i, '');
         if (normalized.length !== 40 || !/^[0-9a-f]{40}$/.test(normalized)) {
             throw new Error("Invalid EVM address. Must be 40 hexadecimal characters.");
         }
