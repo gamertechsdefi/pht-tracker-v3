@@ -171,6 +171,13 @@ export async function GET(request: NextRequest){
             telegram: "https://t.me/puffcatchannel",
             bscscan: "https://bscscan.com/token/0x14a8d0ac8fc456899f2dd33c3f4e32403a78126c"
         },
+        crepe: {
+            website: "https://www.crepe.fun/",
+            twitter: "https://x.com/crepedotfun",
+            telegram: "https://t.me/crepefun",
+            bscscan: "https://bscscan.com/token/0xeb2b7d5691878627eff20492ca7c9a71228d931d"
+
+        }
     };
 
     const socialLinks = tokenSocialMapping[tokenName] ?? {

@@ -36,6 +36,7 @@ const TOKEN_MAP: Record<string, string> = {
   surv: "0xAfF713b62e642b25898e24d5Be6561f863582144",
   tut: "0xCAAE2A2F939F51d97CdFa9A86e79e3F085b799f3",
   puffcat: "0x14a8d0AC8Fc456899F2DD33C3f4E32403A78126c",
+  crepe: "0xeb2B7d5691878627eff20492cA7c9a71228d931D",
 };
 
 // ERC-20 ABI for required functions
