@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
     bob: "0x51363F073b1E4920fdA7AA9E9d84BA97EdE1560e",
     puffcat: "0x14a8d0AC8Fc456899F2DD33C3f4E32403A78126c",
     crepe: "0xeb2B7d5691878627eff20492cA7c9a71228d931D",
+    popielno: "0xdc3d92dd5a468edb7a7772452700cc93bb1826ad",
   };
 
   const poolAddress =

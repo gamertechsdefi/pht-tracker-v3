@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest){
+export async function GET(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const parts = pathname.split("/");
     const tokenName = parts[parts.length - 1].toLowerCase();
@@ -177,6 +177,12 @@ export async function GET(request: NextRequest){
             telegram: "https://t.me/crepefun",
             bscscan: "https://bscscan.com/token/0xeb2b7d5691878627eff20492ca7c9a71228d931d"
 
+        },
+        popielno: {
+            website: "https://www.popielnotoken.xyz/",
+            twitter: "https://x.com/popielno_token",
+            telegram: "https://t.me/POPIELNO",
+            bscscan: "https://bscscan.com/token/0xdc3d92dd5a468edb7a7772452700cc93bb1826ad"
         }
     };
 

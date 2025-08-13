@@ -28,6 +28,7 @@ const TOKEN_MAP: Record<string, string> = {
   bbft: "0xfB69e2d3d673A8DB9Fa74ffc036A8Cf641255769",
   puffcat: "0x14a8d0AC8Fc456899F2DD33C3f4E32403A78126c",
   crepe: "0xeb2B7d5691878627eff20492cA7c9a71228d931D",
+  popielno: "0xdc3d92dd5a468edb7a7772452700cc93bb1826ad",
 };
 
 interface BurnData {
