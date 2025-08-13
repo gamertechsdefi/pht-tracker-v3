@@ -88,6 +88,7 @@ const TOKEN_LIST: Record<string, string> = {
     tut: "bsc",
     puffcat: "bsc",
     crepe: "bsc",
+    popielno: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -123,7 +124,8 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     bob: "Build on BNB",
     tut: "Tutorial Token",
     puffcat: "PuffCat Token",
-    crepe: "CREPE"
+    crepe: "CREPE",
+    popielno: "POPIELNO",
 };
 
 // Define burn interval options
