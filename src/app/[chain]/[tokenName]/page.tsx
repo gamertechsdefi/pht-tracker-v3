@@ -10,6 +10,7 @@ import { SiX } from "react-icons/si";
 import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
 import Image from "next/image";
+import CurrencyConverter from "@/components/Converter";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -532,6 +533,14 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 <button onClick={()=> copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
                                             </h1>
                                         </div>
+
+                                        {tokenData.contract && (
+                                            <CurrencyConverter 
+                                                tokenSymbol={tokenName?.toUpperCase() ?? ""}
+                                                tokenAddress={tokenData.contract} 
+                                                tokenLogoUrl={tokenData.profile}
+                                            />
+                                        )}
                                     </section>
 
                                     <section className="mt-8 flex flex-col my-16">
@@ -700,9 +709,17 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             <p className="text-md">Contract Address</p>
                                             <h1 className="text-2xl font-bold text-orange-500 flex gap-2">
                                                 <span>{tokenData.contract}</span>
-                                                <button><FaCopy size={20} fill="#ffffff" /></button>
+                                                <button onClick={()=> copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
                                             </h1>
                                         </div>
+
+                                        {tokenData.contract && tokenName && (
+                                            <CurrencyConverter 
+                                                tokenSymbol={tokenName?.toUpperCase() ?? ""}
+                                                tokenAddress={tokenData.contract}
+                                                tokenLogoUrl={tokenData.profile}
+                                            />
+                                        )}
 
                                         <div className="mt-8 space-y-4">
                                             <DataCard
