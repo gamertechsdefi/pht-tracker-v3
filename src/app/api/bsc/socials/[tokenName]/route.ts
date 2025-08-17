@@ -182,8 +182,14 @@ export async function GET(request: NextRequest) {
             website: "https://www.popielnotoken.xyz/",
             twitter: "https://x.com/popielno_token",
             telegram: "https://t.me/POPIELNO",
-            bscscan: "https://bscscan.com/token/0xdc3d92dd5a468edb7a7772452700cc93bb1826ad"
-        }
+            bscscan: "https://bscscan.com/token/0xdc3d92dd5a468edb7a7772452700cc93bb1826ad",
+        },
+        spray: {
+            website: "",
+            twitter: "https://x.com/SprayDURT",
+            telegram: "https://t.me/DutchRabbitCoinOfficial",
+            bscscan: "https://bscscan.com/token/0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575",
+        },
     };
 
     const socialLinks = tokenSocialMapping[tokenName] ?? {

@@ -90,6 +90,7 @@ const TOKEN_LIST: Record<string, string> = {
     puffcat: "bsc",
     crepe: "bsc",
     popielno: "bsc",
+    spray: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -127,6 +128,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     puffcat: "PuffCat Token",
     crepe: "CREPE",
     popielno: "POPIELNO",
+    spray: "SPRAY LOTTERY TOKEN"
 };
 
 // Define burn interval options
@@ -422,7 +424,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 {/* Info Tab */}
                                 <div className={activeTab === "info" ? "" : "hidden"}>
                                     <section className="">
-                                        <div className="flex flex-row bg-black rounded-lg p-4 mb-2 justify-between items-start w-full">
+                                        <div className="flex flex-row bg-black rounded-lg p-4 mb-2 justify-between md:items-end w-full">
                                             <div className="flex flex-row items-center gap-2 flex-1 min-w-0">
                                                 <img
                                                     src={`/api/${chain}/logo/${tokenName}`}

@@ -50,6 +50,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     puffcat: "bsc",
     crepe: "bsc",
     popielno: "bsc",
+    spray: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -83,6 +84,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "PuffCat Token": "puffcat",
     "CREPE": "crepe",
     "POPIELNO": "popielno",
+    "SPRAY LOTTERY TOKEN": "spray",
 };
 
 export default function Header() {
