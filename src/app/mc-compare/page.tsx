@@ -1,6 +1,7 @@
 "use client";
 
 import Header from '@/components/Header';
+
 import React, { useState, useEffect, useCallback } from 'react';
 
 // Define interfaces for our data structures
@@ -361,7 +362,7 @@ const PriceComparison = () => {
               <div className="px-4 py-2 text-neutral-400">No tokens found</div>
             ) : (
               <div>
-                {filteredPlatformTokens.length > 0 && (
+                {type === 'from' && filteredPlatformTokens.length > 0 && (
                   <div>
                     <div className="px-4 py-2 text-xs font-medium text-neutral-400 uppercase tracking-wider">Platform Tokens</div>
                     {filteredPlatformTokens.map((token) => (
@@ -385,7 +386,7 @@ const PriceComparison = () => {
                 )}
                 {type === 'to' && filteredTop100Tokens.length > 0 && (
                   <div>
-                    <div className="px-4 py-2 text-xs font-medium text-neutral-400 uppercase tracking-wider border-t border-neutral-700 mt-2">Top 100 Tokens</div>
+                    <div className="px-4 py-2 text-xs font-medium text-neutral-400 uppercase tracking-wider">Top 100 Tokens</div>
                     {filteredTop100Tokens.map((token) => (
                       <div
                         key={token.id}
