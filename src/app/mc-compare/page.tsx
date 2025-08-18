@@ -341,11 +341,12 @@ const PriceComparison = () => {
           <input
             type="text"
             className="w-full bg-neutral-800 border border-neutral-700 rounded-md py-2 pl-3 pr-10 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            placeholder={`Search ${type === 'from' ? 'Token A' : 'Token B'}`}
+            placeholder={loadingTokens ? 'Loading tokens...' : `Search ${type === 'from' ? 'Token A' : 'Token B'}`}
             value={showDropdown ? searchTerm : selectedTokenData?.name || ''}
             onChange={(e) => setSearchTerm(e.target.value)}
             onFocus={() => setShowDropdown(true)}
             onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+            disabled={loadingTokens}
           />
           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-neutral-400">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -413,8 +414,8 @@ const PriceComparison = () => {
   };
 
   const renderComparison = (): React.ReactElement => {
-    if (loading) {
-      return <div className="text-center py-8">Loading comparison data...</div>;
+    if (loading || loadingTokens) {
+      return <div className="text-center py-8">Loading token data...</div>;
     }
 
     if (error) {
@@ -444,7 +445,7 @@ const PriceComparison = () => {
         </div>
 
         <div className="text-xl">
-          with {cryptoBData.name}'s market cap of
+          with {cryptoBData.name}&apos;s market cap of
           <span className="font-bold"> {formatMarketCap(cryptoBData.marketCap)}</span>:
         </div>
 
@@ -462,7 +463,7 @@ const PriceComparison = () => {
             `${(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}% increase` :
             `${Math.abs(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}% decrease`}
           <br />
-          to reach {cryptoBData.name}'s market cap
+          to reach {cryptoBData.name}&apos;s market cap
         </div>
       </div>
     );
