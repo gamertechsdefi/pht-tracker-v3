@@ -324,7 +324,6 @@ const PriceComparison = () => {
     );
 
     const filteredTop100Tokens = top100Tokens.filter(token =>
-      token.name.toLowerCase().includes(searchLower) ||
       token.symbol.toLowerCase().includes(searchLower)
     );
 
