@@ -289,6 +289,13 @@ export default function Header() {
                         Burns
                     </Link>
                     <Link
+                        href="/price2mc"
+                        className="block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
+                        onClick={toggleMenu}
+                    >
+                        Price Comparison
+                    </Link>
+                    <Link
                         href="https://www.phoenixtoken.community"
                         className="block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
                         onClick={toggleMenu}
