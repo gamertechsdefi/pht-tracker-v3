@@ -166,12 +166,12 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
             </option>
           ))}
         </select>
-        <span className="text-3xl font-bold text-red-500">
+        <span className="text-2xl md:text-3xl font-bold text-red-500">
           {typeof value === 'number' ? formatBurnValue(value) : "N/A"}
         </span>
         <p className="flex gap-2 items-center text-red-100 mb-2">
-          <span className="text-md">USD Value: </span>
-          <span className="font-semibold text-xl text-red-500">
+          <span className="text-sm">USD Value: </span>
+          <span className="font-semibold text-lg md:text-xl text-red-500">
             {usdValue}
           </span>
         </p>

@@ -435,7 +435,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                         (e.target as HTMLImageElement).alt = 'Default Logo';
                                                     }}
                                                 />
-                                                <h1 className="text-2xl font-bold break-words">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
+                                                <h1 className="text-lg md:text-2xl font-bold break-words">{tokenName ? TOKEN_FULL_NAMES[tokenName.toLowerCase()] || tokenName.toUpperCase() : "Unknown Token"}</h1>
                                             </div>
                                             {socialLinks && (
                                                 <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
@@ -457,7 +457,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
                                         <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                             <h1>Price:</h1>
-                                            <h1 className="font-medium text-xl">
+                                            <h1 className="font-medium text-lg md:text-xl">
                                                 ${" "}
                                                 {(() => {
                                                     const { display, isExponential } = formatPrice(tokenData.price);
@@ -477,15 +477,15 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         <div className="mt-4 grid grid-cols-3 gap-4">
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>MarketCap:</h1>
-                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
+                                                <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
                                             </div>
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>Liquidity:</h1>
-                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.liquidity)}</h1>
+                                                <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.liquidity)}</h1>
                                             </div>
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>Volume:</h1>
-                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.volume)}</h1>
+                                                <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.volume)}</h1>
                                             </div>
                                             {/* <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>Holders:</h1>
@@ -530,7 +530,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         <div className="flex flex-col gap-2 bg-neutral-900 border-2 border-neutral-600 p-4 mt-4 rounded-xl">
 
                                             <p className="text-md">Contract Address</p>
-                                            <h1 className="text-2xl font-bold text-orange-500 flex gap-2">
+                                            <h1 className="text-lg md:text-xl font-bold text-orange-500 flex gap-2">
                                                 <span>{formatEvmAddress(tokenData.contract)}</span>
                                                 <button onClick={()=> copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
                                             </h1>
@@ -709,7 +709,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         <div className="flex flex-col gap-2 bg-neutral-900 border-2 border-neutral-600 p-4 mt-4 rounded-xl">
 
                                             <p className="text-md">Contract Address</p>
-                                            <h1 className="text-2xl font-bold text-orange-500 flex gap-2">
+                                            <h1 className="text-lg md:text-2xl font-bold text-orange-500 flex gap-2">
                                                 <span>{tokenData.contract}</span>
                                                 <button onClick={()=> copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
                                             </h1>
