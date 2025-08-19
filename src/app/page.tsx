@@ -1,33 +1,113 @@
-'use client';
+import { promises as fs } from 'fs';
+import path from 'path';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+async function getTokens() {
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+  const res = await fetch(`${apiBaseUrl}/api/tokens`, { cache: 'no-store' });
+  if (!res.ok) {
+    throw new Error('Failed to fetch tokens');
+  }
+  return res.json();
+}
 
-const Home: React.FC = () => {
-  const router = useRouter();
-  const [countdown, setCountdown] = useState<number>(5); // Add type for state
+function formatMarketCap(marketCap: number | string): string {
+  if (typeof marketCap === 'string') {
+    marketCap = parseFloat(marketCap.replace(/[^0-9.-]+/g,""));
+  }
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
+  if (isNaN(marketCap)) {
+    return "N/A";
+  }
 
-    const timer = setTimeout(() => {
-      router.push('/bsc/pht');
-    }, 5000);
+  if (marketCap >= 1e12) {
+    return (marketCap / 1e12).toFixed(2) + 'T';
+  }
+  if (marketCap >= 1e9) {
+    return (marketCap / 1e9).toFixed(2) + 'B';
+  }
+  if (marketCap >= 1e6) {
+    return (marketCap / 1e6).toFixed(2) + 'M';
+  }
+  if (marketCap >= 1e3) {
+    return (marketCap / 1e3).toFixed(2) + 'K';
+  }
+  return marketCap.toString();
+}
 
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
-  }, [router]);
+function formatPrice(price: number | string): { display: string; isExponential: boolean; zeros?: number, rest?: string } {
+  const priceStr = String(price);
+
+  if (priceStr.includes('.')) {
+    const decimalPart = priceStr.split('.')[1];
+    if (decimalPart.startsWith('00000')) {
+      const leadingZeros = decimalPart.match(/^0+/)?.[0].length || 0;
+      const restOfNumber = decimalPart.substring(leadingZeros);
+      return {
+        display: `0.`,
+        isExponential: true,
+        zeros: leadingZeros,
+        rest: restOfNumber
+      };
+    }
+  }
+
+  return {
+    display: priceStr,
+    isExponential: false,
+  };
+}
+
+export default async function Home() {
+  const tokens = await getTokens();
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold">Redirecting to PHT in {countdown}...</h1>
-      <p className="mt-2">Please wait while we load the data.</p>
+    <div className="container mx-auto">
+      <div className="">
+        <div className="shadow rounded-lg">
+          {/* Header */}
+          <div className="grid grid-cols-12 bg-orange-500 text-center text-md items-center font-semibold text-white uppercase tracking-wider sticky top-0 z-10">
+            <div className="col-span-4 px-5 py-3">Token</div>
+            <div className="col-span-8 px-5 py-3">
+              <div className="grid grid-cols-2 items-center">
+                <div>Price</div>
+                <div className="whitespace-no-wrap">Market Cap</div>
+              </div>
+            </div>
+          </div>
+          {/* Body */}
+          <div>
+            {tokens.map((token: any) => (
+              <div key={token.symbol} className="bg-neutral-700 grid grid-cols-12">
+                <div className="bg-neutral-900 col-span-4 px-5 py-5 text-sm">
+                  <p className="text-white whitespace-no-wrap">{token.symbol.toUpperCase()}</p>
+                </div>
+                <div className="col-span-8 overflow-x-auto text-sm">
+                  <div className="grid grid-cols-2">
+                    <div className="px-5 py-5">
+                      <p className="text-white whitespace-no-wrap">
+                        {(() => {
+                          const { display, isExponential, zeros, rest } = formatPrice(token.price);
+                          if (!isExponential) return display;
+                          return (
+                            <>
+                              {display}0
+                              <sub>{zeros}</sub>
+                              {rest}
+                            </>
+                          );
+                        })()}
+                      </p>
+                    </div>
+                    <div className="px-5 py-5">
+                      <p className="text-white whitespace-no-wrap">{formatMarketCap(token.marketCap)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default Home;
+}
