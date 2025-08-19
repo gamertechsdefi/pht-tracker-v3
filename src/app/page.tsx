@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { GET as getTokensData } from "./api/tokens/route";
-import { GET as getTokenProfileData } from "./api/bsc/token-profile/[tokenName]/route";
+
 
 function formatMarketCap(marketCap: number | string): string {
   if (typeof marketCap === 'string') {
@@ -61,7 +61,7 @@ export default async function Home() {
 
     const tokensWithImages = await Promise.all(initialTokens.map(async (token: any) => {
       try {
-        const profileResponse = await getTokenProfileData({ params: { tokenName: token.symbol } });
+        const profileResponse = await fetch(`/api/bsc/token-profile/${token.symbol}`);
         const profileData = await profileResponse.json();
         return { ...token, profileImage: profileData.profileImage || '/logo.png' };
       } catch (error) {
