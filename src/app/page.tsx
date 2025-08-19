@@ -63,7 +63,25 @@ export default async function Home() {
       try {
         const profileResponse = await fetch(`/api/bsc/token-profile/${token.symbol}`);
         const profileData = await profileResponse.json();
-        return { ...token, profileImage: profileData.profileImage || '/logo.png' };
+
+        let logoImage = '/logo.png'; // Default fallback
+
+        try {
+          const logoResponse = await fetch(`/api/bsc/logo/${token.symbol}`);
+          if (logoResponse.ok) {
+            // If the logo is found, the URL itself can be used as the image source
+            logoImage = `/api/bsc/logo/${token.symbol}`;
+          } else {
+            // If logo not found via the logo route, try the profileData.profileImage as a fallback
+            logoImage = profileData.profileImage || '/logo.png';
+          }
+        } catch (logoError) {
+          console.error(`Error fetching logo for ${token.symbol}:`, logoError);
+          // Fallback to profileData.profileImage if logo fetch fails
+          logoImage = profileData.profileImage || '/logo.png';
+        }
+
+        return { ...token, profileImage: logoImage };
       } catch (error) {
         console.error(`Error fetching profile for ${token.symbol}:`, error);
         return { ...token, profileImage: '/logo.png' }; // Fallback image
