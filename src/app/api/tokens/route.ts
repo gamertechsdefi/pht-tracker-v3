@@ -15,6 +15,7 @@ export async function GET() {
         marketCap: data.marketCap,
       });
     }
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Add a 1-second delay
   }
 
   tokenData.sort((a, b) => {

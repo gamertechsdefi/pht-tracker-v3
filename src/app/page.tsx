@@ -1,14 +1,10 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+"use client"
 
-async function getTokens() {
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
-  const res = await fetch(`${apiBaseUrl}/api/tokens`, { cache: 'no-store' });
-  if (!res.ok) {
-    throw new Error('Failed to fetch tokens');
-  }
-  return res.json();
-}
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { GET as getTokensData } from "./api/tokens/route";
+import { GET as getTokenProfileData } from "./api/bsc/token-profile/[tokenName]/route";
 
 function formatMarketCap(marketCap: number | string): string {
   if (typeof marketCap === 'string') {
@@ -58,7 +54,27 @@ function formatPrice(price: number | string): { display: string; isExponential: 
 }
 
 export default async function Home() {
-  const tokens = await getTokens();
+  let tokens = [];
+  try {
+    const response = await getTokensData();
+    const initialTokens = await response.json();
+
+    const tokensWithImages = await Promise.all(initialTokens.map(async (token: any) => {
+      try {
+        const profileResponse = await getTokenProfileData({ params: { tokenName: token.symbol } });
+        const profileData = await profileResponse.json();
+        return { ...token, profileImage: profileData.profileImage || '/logo.png' };
+      } catch (error) {
+        console.error(`Error fetching profile for ${token.symbol}:`, error);
+        return { ...token, profileImage: '/logo.png' }; // Fallback image
+      }
+    }));
+    tokens = tokensWithImages;
+
+  } catch (error) {
+    console.error("Error fetching tokens:", error);
+  }
+  console.log("Tokens fetched:", tokens);
 
   return (
     <div className="container mx-auto">
@@ -79,7 +95,10 @@ export default async function Home() {
             {tokens.map((token: any) => (
               <div key={token.symbol} className="bg-neutral-700 grid grid-cols-12">
                 <div className="bg-neutral-900 col-span-4 px-5 py-5 text-sm">
-                  <p className="text-white whitespace-no-wrap">{token.symbol.toUpperCase()}</p>
+                  <Link href={`/bsc/${token.symbol}`} className="flex items-center">
+                    <Image src={token.profileImage || '/logo.png'} alt={token.symbol} width={24} height={24} className="mr-3" />
+                    <p className="text-white whitespace-no-wrap">{token.symbol.toUpperCase()}</p>
+                  </Link>
                 </div>
                 <div className="col-span-8 overflow-x-auto text-sm">
                   <div className="grid grid-cols-2">
