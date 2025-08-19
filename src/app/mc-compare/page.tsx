@@ -137,7 +137,7 @@ const formatMarketCap = (marketCap: string | undefined): string => {
 
 const PriceComparison = () => {
   const [cryptoA, setCryptoA] = useState<string>('pht');
-  const [cryptoB, setCryptoB] = useState<string>('wkc');
+  const [cryptoB, setCryptoB] = useState<string>('btc');
   const [cryptoAData, setCryptoAData] = useState<TokenData | null>(null);
   const [cryptoBData, setCryptoBData] = useState<TokenData | null>(null);
   const [tokens, setTokens] = useState<TokenData[]>([]);
@@ -343,7 +343,7 @@ const PriceComparison = () => {
             type="text"
             className="w-full bg-neutral-800 border border-neutral-700 rounded-md py-2 pl-3 pr-10 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
             placeholder={loadingTokens ? 'Loading tokens...' : `Search ${type === 'from' ? 'Token A' : 'Token B'}`}
-            value={showDropdown ? searchTerm : selectedTokenData?.name || ''}
+            value={showDropdown ? searchTerm : selectedTokenData?.symbol || ''}
             onChange={(e) => setSearchTerm(e.target.value)}
             onFocus={() => setShowDropdown(true)}
             onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
@@ -436,7 +436,7 @@ const PriceComparison = () => {
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center space-x-2">
           {cryptoAData.image && <img src={cryptoAData.image} alt={cryptoAData.name} className="w-8 h-8" />}
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-xl md:text-2xl font-bold">
             {cryptoAData.name} ({cryptoAData.symbol})
           </h2>
         </div>
@@ -460,7 +460,7 @@ const PriceComparison = () => {
         </div>
 
         <div className="text-sm text-neutral-400 mt-2">
-          {cryptoAData.name} needs a {percentageDifference > 0 ?
+          {cryptoAData.symbol} needs a {percentageDifference > 0 ?
             `${(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}% increase` :
             `${Math.abs(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}% decrease`}
           <br />
@@ -479,9 +479,9 @@ const PriceComparison = () => {
         </h1>
 
         <div className="bg-neutral-800 rounded-xl p-6 shadow-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div>
-              <h2 className="text-xl font-semibold mb-3">Select Token</h2>
+          <div className="flex flex-row gap-6 mb-8">
+            <div className="w-full md:w-1/2">
+              <h2 className="text-sm md:text-lg font-semibold mb-3">Select Token</h2>
               {renderTokenSelect('from')}
               {cryptoAData && (
                 <div className="mt-2 text-sm text-neutral-400">
@@ -490,8 +490,8 @@ const PriceComparison = () => {
               )}
             </div>
 
-            <div>
-              <h2 className="text-xl font-semibold mb-3">Compare With</h2>
+            <div className="w-full md:w-1/2">
+              <h2 className="text-sm md:text-lg font-semibold mb-3">Compare With</h2>
               {renderTokenSelect('to')}
               {cryptoBData && (
                 <div className="mt-2 text-sm text-neutral-400">
