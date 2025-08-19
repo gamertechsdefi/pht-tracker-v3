@@ -320,7 +320,6 @@ const PriceComparison = () => {
     const top100Tokens = tokens.filter(t => t.isTop100);
 
     const filteredPlatformTokens = platformTokens.filter(token =>
-      token.name.toLowerCase().includes(searchLower) ||
       token.symbol.toLowerCase().includes(searchLower)
     );
 
@@ -379,7 +378,6 @@ const PriceComparison = () => {
                           <img src={token.image} alt={token.name} className="w-5 h-5 mr-2 rounded-full" />
                         )}
                         <span className="font-medium">{token.symbol}</span>
-                        <span className="text-neutral-400 ml-2 text-sm">{token.name}</span>
                       </div>
                     ))}
                   </div>
@@ -431,32 +429,27 @@ const PriceComparison = () => {
     const potentialPrice = calculateAdjustedPrice(cryptoAData, cryptoBData);
     const priceDifference = potentialPrice - currentPrice;
     const percentageDifference = currentPrice > 0 ? (priceDifference / currentPrice) * 100 : 0;
+    const multiplier = currentPrice > 0 ? potentialPrice / currentPrice : 0;
 
     return (
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center space-x-2">
-          {cryptoAData.image && <img src={cryptoAData.image} alt={cryptoAData.name} className="w-8 h-8" />}
+      <div className="text-center">
+        <div className="flex items-center justify-center mb-2 space-x-2">
+          {cryptoAData.image && <img src={cryptoAData.image} alt={cryptoAData.name} className="w-8 h-8 rounded-md" /> }
           <h2 className="text-xl md:text-2xl font-bold">
-            {cryptoAData.name} ({cryptoAData.symbol})
+            {cryptoAData.symbol} (${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })})
           </h2>
         </div>
-
-        <div className="text-2xl font-bold text-orange-400">
-          ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
-        </div>
-
         <div className="text-xl">
           with {cryptoBData.name}&apos;s market cap of
           <span className="font-bold"> {formatMarketCap(cryptoBData.marketCap)}</span>:
         </div>
 
-        <div className="text-2xl font-bold text-green-400 my-4">
-          ${potentialPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
+        <div className="text-2xl font-bold text-green-400">
+          ${potentialPrice.toLocaleString(undefined, { minimumFractionDigits: 7 })}
         </div>
 
-        <div className={`text-xl ${percentageDifference >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-          {percentageDifference >= 0 ? '↑' : '↓'} {Math.abs(percentageDifference).toFixed(2)}%
-          (${Math.abs(priceDifference).toLocaleString(undefined, { minimumFractionDigits: 2 })})
+        <div className={`text-2xl ${percentageDifference >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+          {multiplier.toFixed(2)}x
         </div>
 
         <div className="text-sm text-neutral-400 mt-2">
