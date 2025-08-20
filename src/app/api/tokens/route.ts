@@ -20,9 +20,9 @@ export async function GET() {
     })
     .filter(Boolean);
 
-  tokenData.sort((a, b) => {
-    const marketCapA = parseFloat(String(a.marketCap).replace(/[^0-9.-]+/g, "")) || 0;
-    const marketCapB = parseFloat(String(b.marketCap).replace(/[^0-9.-]+/g, "")) || 0;
+    tokenData.sort((a, b) => {
+    const marketCapA = parseFloat(String(a?.marketCap).replace(/[^0-9.-]+/g, "")) || 0;
+    const marketCapB = parseFloat(String(b?.marketCap).replace(/[^0-9.-]+/g, "")) || 0;
     return marketCapB - marketCapA;
   });
 
