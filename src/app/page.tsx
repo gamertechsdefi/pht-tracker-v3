@@ -1,10 +1,7 @@
-"use client"
+'use client';
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { GET as getTokensData } from "./api/tokens/route";
-
 
 function formatMarketCap(marketCap: number | string): string {
   if (typeof marketCap === 'string') {
@@ -53,53 +50,35 @@ function formatPrice(price: number | string): { display: string; isExponential: 
   };
 }
 
-export default async function Home() {
-  let tokens = [];
-  try {
-    const response = await getTokensData();
-    const initialTokens = await response.json();
+export default function Home() {
+  const [tokens, setTokens] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const tokensWithImages = await Promise.all(initialTokens.map(async (token: any) => {
+  useEffect(() => {
+    async function fetchTokens() {
       try {
-        const profileResponse = await fetch(`/api/bsc/token-profile/${token.symbol}`);
-        const profileData = await profileResponse.json();
-
-        let logoImage = '/logo.png'; // Default fallback
-
-        try {
-          const logoResponse = await fetch(`/api/bsc/logo/${token.symbol}`);
-          if (logoResponse.ok) {
-            // If the logo is found, the URL itself can be used as the image source
-            logoImage = `/api/bsc/logo/${token.symbol}`;
-          } else {
-            // If logo not found via the logo route, try the profileData.profileImage as a fallback
-            logoImage = profileData.profileImage || '/logo.png';
-          }
-        } catch (logoError) {
-          console.error(`Error fetching logo for ${token.symbol}:`, logoError);
-          // Fallback to profileData.profileImage if logo fetch fails
-          logoImage = profileData.profileImage || '/logo.png';
+        const response = await fetch('/api/tokens');
+        if (!response.ok) {
+          throw new Error('Failed to fetch tokens');
         }
-
-        return { ...token, profileImage: logoImage };
+        const data = await response.json();
+        setTokens(data);
       } catch (error) {
-        console.error(`Error fetching profile for ${token.symbol}:`, error);
-        return { ...token, profileImage: '/logo.png' }; // Fallback image
+        console.error("Error fetching tokens:", error);
+      } finally {
+        setLoading(false);
       }
-    }));
-    tokens = tokensWithImages;
+    }
 
-  } catch (error) {
-    console.error("Error fetching tokens:", error);
-  }
-  console.log("Tokens fetched:", tokens);
+    fetchTokens();
+  }, []);
 
   return (
     <div className="container mx-auto">
       <div className="">
         <div className="shadow rounded-lg">
           {/* Header */}
-          <div className="grid grid-cols-12 bg-orange-500 text-center text-md items-center font-semibold text-white uppercase tracking-wider sticky top-0 z-10">
+          <div className="grid grid-cols-12 bg-orange-500 text-start text-md items-center font-semibold text-white uppercase tracking-wider sticky top-0 z-10">
             <div className="col-span-4 px-5 py-3">Token</div>
             <div className="col-span-8 px-5 py-3">
               <div className="grid grid-cols-2 items-center">
@@ -110,38 +89,51 @@ export default async function Home() {
           </div>
           {/* Body */}
           <div>
-            {tokens.map((token: any) => (
-              <div key={token.symbol} className="bg-neutral-700 grid grid-cols-12">
-                <div className="bg-neutral-900 col-span-4 px-5 py-5 text-sm">
-                  <Link href={`/bsc/${token.symbol}`} className="flex items-center">
-                    <Image src={token.profileImage || '/logo.png'} alt={token.symbol} width={24} height={24} className="mr-3" />
-                    <p className="text-white whitespace-no-wrap">{token.symbol.toUpperCase()}</p>
-                  </Link>
-                </div>
-                <div className="col-span-8 overflow-x-auto text-sm">
-                  <div className="grid grid-cols-2">
-                    <div className="px-5 py-5">
-                      <p className="text-white whitespace-no-wrap">
-                        {(() => {
-                          const { display, isExponential, zeros, rest } = formatPrice(token.price);
-                          if (!isExponential) return display;
-                          return (
-                            <>
-                              {display}0
-                              <sub>{zeros}</sub>
-                              {rest}
-                            </>
-                          );
-                        })()}
-                      </p>
-                    </div>
-                    <div className="px-5 py-5">
-                      <p className="text-white whitespace-no-wrap">{formatMarketCap(token.marketCap)}</p>
+            {loading ? (
+              <div className="text-center p-10">Loading tokens...</div>
+            ) : (
+              tokens.map((token: any) => (
+                <div key={token.symbol} className="bg-neutral-700 grid grid-cols-12">
+                  <div className="bg-neutral-900 col-span-4 px-5 py-5 text-sm">
+                    <Link href={`/bsc/${token.symbol}`} className="flex items-center">
+                      <img 
+                        src={`/api/bsc/logo/${token.symbol}`} 
+                        alt={token.symbol} 
+                        width={24} 
+                        height={24} 
+                        className="mr-3" 
+                        onError={(e) => {
+                          (e.target as any).src = '/logo.png';
+                        }}
+                      />
+                      <p className="text-white whitespace-no-wrap">{token.symbol.toUpperCase()}</p>
+                    </Link>
+                  </div>
+                  <div className="col-span-8 overflow-x-auto text-sm">
+                    <div className="grid grid-cols-2">
+                      <div className="px-5 py-5">
+                        <p className="text-white whitespace-no-wrap">
+                          {(() => {
+                            const { display, isExponential, zeros, rest } = formatPrice(token.price);
+                            if (!isExponential) return display;
+                            return (
+                              <>
+                                {display}0
+                                <sub>{zeros}</sub>
+                                {rest}
+                              </>
+                            );
+                          })()}
+                        </p>
+                      </div>
+                      <div className="px-5 py-5">
+                        <p className="text-white whitespace-no-wrap">{formatMarketCap(token.marketCap)}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
