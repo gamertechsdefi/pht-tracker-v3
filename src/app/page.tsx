@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import Header from "@/components/Header";
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Header from '@/components/Header';
 
 interface Token {
   symbol: string;
@@ -12,11 +12,11 @@ interface Token {
 
 function formatMarketCap(marketCap: number | string): string {
   if (typeof marketCap === 'string') {
-    marketCap = parseFloat(marketCap.replace(/[^0-9.-]+/g,""));
+    marketCap = parseFloat(marketCap.replace(/[^0-9.-]+/g, ''));
   }
 
   if (isNaN(marketCap)) {
-    return "N/A";
+    return 'N/A';
   }
 
   if (marketCap >= 1e12) {
@@ -34,7 +34,7 @@ function formatMarketCap(marketCap: number | string): string {
   return marketCap.toString();
 }
 
-function formatPrice(price: number | string): { display: string; isExponential: boolean; zeros?: number, rest?: string } {
+function formatPrice(price: number | string): { display: string; isExponential: boolean; zeros?: number; rest?: string } {
   const priceStr = String(price);
 
   if (priceStr.includes('.')) {
@@ -46,7 +46,7 @@ function formatPrice(price: number | string): { display: string; isExponential: 
         display: `0.`,
         isExponential: true,
         zeros: leadingZeros,
-        rest: restOfNumber
+        rest: restOfNumber,
       };
     }
   }
@@ -70,14 +70,14 @@ export default function Home() {
         }
         const data: Token[] = await response.json();
 
-        const phtToken = data.find(token => token.symbol.toLowerCase() === 'pht');
-        const otherTokens = data.filter(token => token.symbol.toLowerCase() !== 'pht');
+        const phtToken = data.find((token) => token.symbol.toLowerCase() === 'pht');
+        const otherTokens = data.filter((token) => token.symbol.toLowerCase() !== 'pht');
 
         const sortedData = phtToken ? [phtToken, ...otherTokens] : data;
 
         setTokens(sortedData);
       } catch (error) {
-        console.error("Error fetching tokens:", error);
+        console.error('Error fetching tokens:', error);
       } finally {
         setLoading(false);
       }
@@ -89,29 +89,34 @@ export default function Home() {
   return (
     <div className="container mx-auto">
       <Header />
-      <div className="px-4 pt-8 rounded-md">
-        <div className="shadow rounded-lg flex">
+      <div className="px-4 pt-8">
+        <div className="shadow rounded-lg md:flex md:flex-row flex-col">
           {/* Fixed Token Column */}
-          <div className="w-1/2 flex-shrink-0">
+          <div className="md:w-1/2 w-full">
             {/* Token Header */}
-            <div className="bg-orange-500 text-md font-semibold text-white uppercase tracking-wider px-5 py-3 sticky top-4 z-10">
+            <div className="bg-orange-500 text-md font-semibold text-white uppercase tracking-wider px-5 py-3 sticky top-0 z-10">
               Token
             </div>
             {/* Token Body */}
             {loading ? (
-              <div className="text-center p-10 bg-neutral-700">Loading tokens...</div>
+              <div className="bg-neutral-700 text-center py-10 min-h-[60px] flex items-center justify-center">
+                Loading tokens...
+              </div>
             ) : (
               tokens.map((token: Token) => (
-                <div key={token.symbol} className="bg-neutral-900 px-5 py-5 text-sm border-b border-neutral-800">
+                <div
+                  key={token.symbol}
+                  className="bg-neutral-900 px-5 py-5 text-sm border-b border-neutral-800 min-h-[60px] flex items-center"
+                >
                   <Link href={`/bsc/${token.symbol}`} className="flex items-center">
-                    <img 
-                      src={`/api/bsc/logo/${token.symbol}`} 
-                      alt={token.symbol} 
-                      width={24} 
-                      height={24} 
-                      className="mr-3" 
+                    <img
+                      src={`/api/bsc/logo/${token.symbol}`}
+                      alt={token.symbol}
+                      width={24}
+                      height={24}
+                      className="mr-3"
                       onError={(e) => {
-                        (e.target as any).src = '/logo.png';
+                        (e.target as HTMLImageElement).src = '/logo.png';
                       }}
                     />
                     <p className="text-white whitespace-nowrap">{token.symbol.toUpperCase()}</p>
@@ -121,19 +126,24 @@ export default function Home() {
             )}
           </div>
           {/* Scrollable Price and Market Cap Columns */}
-          <div className="w-1/2 overflow-x-auto">
+          <div className="md:w-1/2 w-full overflow-x-auto">
             {/* Header */}
-            <div className="text-md font-semibold text-white uppercase tracking-wider sticky top-0 z-10 flex">
-              <div className="w-[150px] px-5 py-3 flex-shrink-0">Price</div>
-              <div className="w-[150px] px-5 py-3 flex-shrink-0">Marketcap</div>
+            <div className="bg-orange-500 text-md font-semibold text-white uppercase tracking-wider sticky top-0 z-10 flex min-w-[300px]">
+              <div className="w-[150px] px-5 py-3">Price</div>
+              <div className="w-[150px] px-5 py-3">Marketcap</div>
             </div>
             {/* Body */}
             {loading ? (
-              <div className="text-center p-10 bg-neutral-700">Loading...</div>
+              <div className="bg-neutral-700 text-center py-10 min-h-[60px] flex items-center justify-center min-w-[300px]">
+                Loading...
+              </div>
             ) : (
               tokens.map((token: Token) => (
-                <div key={token.symbol} className="flex">
-                  <div className="w-[150px] px-5 py-5 text-sm flex-shrink-0">
+                <div
+                  key={token.symbol}
+                  className="flex border-b border-neutral-800 bg-neutral-900 min-h-[60px] min-w-[300px]"
+                >
+                  <div className="w-[150px] px-5 py-5 text-sm flex items-center">
                     <p className="text-white whitespace-nowrap">
                       {(() => {
                         const { display, isExponential, zeros, rest } = formatPrice(token.price);
@@ -148,7 +158,7 @@ export default function Home() {
                       })()}
                     </p>
                   </div>
-                  <div className="w-[150px] px-5 py-5 text-sm flex-shrink-0">
+                  <div className="w-[150px] px-5 py-5 text-sm flex items-center">
                     <p className="text-white whitespace-nowrap">{formatMarketCap(token.marketCap)}</p>
                   </div>
                 </div>
