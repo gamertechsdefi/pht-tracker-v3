@@ -63,7 +63,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "BTC Dragon Token": "btcdragon",
     "OciCat Token": "ocicat",
     "Nene": "nene",
-    "TIWI CAT": "twc",
+    "TIWICAT": "twc",
     "The Word Token": "twd",
     "The Kingdom Coin": "tkc",
     "Dutch Rabbit": "durt",
