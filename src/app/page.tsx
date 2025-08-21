@@ -90,80 +90,85 @@ export default function Home() {
     <div className="container mx-auto">
       <Header />
       <div className="px-4 pt-8">
-        <div className="shadow rounded-lg md:flex md:flex-row flex-col">
-          {/* Fixed Token Column */}
-          <div className="md:w-1/2 w-full">
-            {/* Token Header */}
-            <div className="bg-orange-500 text-md font-semibold text-white uppercase tracking-wider px-5 py-3 sticky top-0 z-10">
-              Token
-            </div>
-            {/* Token Body */}
-            {loading ? (
-              <div className="bg-neutral-700 text-center py-10 min-h-[60px] flex items-center justify-center">
-                Loading tokens...
-              </div>
-            ) : (
-              tokens.map((token: Token) => (
-                <div
-                  key={token.symbol}
-                  className="bg-neutral-900 px-5 py-5 text-sm border-b border-neutral-800 min-h-[60px] flex items-center"
-                >
-                  <Link href={`/bsc/${token.symbol}`} className="flex items-center">
-                    <img
-                      src={`/api/bsc/logo/${token.symbol}`}
-                      alt={token.symbol}
-                      width={24}
-                      height={24}
-                      className="mr-3"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/logo.png';
-                      }}
-                    />
-                    <p className="text-white whitespace-nowrap">{token.symbol.toUpperCase()}</p>
-                  </Link>
-                </div>
-              ))
-            )}
+        <div className="shadow rounded-lg overflow-hidden">
+          {/* Mobile: Horizontal scroll wrapper */}
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[400px] bg-neutral-900">
+              <thead>
+                <tr className="bg-orange-500">
+                  <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left sticky left-0 bg-orange-500 z-20 min-w-[120px]">
+                    Token
+                  </th>
+                  <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[120px]">
+                    Price
+                  </th>
+                  <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[120px]">
+                    Marketcap
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={3} className="bg-neutral-700 text-center py-10 text-white">
+                      Loading tokens...
+                    </td>
+                  </tr>
+                ) : (
+                  tokens.map((token: Token) => (
+                    <tr key={token.symbol} className="border-b border-neutral-800 hover:bg-neutral-800 transition-colors">
+                      {/* Token column - sticky on mobile */}
+                      <td className="px-5 py-4 text-sm sticky left-0 bg-neutral-900 z-10 min-w-[120px]">
+                        <Link href={`/bsc/${token.symbol}`} className="flex items-center hover:opacity-80">
+                          <img
+                            src={`/api/bsc/logo/${token.symbol}`}
+                            alt={token.symbol}
+                            width={24}
+                            height={24}
+                            className="mr-3 flex-shrink-0"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/logo.png';
+                            }}
+                          />
+                          <span className="text-white whitespace-nowrap font-medium">
+                            {token.symbol.toUpperCase()}
+                          </span>
+                        </Link>
+                      </td>
+                      
+                      {/* Price column */}
+                      <td className="px-5 py-4 text-sm min-w-[120px]">
+                        <span className="text-white whitespace-nowrap">
+                          {(() => {
+                            const { display, isExponential, zeros, rest } = formatPrice(token.price);
+                            if (!isExponential) return display;
+                            return (
+                              <>
+                                {display}0
+                                <sub>{zeros}</sub>
+                                {rest}
+                              </>
+                            );
+                          })()}
+                        </span>
+                      </td>
+                      
+                      {/* Market Cap column */}
+                      <td className="px-5 py-4 text-sm min-w-[120px]">
+                        <span className="text-white whitespace-nowrap">
+                          {formatMarketCap(token.marketCap)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-          {/* Scrollable Price and Market Cap Columns */}
-          <div className="md:w-1/2 w-full overflow-x-auto">
-            {/* Header */}
-            <div className="bg-orange-500 text-md font-semibold text-white uppercase tracking-wider sticky top-0 z-10 flex min-w-[300px]">
-              <div className="w-[150px] px-5 py-3">Price</div>
-              <div className="w-[150px] px-5 py-3">Marketcap</div>
-            </div>
-            {/* Body */}
-            {loading ? (
-              <div className="bg-neutral-700 text-center py-10 min-h-[60px] flex items-center justify-center min-w-[300px]">
-                Loading...
-              </div>
-            ) : (
-              tokens.map((token: Token) => (
-                <div
-                  key={token.symbol}
-                  className="flex border-b border-neutral-800 bg-neutral-900 min-h-[60px] min-w-[300px]"
-                >
-                  <div className="w-[150px] px-5 py-5 text-sm flex items-center">
-                    <p className="text-white whitespace-nowrap">
-                      {(() => {
-                        const { display, isExponential, zeros, rest } = formatPrice(token.price);
-                        if (!isExponential) return display;
-                        return (
-                          <>
-                            {display}0
-                            <sub>{zeros}</sub>
-                            {rest}
-                          </>
-                        );
-                      })()}
-                    </p>
-                  </div>
-                  <div className="w-[150px] px-5 py-5 text-sm flex items-center">
-                    <p className="text-white whitespace-nowrap">{formatMarketCap(token.marketCap)}</p>
-                  </div>
-                </div>
-              ))
-            )}
+          
+          {/* Optional: Scroll indicator for mobile */}
+          <div className="md:hidden bg-neutral-800 px-4 py-2 text-xs text-neutral-400 text-center">
+            ← Swipe to see more columns →
           </div>
         </div>
       </div>
