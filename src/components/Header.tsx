@@ -51,6 +51,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     crepe: "bsc",
     popielno: "bsc",
     spray: "bsc",
+    mbc: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -85,6 +86,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "CREPE": "crepe",
     "POPIELNO": "popielno",
     "SPRAY LOTTERY TOKEN": "spray",
+    "Mamba Token": "mbc",
 };
 
 export default function Header() {

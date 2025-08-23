@@ -190,6 +190,12 @@ export async function GET(request: NextRequest) {
             telegram: "https://t.me/DutchRabbitCoinOfficial",
             bscscan: "https://bscscan.com/token/0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575",
         },
+        mbc: {
+            website: "https://mambabasketball.online/",
+            twitter: "https://x.com/Mambatoken",
+            telegram: "https://t.me/longlivemambacoin",
+            bscscan: "https://bscscan.com/token/0x170f044f9c7a41FF83CAccaD6CCCa1B941d75Af7",
+        },
     };
 
     const socialLinks = tokenSocialMapping[tokenName] ?? {

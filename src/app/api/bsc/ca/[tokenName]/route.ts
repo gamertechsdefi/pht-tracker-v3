@@ -31,6 +31,7 @@ const TOKEN_MAP: Record<string, { address: string }> = {
   crepe: { address: "0xeb2B7d5691878627eff20492cA7c9a71228d931D" },
   popielno: { address: "0xdc3d92dd5a468edb7a7772452700cc93bb1826ad" },
   spray: { address: "0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575" },
+  mbc: { address: "0x170f044f9c7a41ff83caccad6ccca1b941d75af7"},
 };
 
 export async function GET(
