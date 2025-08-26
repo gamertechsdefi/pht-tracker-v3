@@ -60,6 +60,26 @@ function formatPrice(price: number | string): { display: string; isExponential: 
 export default function Home() {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(true);
+  const [analyticsSent, setAnalyticsSent] = useState(false);
+
+  const handleAnalyticsClick = async () => {
+    try {
+      await fetch('/api/analytics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'event',
+          hostname: window.location.hostname,
+          event: 'test_button_click',
+        }),
+      });
+      setAnalyticsSent(true);
+    } catch (error) {
+      console.error('Error sending analytics event:', error);
+    }
+  };
 
   useEffect(() => {
     async function fetchTokens() {
@@ -170,6 +190,15 @@ export default function Home() {
           <div className="md:hidden bg-neutral-800 px-4 py-2 text-xs text-neutral-400 text-center">
             ← Swipe to see more columns →
           </div>
+        </div>
+        <div className="text-center mt-4">
+          <button 
+            onClick={handleAnalyticsClick} 
+            disabled={analyticsSent}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400"
+          >
+            {analyticsSent ? "Event Sent!" : "Send Test Event"}
+          </button>
         </div>
       </div>
     </div>

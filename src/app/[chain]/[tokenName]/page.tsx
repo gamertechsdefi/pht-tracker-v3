@@ -92,6 +92,7 @@ const TOKEN_LIST: Record<string, string> = {
     popielno: "bsc",
     spray: "bsc",
     mbc: "bsc",
+    mars: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -131,6 +132,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     popielno: "POPIELNO",
     spray: "SPRAY LOTTERY TOKEN",
     mbc: "Mamba Token",
+    mars: "Matara Token",
 };
 
 // Define burn interval options

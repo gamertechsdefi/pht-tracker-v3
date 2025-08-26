@@ -91,6 +91,7 @@ const TOKEN_MAP: Record<string, TokenInfo> = {
     crepe: { address: "0xeb2B7d5691878627eff20492cA7c9a71228d931D", burnAddress: "0x000000000000000000000000000000000000dEaD" },
     popielno: { address: "0xdc3d92dd5a468edb7a7772452700cc93bb1826ad", burnAddress: "0x000000000000000000000000000000000000dEaD" },
     spray: { address: "0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+    mars: { address: "0x6844b2e9afb002d188a072a3ef0fbb068650f214", burnAddress: "0x000000000000000000000000000000000000dEaD" },
 };
 
 /**

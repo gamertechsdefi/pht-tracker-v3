@@ -73,6 +73,7 @@ const TOKEN_LIST: { [key: string]: string } = {
   crepe: "bsc",
   popielno: "bsc",
   spray: "bsc",
+  mars: "bsc",
 };
 
 // Full name to symbol mapping
@@ -107,6 +108,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
   "CREPE": "crepe",
   "POPIELNO": "popielno",
   "SPRAY LOTTERY TOKEN": "spray",
+  "Matara Token": "mars",
 };
 
 const TOKENS = Object.entries(TOKEN_LIST).map(([symbol, chain]) => {

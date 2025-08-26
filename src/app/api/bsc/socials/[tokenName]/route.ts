@@ -196,6 +196,12 @@ export async function GET(request: NextRequest) {
             telegram: "https://t.me/longlivemambacoin",
             bscscan: "https://bscscan.com/token/0x170f044f9c7a41FF83CAccaD6CCCa1B941d75Af7",
         },
+        mars: {
+            website: "http://mataratoken.com/",
+            twitter: "https://x.com/captainmatara",
+            telegram: "http://t.me/MATARA_TOKEN",
+            bscscan: "https://bscscan.com/token/0x6844B2e9afB002d188A072A3ef0FBb068650F214"
+        }
     };
 
     const socialLinks = tokenSocialMapping[tokenName] ?? {
