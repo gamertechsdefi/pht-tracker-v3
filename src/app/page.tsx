@@ -191,15 +191,6 @@ export default function Home() {
             ← Swipe to see more columns →
           </div>
         </div>
-        <div className="text-center mt-4">
-          <button 
-            onClick={handleAnalyticsClick} 
-            disabled={analyticsSent}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400"
-          >
-            {analyticsSent ? "Event Sent!" : "Send Test Event"}
-          </button>
-        </div>
       </div>
     </div>
   );

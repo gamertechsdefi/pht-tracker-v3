@@ -1,3 +1,4 @@
+// pages/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -15,29 +16,14 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // IMPORTANT: Replace with your actual domain and API key.
-  const domain = process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN || 'firescreener.com';
-  const apiKey = process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_API_KEY;
-
   useEffect(() => {
     async function fetchAnalytics() {
-      if (!apiKey) {
-        setError('Simple Analytics API key is not set. Please set NEXT_PUBLIC_SIMPLE_ANALYTICS_API_KEY environment variable.');
-        setLoading(false);
-        return;
-      }
-
       try {
-        const response = await fetch(`https://simpleanalytics.com/${domain}.json?version=5&fields=pageviews,visitors,pages,referrers`, {
-          headers: {
-            'Api-Key': apiKey,
-          },
-        });
-
+        const response = await fetch('/api/analytics');
         if (!response.ok) {
-          throw new Error('Failed to fetch analytics data');
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to fetch analytics data');
         }
-
         const data = await response.json();
         setAnalytics(data);
       } catch (err: any) {
@@ -48,7 +34,7 @@ export default function AnalyticsPage() {
     }
 
     fetchAnalytics();
-  }, [domain, apiKey]);
+  }, []);
 
   return (
     <div className="container mx-auto">
@@ -64,7 +50,7 @@ export default function AnalyticsPage() {
 
         {loading ? (
           <div className="text-white">Loading analytics...</div>
-        ) : analytics && (
+        ) : analytics ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-neutral-800 p-4 rounded-lg">
               <h2 className="text-xl font-semibold text-white mb-2">Pageviews</h2>
@@ -97,6 +83,8 @@ export default function AnalyticsPage() {
               </ul>
             </div>
           </div>
+        ) : (
+          <div className="text-white">No analytics data available</div>
         )}
       </div>
     </div>
