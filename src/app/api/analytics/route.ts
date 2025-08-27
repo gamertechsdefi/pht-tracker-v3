@@ -1,5 +1,5 @@
 // pages/api/analytics/stats.js
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   // The Stats API expects the site hostname only (no protocol). Example:

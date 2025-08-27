@@ -60,26 +60,6 @@ function formatPrice(price: number | string): { display: string; isExponential: 
 export default function Home() {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(true);
-  const [analyticsSent, setAnalyticsSent] = useState(false);
-
-  const handleAnalyticsClick = async () => {
-    try {
-      await fetch('/api/analytics', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'event',
-          hostname: window.location.hostname,
-          event: 'test_button_click',
-        }),
-      });
-      setAnalyticsSent(true);
-    } catch (error) {
-      console.error('Error sending analytics event:', error);
-    }
-  };
 
   useEffect(() => {
     async function fetchTokens() {
