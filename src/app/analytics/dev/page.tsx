@@ -4,13 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 
-interface AnalyticsData {
-  pageviews: number;
-  visitors: number;
-  pages: { page: string; pageviews: number }[];
-  referrers: { referrer: string; pageviews: number }[];
-}
-
 interface VisitorsData {
   visitors: number;
 }
@@ -28,39 +21,20 @@ interface ReferrersData {
 }
 
 export default function AnalyticsPage() {
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [visitorsOnly, setVisitorsOnly] = useState<VisitorsData | null>(null);
   const [pageviewsOnly, setPageviewsOnly] = useState<PageviewsData | null>(null);
   const [pagesOnly, setPagesOnly] = useState<PagesData | null>(null);
   const [referrersOnly, setReferrersOnly] = useState<ReferrersData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [visitorsLoading, setVisitorsLoading] = useState(true);
   const [pageviewsLoading, setPageviewsLoading] = useState(true);
   const [pagesLoading, setPagesLoading] = useState(true);
   const [referrersLoading, setReferrersLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [visitorsError, setVisitorsError] = useState<string | null>(null);
   const [pageviewsError, setPageviewsError] = useState<string | null>(null);
   const [pagesError, setPagesError] = useState<string | null>(null);
   const [referrersError, setReferrersError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchAnalytics() {
-      try {
-        const response = await fetch('/api/analytics');
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to fetch analytics data');
-        }
-        const data = await response.json();
-        setAnalytics(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     async function fetchVisitorsOnly() {
       try {
         const response = await fetch('/api/analytics/visitors');
@@ -125,7 +99,6 @@ export default function AnalyticsPage() {
       }
     }
 
-    fetchAnalytics();
     fetchVisitorsOnly();
     fetchPageviewsOnly();
     fetchPagesOnly();
@@ -141,27 +114,6 @@ export default function AnalyticsPage() {
         <div className="mb-8">
           <h2 className="text-2xl font-semibold text-white mb-4">Raw JSON Responses</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {/* Full Analytics Response */}
-            {/* <div className="bg-neutral-700 p-4 rounded-lg">
-              <p className="text-sm text-gray-300 mb-2 font-mono">GET /api/analytics</p>
-              {error && (
-                <div className="bg-red-500 text-white p-2 rounded mb-2">
-                  <p className="text-sm">{error}</p>
-                </div>
-              )}
-              {loading ? (
-                <div className="text-white">Loading...</div>
-              ) : analytics ? (
-                <div className="bg-neutral-800 p-3 rounded">
-                  <pre className="text-white font-mono text-sm overflow-x-auto">
-                    {JSON.stringify(analytics, null, 2)}
-                  </pre>
-                </div>
-              ) : (
-                <div className="text-gray-400">No data available</div>
-              )}
-            </div> */}
-
             {/* Visitors Only */}
             <div className="bg-neutral-700 p-4 rounded-lg">
               <p className="text-sm text-gray-300 mb-2 font-mono">GET /api/stats/visitors</p>

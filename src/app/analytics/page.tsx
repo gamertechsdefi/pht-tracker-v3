@@ -4,13 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 
-interface AnalyticsData {
-  pageviews: number;
-  visitors: number;
-  pages: { page: string; pageviews: number }[];
-  referrers: { referrer: string; pageviews: number }[];
-}
-
 interface VisitorsData {
   visitors: number;
 }
@@ -30,39 +23,20 @@ interface ReferrersData {
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 
 export default function AnalyticsPage() {
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [visitorsOnly, setVisitorsOnly] = useState<VisitorsData | null>(null);
   const [pageviewsOnly, setPageviewsOnly] = useState<PageviewsData | null>(null);
   const [pagesOnly, setPagesOnly] = useState<PagesData | null>(null);
   const [referrersOnly, setReferrersOnly] = useState<ReferrersData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [visitorsLoading, setVisitorsLoading] = useState(true);
   const [pageviewsLoading, setPageviewsLoading] = useState(true);
   const [pagesLoading, setPagesLoading] = useState(true);
   const [referrersLoading, setReferrersLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [visitorsError, setVisitorsError] = useState<string | null>(null);
   const [pageviewsError, setPageviewsError] = useState<string | null>(null);
   const [pagesError, setPagesError] = useState<string | null>(null);
   const [referrersError, setReferrersError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchAnalytics() {
-      try {
-        const response = await fetch('/api/analytics');
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to fetch analytics data');
-        }
-        const data = await response.json();
-        setAnalytics(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     async function fetchVisitorsOnly() {
       try {
         const response = await fetch('/api/analytics/visitors');
@@ -127,7 +101,6 @@ export default function AnalyticsPage() {
       }
     }
 
-    fetchAnalytics();
     fetchVisitorsOnly();
     fetchPageviewsOnly();
     fetchPagesOnly();
