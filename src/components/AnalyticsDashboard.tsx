@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface AnalyticsData {
-  pageviews: number;
-  visitors: number;
-  pages: { page: string; pageviews: number }[];
-  referrers: { referrer: string; pageviews: number }[];
-}
+// interface AnalyticsData {
+//   pageviews: number;
+//   visitors: number;
+//   pages: { page: string; pageviews: number }[];
+//   referrers: { referrer: string; pageviews: number }[];
+// }
 
 interface VisitorsData {
   visitors: number;
