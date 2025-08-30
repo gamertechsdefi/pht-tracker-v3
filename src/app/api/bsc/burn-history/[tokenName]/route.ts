@@ -92,6 +92,7 @@ const TOKEN_MAP: Record<string, TokenInfo> = {
     popielno: { address: "0xdc3d92dd5a468edb7a7772452700cc93bb1826ad", burnAddress: "0x000000000000000000000000000000000000dEaD" },
     spray: { address: "0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575", burnAddress: "0x000000000000000000000000000000000000dEaD" },
     mars: { address: "0x6844b2e9afb002d188a072a3ef0fbb068650f214", burnAddress: "0x000000000000000000000000000000000000dEaD" },
+    sdc: { address: "0x8cDC41236C567511f84C12Da10805cF50Dcdc27b", burnAddress: "0x000000000000000000000000000000000000dEaD"},
 };
 
 /**

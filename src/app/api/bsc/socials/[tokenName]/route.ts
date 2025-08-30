@@ -201,6 +201,12 @@ export async function GET(request: NextRequest) {
             twitter: "https://x.com/captainmatara",
             telegram: "http://t.me/MATARA_TOKEN",
             bscscan: "https://bscscan.com/token/0x6844B2e9afB002d188A072A3ef0FBb068650F214"
+        },
+        sdc: {
+            website: " ",
+            twitter: "https://x.com/Side_Chick_SDC",
+            telegram: "https://t.me/Sidechickglobal",
+            bscscan: "https://bscscan.com/token/0x8cDC41236C567511f84C12Da10805cF50Dcdc27b",
         }
     };
 

@@ -15,6 +15,7 @@ interface TokenData {
   priceChange24h?: string;
   image?: string;
   isTop100?: boolean;
+  isMeme?: boolean;
 }
 
 interface CoinGeckoMarketData {
@@ -38,6 +39,7 @@ interface CoinGeckoCoinData {
         market_cap: { usd: number; };
         total_volume: { usd: number; };
         price_change_percentage_24h: number;
+        ath_market_cap: { usd: number; };
     };
 }
 
@@ -151,8 +153,9 @@ const PriceComparison = () => {
   const [searchTermB, setSearchTermB] = useState('');
   const [showDropdownA, setShowDropdownA] = useState(false);
   const [showDropdownB, setShowDropdownB] = useState(false);
+  const [activeTab, setActiveTab] = useState<'top100' | 'meme'>('top100');
 
-  const fetchTokenData = useCallback(async (tokenId: string): Promise<TokenData | null> => {
+  const fetchTokenData = useCallback(async (tokenId: string, timeframe: 'now' | 'ath' = 'now'): Promise<TokenData | null> => {
     const isPlatformToken = TOKENS.some(t => t.id === tokenId);
 
     if (isPlatformToken) {
@@ -165,6 +168,9 @@ const PriceComparison = () => {
             if (data.error) {
                 console.error(`Token data not found: ${data.message}`);
                 return null;
+            }
+            if (timeframe === 'ath') {
+                console.warn(`ATH market cap is not available for platform token ${tokenId}. Using current market cap.`);
             }
             const tokenInfo = TOKENS.find(t => t.id === tokenId)
             return {
@@ -189,12 +195,17 @@ const PriceComparison = () => {
           return null;
         }
         const data: CoinGeckoCoinData = await response.json();
+        const athMarketCap = data.market_data.ath_market_cap?.usd;
+        const marketCap = timeframe === 'ath' && athMarketCap !== undefined && athMarketCap !== null
+            ? athMarketCap.toString()
+            : data.market_data.market_cap.usd.toString();
+
         return {
           id: data.id,
           symbol: data.symbol.toUpperCase(),
           name: data.name,
           price: data.market_data.current_price.usd.toString(),
-          marketCap: data.market_data.market_cap.usd.toString(),
+          marketCap: marketCap,
           volume24h: data.market_data.total_volume.usd.toString(),
           priceChange24h: data.market_data.price_change_percentage_24h.toString(),
           image: data.image.large,
@@ -211,10 +222,10 @@ const PriceComparison = () => {
   const fetchTokenLists = useCallback(async () => {
     try {
       setLoadingTokens(true);
-      const platformTokens = TOKENS.map(token => ({...token, isTop100: false}));
+      const platformTokens = TOKENS.map(token => ({...token, isTop100: false, isMeme: false}));
 
       const response = await fetch(
-        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false'
+        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=200&page=1&sparkline=false'
       );
       if (!response.ok) {
         throw new Error('Failed to fetch top 100 tokens from CoinGecko');
@@ -226,12 +237,32 @@ const PriceComparison = () => {
         name: coin.name,
         image: coin.image,
         isTop100: true,
+        isMeme: false,
+      }));
+
+      const meme_response = await fetch(
+        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=meme-token'
+      );
+      if (!meme_response.ok) {
+        throw new Error('Failed to fetch meme tokens from CoinGecko');
+      }
+      const memeData: CoinGeckoMarketData[] = await meme_response.json();
+      const memeTokens = memeData.map((coin) => ({
+        id: coin.id,
+        symbol: coin.symbol.toUpperCase(),
+        name: coin.name,
+        image: coin.image,
+        isTop100: false,
+        isMeme: true,
       }));
 
       const platformTokenIds = new Set(platformTokens.map(t => t.id));
       const uniqueTop100Tokens = top100Tokens.filter(t => !platformTokenIds.has(t.id));
 
-      const allTokens = [...platformTokens, ...uniqueTop100Tokens];
+      const existingIds = new Set([...platformTokens.map(t => t.id), ...uniqueTop100Tokens.map(t => t.id)]);
+      const uniqueMemeTokens = memeTokens.filter(t => !existingIds.has(t.id));
+
+      const allTokens = [...platformTokens, ...uniqueTop100Tokens, ...uniqueMemeTokens];
 
       setTokens(allTokens);
 
@@ -253,8 +284,8 @@ const PriceComparison = () => {
         setError(null);
         try {
             const [dataA, dataB] = await Promise.all([
-                fetchTokenData(cryptoA),
-                fetchTokenData(cryptoB)
+                fetchTokenData(cryptoA, 'now'),
+                fetchTokenData(cryptoB, timeframe)
             ]);
             setCryptoAData(dataA);
             setCryptoBData(dataB);
@@ -268,7 +299,7 @@ const PriceComparison = () => {
     if(tokens.length > 0) {
         fetchInitialData();
     }
-  }, [cryptoA, cryptoB, fetchTokenData, tokens]);
+  }, [cryptoA, cryptoB, fetchTokenData, tokens, timeframe]);
 
 
   const calculateAdjustedPrice = useCallback((tokenA: TokenData | null, tokenB: TokenData | null): number => {
@@ -291,7 +322,7 @@ const PriceComparison = () => {
       const potentialPrice = calculateAdjustedPrice(cryptoAData, cryptoBData);
       const shareData = {
         title: `${cryptoAData.name} (${cryptoAData.symbol}) with ${cryptoBData.name}'s Market Cap`,
-        text: `If ${cryptoAData.name} had ${cryptoBData.name}'s market cap, its price would be $${potentialPrice.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 6 })}`,
+        text: `If ${cryptoAData.name} had ${cryptoBData.name}'s market cap, its price would be ${potentialPrice.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 6 })}`,
         url: window.location.href,
       };
 
@@ -318,15 +349,20 @@ const PriceComparison = () => {
 
     const searchLower = searchTerm.toLowerCase();
 
-    const platformTokens = tokens.filter(t => !t.isTop100);
+    const platformTokens = tokens.filter(t => !t.isTop100 && !t.isMeme);
     const top100Tokens = tokens.filter(t => t.isTop100);
+    const memeTokens = tokens.filter(t => t.isMeme);
 
     const filteredPlatformTokens = platformTokens.filter(token =>
-      token.symbol.toLowerCase().includes(searchLower)
+      token.symbol.toLowerCase().includes(searchLower) || token.name.toLowerCase().includes(searchLower)
     );
 
     const filteredTop100Tokens = top100Tokens.filter(token =>
-      token.symbol.toLowerCase().includes(searchLower)
+      token.symbol.toLowerCase().includes(searchLower) || token.name.toLowerCase().includes(searchLower)
+    );
+
+    const filteredMemeTokens = memeTokens.filter(token =>
+      token.symbol.toLowerCase().includes(searchLower) || token.name.toLowerCase().includes(searchLower)
     );
 
     const handleSelect = (tokenId: string) => {
@@ -334,6 +370,11 @@ const PriceComparison = () => {
         const tokenInfo = tokens.find(t => t.id === tokenId);
         setSearchTerm(tokenInfo?.name || '');
         setShowDropdown(false);
+    };
+
+    const handleFocus = () => {
+        setShowDropdown(true);
+        setSearchTerm('');
     };
 
     return (
@@ -345,7 +386,7 @@ const PriceComparison = () => {
             placeholder={loadingTokens ? 'Loading tokens...' : `Search ${type === 'from' ? 'Token A' : 'Token B'}`}
             value={showDropdown ? searchTerm : selectedTokenData?.symbol || ''}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onFocus={() => setShowDropdown(true)}
+            onFocus={handleFocus}
             onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
             disabled={loadingTokens}
           />
@@ -358,7 +399,7 @@ const PriceComparison = () => {
 
         {showDropdown && (
           <div className="absolute z-10 mt-1 w-full bg-neutral-800 rounded-md shadow-lg max-h-96 overflow-auto">
-            {filteredPlatformTokens.length === 0 && filteredTop100Tokens.length === 0 ? (
+            {filteredPlatformTokens.length === 0 && filteredTop100Tokens.length === 0 && filteredMemeTokens.length === 0 ? (
               <div className="px-4 py-2 text-neutral-400">No tokens found</div>
             ) : (
               <div>
@@ -383,27 +424,65 @@ const PriceComparison = () => {
                     ))}
                   </div>
                 )}
-                {type === 'to' && filteredTop100Tokens.length > 0 && (
-                  <div>
-                    <div className="px-4 py-2 text-xs font-medium text-neutral-400 uppercase tracking-wider">Top 100 Tokens</div>
-                    {filteredTop100Tokens.map((token) => (
-                      <div
-                        key={token.id}
-                        className={`px-4 py-2 hover:bg-neutral-700 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-neutral-700' : ''
-                          }`}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          handleSelect(token.id);
-                        }}
+                {type === 'to' && (
+                  <>
+                    <div className="flex border-b border-neutral-700 sticky top-0 bg-neutral-800">
+                      <button
+                        className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'top100' ? 'text-white border-b-2 border-orange-500' : 'text-neutral-400'}`}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => setActiveTab('top100')}
                       >
-                        {token.image && (
-                          <img src={token.image} alt={token.name} className="w-5 h-5 mr-2 rounded-full" />
-                        )}
-                        <span className="font-medium">{token.symbol}</span>
-                        <span className="text-neutral-400 ml-2 text-sm">{token.name}</span>
+                        Top 100
+                      </button>
+                      <button
+                        className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'meme' ? 'text-white border-b-2 border-orange-500' : 'text-neutral-400'}`}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => setActiveTab('meme')}
+                      >
+                        Meme
+                      </button>
+                    </div>
+                    {activeTab === 'top100' && (
+                      <div>
+                        {filteredTop100Tokens.map((token) => (
+                          <div
+                            key={token.id}
+                            className={`px-4 py-2 hover:bg-neutral-700 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-neutral-700' : ''
+                              }`}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelect(token.id);
+                            }}
+                          >
+                            {token.image && (
+                              <img src={token.image} alt={token.name} className="w-5 h-5 mr-2 rounded-full" />
+                            )}
+                            <span className="font-medium">{token.symbol}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    )}
+                    {activeTab === 'meme' && (
+                      <div>
+                        {filteredMemeTokens.map((token) => (
+                          <div
+                            key={token.id}
+                            className={`px-4 py-2 hover:bg-neutral-700 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-neutral-700' : ''
+                              }`}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelect(token.id);
+                            }}
+                          >
+                            {token.image && (
+                              <img src={token.image} alt={token.name} className="w-5 h-5 mr-2 rounded-full" />
+                            )}
+                            <span className="font-medium">{token.symbol}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
@@ -441,7 +520,7 @@ const PriceComparison = () => {
           </h2>
         </div>
         <div className="text-xl">
-          with {cryptoBData.name}&apos;s market cap of
+          with {cryptoBData.symbol}&apos;s {timeframe === 'ath' ? 'ATH ' : ''}market cap of
           <span className="font-bold"> {formatMarketCap(cryptoBData.marketCap)}</span>:
         </div>
 
@@ -515,8 +594,6 @@ const PriceComparison = () => {
                 ? 'bg-orange-600 text-white'
                 : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
                 }`}
-              disabled={true} // TODO: Implement ATH data fetching
-              title="Coming soon"
             >
               All-Time High
             </button>

@@ -41,6 +41,7 @@ const TOKEN_MAP: Record<string, string> = {
   spray: "0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575",
   mbc: "0x170f044f9c7a41ff83caccad6ccca1b941d75af7",
   mars: "0x6844b2e9afb002d188a072a3ef0fbb068650f214",
+  sdc: "0x8cDC41236C567511f84C12Da10805cF50Dcdc27b",
 };
 
 // ERC-20 ABI for required functions

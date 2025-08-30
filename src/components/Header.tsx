@@ -53,6 +53,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     spray: "bsc",
     mbc: "bsc",
     mars: "bsc",
+    sdc: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -89,6 +90,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "SPRAY LOTTERY TOKEN": "spray",
     "Mamba Token": "mbc",
     "Matara Token": "mars",
+    "SIDE CHICK": "sdc"
 };
 
 export default function Header() {
@@ -229,8 +231,10 @@ export default function Header() {
                 <div className="hidden md:flex flex-row gap-8 items-center">
                     <Link href="#" className="hover:text-neutral-700 transition-colors duration-200">Home</Link>
                     <Link href="#" className="hover:text-neutral-700 transition-colors duration-200">Burns</Link>
+                    <Link href="/price2mc" className="hover:text-neutral-700 transition-colors duration-200">Price2MC</Link>
                     <Link href="https://www.phoenixtoken.community" className="hover:text-neutral-700 transition-colors duration-200">Token</Link>
                 </div>
+                
                 <button
                     onClick={() => setIsSearchOpen(true)}
                     className="flex items-center bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition duration-200"
@@ -297,7 +301,7 @@ export default function Header() {
                         className="block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
                         onClick={toggleMenu}
                     >
-                        Price Comparison
+                        Price2MC
                     </Link>
                     <Link
                         href="https://www.phoenixtoken.community"

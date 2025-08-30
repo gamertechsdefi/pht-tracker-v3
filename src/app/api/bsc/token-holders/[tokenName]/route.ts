@@ -38,6 +38,8 @@ const TOKEN_MAP: Record<string, TokenMapEntry> = {
   crepe: { address: "0xeb2B7d5691878627eff20492cA7c9a71228d931D" },
   popielno: { address: "0xdc3d92dd5a468edb7a7772452700cc93bb1826ad" },
   spray: { address: "0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575" },
+  mars: { address: "" },
+  sdc: { address: "0x8cDC41236C567511f84C12Da10805cF50Dcdc27b" },
 };
 
 interface MoralisHoldersResponse {
