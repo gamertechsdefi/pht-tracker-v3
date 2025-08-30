@@ -150,14 +150,13 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
 // ];
 
 import { useTokenData } from "@/hooks/useTokenData";
-import { Metadata } from 'next';
 
 type Props = {
   params: { chain: string; tokenName: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export default function TokenPage({ params, searchParams }: Props) {
+export default function TokenPage({ params }: Props) {
     const router = useRouter();
     const { chain, tokenName } = params;
 
