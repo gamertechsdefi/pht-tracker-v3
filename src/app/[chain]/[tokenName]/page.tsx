@@ -150,11 +150,11 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
 // ];
 
 import { useTokenData } from "@/hooks/useTokenData";
-import type { PageProps } from "next";
+type Props = {
+  params: { chain: string; tokenName: string };
+};
 
-type TokenPageProps = PageProps<{ chain: string; tokenName: string }>;
-
-export default function TokenPage({ params }: TokenPageProps) {
+export default function TokenPage({ params }: Props) {
     const router = useRouter();
     const { chain, tokenName } = params;
 
