@@ -151,14 +151,29 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
 
 import { useTokenData } from "@/hooks/useTokenData";
 
-type Props = {
-  params: { chain: string; tokenName: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
+import { Metadata } from 'next';
+import TokenPageClient from './TokenPageClient';
 
-export default function TokenPage({ params }: Props) {
-    const router = useRouter();
+interface PageProps {
+    params: {
+        chain: string;
+        tokenName: string;
+    };
+    searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { chain, tokenName } = params;
+    return {
+        title: `${tokenName.toUpperCase()} Token Info | PHT Tracker`,
+        description: `View real-time information about ${tokenName.toUpperCase()} token including price, market cap, supply, and burn statistics.`
+    };
+}
+
+export default function TokenPage({ params }: PageProps) {
+    const { chain, tokenName } = params;
+    
+    return <TokenPageClient chain={chain} tokenName={tokenName} />;
 
     const { tokenData, socialLinks, loading, error } = useTokenData(chain, tokenName);
     const [activeTab, setActiveTab] = useState<string>("info");
