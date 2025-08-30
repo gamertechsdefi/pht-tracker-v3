@@ -43,6 +43,7 @@ export const TOKEN_MAP: TokenMap = {
     "mbc": { address: "0x170f044f9c7a41ff83caccad6ccca1b941d75af7" },
     "mars": { address: "0x6844b2e9afb002d188a072a3ef0fbb068650f214" },
     "sdc": { address: "0x8cDC41236C567511f84C12Da10805cF50Dcdc27b" },
+    "kind": { address: "0x41f52a42091a6b2146561bf05b722ad1d0e46f8b" },
 };
 
 export async function getTokenData(tokenName: string) {
