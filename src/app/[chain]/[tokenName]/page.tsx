@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Header from "@/components/Header";
 import DataCard from "@/components/DataCard";
 import BurnsDisplay from "@/components/BurnHistory";
@@ -13,31 +13,31 @@ import Image from "next/image";
 import CurrencyConverter from "@/components/Converter";
 
 // Define types for token data and intervals
-interface TokenData {
-    price: string | number;
-    totalSupply: string | number;
-    cSupply: string | number;
-    lSupply: string | number;
-    holders: string | number;
-    marketCap: string | number;
-    volume: string | number;
-    burn5min: string | number;
-    burn15min: string | number;
-    burn30min: string | number;
-    burn1h: string | number;
-    burn3h: string | number;
-    burn6h: string | number;
-    burn12h: string | number;
-    burn24h: string | number;
-    totalburnt: string | number;
-    priceChange24h: string | number;
-    priceChange6h: string | number;
-    priceChange3h: string | number;
-    priceChange1h: string | number;
-    liquidity: string | number;
-    profile: string;
-    contract: string;
-}
+// interface TokenData {
+//     price: string | number;
+//     totalSupply: string | number;
+//     cSupply: string | number;
+//     lSupply: string | number;
+//     holders: string | number;
+//     marketCap: string | number;
+//     volume: string | number;
+//     burn5min: string | number;
+//     burn15min: string | number;
+//     burn30min: string | number;
+//     burn1h: string | number;
+//     burn3h: string | number;
+//     burn6h: string | number;
+//     burn12h: string | number;
+//     burn24h: string | number;
+//     totalburnt: string | number;
+//     priceChange24h: string | number;
+//     priceChange6h: string | number;
+//     priceChange3h: string | number;
+//     priceChange1h: string | number;
+//     liquidity: string | number;
+//     profile: string;
+//     contract: string;
+// }
 
 // interface BurnInterval {
 //     value: BurnIntervalKey;
@@ -56,45 +56,45 @@ interface TokenData {
 //     | "burn24h";
 
 // Token-to-chain mapping
-const TOKEN_LIST: Record<string, string> = {
-    pht: "bsc",
-    wkc: "bsc",
-    war: "bsc",
-    dtg: "bsc",
-    yukan: "bsc",
-    btcdragon: "bsc",
-    ocicat: "bsc",
-    nene: "bsc",
-    twc: "bsc",
-    durt: "bsc",
-    gtan: "bsc",
-    zedek: "bsc",
-    tkc: "bsc",
-    twd: "bsc",
-    bcat: "bsc",
-    nct: "bsc",
-    kitsune: "bsc",
-    bengcat: "bsc",
-    scat: "sol",
-    petros: "sol",
-    nuke: "sol",
-    venus: "sol",
-    crystalstones: "bsc",
-    bft: "bsc",
-    cross: "bsc",
-    thc: "bsc",
-    bbft: "bsc",
-    surv: "bsc",
-    bob: "bsc",
-    tut: "bsc",
-    puffcat: "bsc",
-    crepe: "bsc",
-    popielno: "bsc",
-    spray: "bsc",
-    mbc: "bsc",
-    mars: "bsc",
-    sdc: "bsc",
-};
+// const TOKEN_LIST: Record<string, string> = {
+//     pht: "bsc",
+//     wkc: "bsc",
+//     war: "bsc",
+//     dtg: "bsc",
+//     yukan: "bsc",
+//     btcdragon: "bsc",
+//     ocicat: "bsc",
+//     nene: "bsc",
+//     twc: "bsc",
+//     durt: "bsc",
+//     gtan: "bsc",
+//     zedek: "bsc",
+//     tkc: "bsc",
+//     twd: "bsc",
+//     bcat: "bsc",
+//     nct: "bsc",
+//     kitsune: "bsc",
+//     bengcat: "bsc",
+//     scat: "sol",
+//     petros: "sol",
+//     nuke: "sol",
+//     venus: "sol",
+//     crystalstones: "bsc",
+//     bft: "bsc",
+//     cross: "bsc",
+//     thc: "bsc",
+//     bbft: "bsc",
+//     surv: "bsc",
+//     bob: "bsc",
+//     tut: "bsc",
+//     puffcat: "bsc",
+//     crepe: "bsc",
+//     popielno: "bsc",
+//     spray: "bsc",
+//     mbc: "bsc",
+//     mars: "bsc",
+//     sdc: "bsc",
+// };
 
 // Token abbreviation to full name mapping
 const TOKEN_FULL_NAMES: Record<string, string> = {
