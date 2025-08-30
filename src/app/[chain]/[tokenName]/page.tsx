@@ -52,35 +52,6 @@ type BurnIntervalKey =
     | "burn12h"
     | "burn24h";
 
-// Token-to-chain mapping
-const TOKEN_LIST: Record<string, string> = {
-    pht: "bsc",
-    wkc: "bsc",
-    war: "bsc",
-    dtg: "bsc",
-    yukan: "bsc",
-    btcdragon: "bsc",
-    ocicat: "bsc",
-    nene: "bsc",
-    twc: "bsc",
-    durt: "bsc",
-    gtan: "bsc",
-    zedek: "bsc",
-    tkc: "bsc",
-    twd: "bsc",
-    bcat: "bsc",
-    nct: "bsc",
-    kitsune: "bsc",
-    bengcat: "bsc",
-    scat: "sol",
-    petros: "sol",
-    nuke: "sol",
-    venus: "sol",
-    crystalstones: "bsc",
-    bft: "bsc",
-    cross: "bsc",
-    thc: "bsc",
-};
 
 // Token abbreviation to full name mapping
 const TOKEN_LIST: Record<string, string> = {
