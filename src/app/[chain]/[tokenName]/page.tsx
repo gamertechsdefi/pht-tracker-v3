@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import DataCard from "@/components/DataCard";
 import BurnsDisplay from "@/components/BurnHistory";
@@ -13,88 +13,87 @@ import Image from "next/image";
 import CurrencyConverter from "@/components/Converter";
 
 // Define types for token data and intervals
-// interface TokenData {
-//     price: string | number;
-//     totalSupply: string | number;
-//     cSupply: string | number;
-//     lSupply: string | number;
-//     holders: string | number;
-//     marketCap: string | number;
-//     volume: string | number;
-//     burn5min: string | number;
-//     burn15min: string | number;
-//     burn30min: string | number;
-//     burn1h: string | number;
-//     burn3h: string | number;
-//     burn6h: string | number;
-//     burn12h: string | number;
-//     burn24h: string | number;
-//     totalburnt: string | number;
-//     priceChange24h: string | number;
-//     priceChange6h: string | number;
-//     priceChange3h: string | number;
-//     priceChange1h: string | number;
-//     liquidity: string | number;
-//     profile: string;
-//     contract: string;
-// }
+interface TokenData {
+    price: string | number;
+    totalSupply: string | number;
+    cSupply: string | number;
+    lSupply: string | number;
+    holders: string | number;
+    marketCap: string | number;
+    volume: string | number;
+    burn5min: string | number;
+    burn15min: string | number;
+    burn30min: string | number;
+    burn1h: string | number;
+    burn3h: string | number;
+    burn6h: string | number;
+    burn12h: string | number;
+    burn24h: string | number;
+    totalburnt: string | number;
+    priceChange24h: string | number;
+    priceChange6h: string | number;
+    priceChange3h: string | number;
+    priceChange1h: string | number;
+    liquidity: string | number;
+    profile: string;
+    contract: string;
+}
 
-// interface BurnInterval {
-//     value: BurnIntervalKey;
-//     label: string;
-// }
+interface BurnInterval {
+    value: BurnIntervalKey;
+    label: string;
+}
 
 
-// type BurnIntervalKey =
-//     | "burn5min"
-//     | "burn15min"
-//     | "burn30min"
-//     | "burn1h"
-//     | "burn3h"
-//     | "burn6h"
-//     | "burn12h"
-//     | "burn24h";
+type BurnIntervalKey =
+    | "burn5min"
+    | "burn15min"
+    | "burn30min"
+    | "burn1h"
+    | "burn3h"
+    | "burn6h"
+    | "burn12h"
+    | "burn24h";
 
 // Token-to-chain mapping
-// const TOKEN_LIST: Record<string, string> = {
-//     pht: "bsc",
-//     wkc: "bsc",
-//     war: "bsc",
-//     dtg: "bsc",
-//     yukan: "bsc",
-//     btcdragon: "bsc",
-//     ocicat: "bsc",
-//     nene: "bsc",
-//     twc: "bsc",
-//     durt: "bsc",
-//     gtan: "bsc",
-//     zedek: "bsc",
-//     tkc: "bsc",
-//     twd: "bsc",
-//     bcat: "bsc",
-//     nct: "bsc",
-//     kitsune: "bsc",
-//     bengcat: "bsc",
-//     scat: "sol",
-//     petros: "sol",
-//     nuke: "sol",
-//     venus: "sol",
-//     crystalstones: "bsc",
-//     bft: "bsc",
-//     cross: "bsc",
-//     thc: "bsc",
-//     bbft: "bsc",
-//     surv: "bsc",
-//     bob: "bsc",
-//     tut: "bsc",
-//     puffcat: "bsc",
-//     crepe: "bsc",
-//     popielno: "bsc",
-//     spray: "bsc",
-//     mbc: "bsc",
-//     mars: "bsc",
-//     sdc: "bsc",
-// };
+const TOKEN_LIST: Record<string, string> = {
+    pht: "bsc",
+    wkc: "bsc",
+    war: "bsc",
+    dtg: "bsc",
+    yukan: "bsc",
+    btcdragon: "bsc",
+    ocicat: "bsc",
+    nene: "bsc",
+    twc: "bsc",
+    durt: "bsc",
+    gtan: "bsc",
+    zedek: "bsc",
+    tkc: "bsc",
+    twd: "bsc",
+    bcat: "bsc",
+    nct: "bsc",
+    kitsune: "bsc",
+    bengcat: "bsc",
+    scat: "sol",
+    petros: "sol",
+    nuke: "sol",
+    venus: "sol",
+    crystalstones: "bsc",
+    bft: "bsc",
+    cross: "bsc",
+    thc: "bsc",
+    bbft: "bsc",
+    surv: "bsc",
+    bob: "bsc",
+    tut: "bsc",
+    puffcat: "bsc",
+    crepe: "bsc",
+    popielno: "bsc",
+    spray: "bsc",
+    mbc: "bsc",
+    mars: "bsc",
+};
 
 // Token abbreviation to full name mapping
 const TOKEN_FULL_NAMES: Record<string, string> = {
@@ -134,46 +133,30 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     spray: "SPRAY LOTTERY TOKEN",
     mbc: "Mamba Token",
     mars: "Matara Token",
-    sdc: "SIDE CHICK",
 };
 
 // Define burn interval options
-// const BURN_INTERVALS: BurnInterval[] = [
-//     { value: "burn5min", label: "5 Minutes" },
-//     { value: "burn15min", label: "15 Minutes" },
-//     { value: "burn30min", label: "30 Minutes" },
-//     { value: "burn1h", label: "1 Hour" },
-//     { value: "burn3h", label: "3 Hours" },
-//     { value: "burn6h", label: "6 Hours" },
-//     { value: "burn12h", label: "12 Hours" },
-//     { value: "burn24h", label: "24 Hours" },
-// ];
+const BURN_INTERVALS: BurnInterval[] = [
+    { value: "burn5min", label: "5 Minutes" },
+    { value: "burn15min", label: "15 Minutes" },
+    { value: "burn30min", label: "30 Minutes" },
+    { value: "burn1h", label: "1 Hour" },
+    { value: "burn3h", label: "3 Hours" },
+    { value: "burn6h", label: "6 Hours" },
+    { value: "burn12h", label: "12 Hours" },
+    { value: "burn24h", label: "24 Hours" },
+];
+
+// Define props interface
+interface TokenPageProps {
+    params: { chain: string; tokenName: string };
+}
 
 import { useTokenData } from "@/hooks/useTokenData";
 
-import { Metadata } from 'next';
-import TokenPageClient from './TokenPageClient';
-
-interface PageProps {
-    params: {
-        chain: string;
-        tokenName: string;
-    };
-    searchParams: { [key: string]: string | string[] | undefined };
-}
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export default function TokenPage({ params }: TokenPageProps) {
+    const router = useRouter();
     const { chain, tokenName } = params;
-    return {
-        title: `${tokenName.toUpperCase()} Token Info | PHT Tracker`,
-        description: `View real-time information about ${tokenName.toUpperCase()} token including price, market cap, supply, and burn statistics.`
-    };
-}
-
-export default function TokenPage({ params }: PageProps) {
-    const { chain, tokenName } = params;
-    
-    return <TokenPageClient chain={chain} tokenName={tokenName} />;
 
     const { tokenData, socialLinks, loading, error } = useTokenData(chain, tokenName);
     const [activeTab, setActiveTab] = useState<string>("info");
