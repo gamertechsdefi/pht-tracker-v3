@@ -149,14 +149,9 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
 //     { value: "burn24h", label: "24 Hours" },
 // ];
 
-// Define props interface
-interface TokenPageProps {
-    params: { chain: string; tokenName: string };
-}
-
 import { useTokenData } from "@/hooks/useTokenData";
 
-export default function TokenPage({ params }: TokenPageProps) {
+export default function TokenPage({ params }: { params: { chain: string; tokenName: string } }) {
     const router = useRouter();
     const { chain, tokenName } = params;
 
