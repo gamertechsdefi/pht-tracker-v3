@@ -207,6 +207,12 @@ export async function GET(request: NextRequest) {
             twitter: "https://x.com/Side_Chick_SDC",
             telegram: "https://t.me/Sidechickglobal",
             bscscan: "https://bscscan.com/token/0x8cDC41236C567511f84C12Da10805cF50Dcdc27b",
+        },
+        kind: {
+            website: "https://kindcattoken.com",
+            twitter: "https://x.com/KindCatToken",
+            telegram: "https://t.me/KindCatToken",
+            bscscan: "https://bscscan.com/token/0x41f52a42091a6b2146561bf05b722ad1d0e46f8b",
         }
     };
 

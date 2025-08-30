@@ -40,6 +40,7 @@ const TOKEN_MAP: Record<string, TokenMapEntry> = {
   spray: { address: "0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575" },
   mars: { address: "" },
   sdc: { address: "0x8cDC41236C567511f84C12Da10805cF50Dcdc27b" },
+  kind: { address: "0x41f52A42091A6B2146561bF05b722Ad1d0e46f8b" },
 };
 
 interface MoralisHoldersResponse {
