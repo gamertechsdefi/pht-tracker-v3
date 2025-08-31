@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+
 import { corsResponse } from "../../utils/cors";
 
 export async function OPTIONS() {

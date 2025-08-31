@@ -1,4 +1,9 @@
-import { NextResponse } from "next/server";
+
+import { corsResponse } from "../../utils/cors";
+
+export async function OPTIONS() {
+  return corsResponse(null, 204);
+}
 
 export async function GET() {
   // The Stats API expects the site hostname only (no protocol). Example:
@@ -10,9 +15,9 @@ export async function GET() {
   const userId = "sa_user_id_2162b862-5dea-4aa1-8101-6c969fc8583b"; // Replace if different
 
   if (!apiKey) {
-    return NextResponse.json(
+    return corsResponse(
       { message: "Simple Analytics API key is not set" },
-      { status: 500 }
+      500
     );
   }
 
@@ -33,7 +38,7 @@ export async function GET() {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Simple Analytics Visitors API error:", errorText);
-      return NextResponse.json(
+      return corsResponse(
         {
           message: "Error fetching visitors data",
           site,
@@ -41,7 +46,7 @@ export async function GET() {
           status: response.status,
           body: errorText,
         },
-        { status: response.status }
+        response.status
       );
     }
 
@@ -52,18 +57,18 @@ export async function GET() {
       visitors: data?.visitors ?? 0,
     };
 
-    return NextResponse.json(result, { status: 200 });
+    return corsResponse(result, 200);
   } catch (error) {
     console.error("Error fetching visitors:", error);
     const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json(
+    return corsResponse(
       { 
         message: "Internal Server Error", 
         error: message, 
         site, 
         requestUrl: `https://simpleanalytics.com/${site}.json?version=5&fields=visitors` 
       },
-      { status: 500 }
+      500
     );
   }
 }
