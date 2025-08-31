@@ -213,6 +213,12 @@ export async function GET(request: NextRequest) {
             twitter: "https://x.com/KindCatToken",
             telegram: "https://t.me/KindCatToken",
             bscscan: "https://bscscan.com/token/0x41f52a42091a6b2146561bf05b722ad1d0e46f8b",
+        },
+        shibc: {
+            website: "https://aishibceo.com",
+            twitter: "https://x.com/AIShibCeo",
+            telegram: "https://t.me/AISHIBCEOglobal",
+            bscscan: "https://bscscan.com/token/0x456B1049bA12f906326891486B2BA93e46Ae0369",
         }
     };
 

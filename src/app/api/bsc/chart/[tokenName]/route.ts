@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
     mars: "0x6844b2e9afb002d188a072a3ef0fbb068650f214",
     sdc: "0x8cDC41236C567511f84C12Da10805cF50Dcdc27b",
     kind: "0x41f52A42091A6B2146561bF05b722Ad1d0e46f8b",
+    shibc: "0x456B1049bA12f906326891486B2BA93e46Ae0369",
   };
 
   const poolAddress =

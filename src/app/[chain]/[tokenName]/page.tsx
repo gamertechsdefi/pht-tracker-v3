@@ -95,6 +95,7 @@ const TOKEN_LIST: Record<string, string> = {
     mars: "bsc",
     sdc: "bsc",
     kind: "bsc",
+    shibc: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -137,6 +138,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     mars: "Matara Token",
     sdc: "SIDE CHICK",
     kind: "KIND CAT TOKEN",
+    shibc: "AIShibCeo"
 };
 
 // Define burn interval options
