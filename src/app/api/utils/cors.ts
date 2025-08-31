@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
+// import { headers } from "next/headers";
 
 export function corsHeaders(origin: string = "http://localhost:3000") {
   return {
