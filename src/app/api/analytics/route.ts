@@ -1,13 +1,17 @@
 
+import { NextResponse } from "next/server";
 import { corsResponse } from "../utils/cors";
+import { TimeRange, getTimeRangeDates } from "@/types/analytics";
 
 export async function OPTIONS() {
   return corsResponse(null, 204);
 }
 
-export async function GET() {
-  // The Stats API expects the site hostname only (no protocol). Example:
-  // https://simpleanalytics.com/<site>.json?version=5
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const timeRange = (searchParams.get('timeRange') as TimeRange) || '24h';
+  const { start, end } = getTimeRangeDates(timeRange);
+  
   const rawDomain =
     process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN || "tracker.phoenixtoken.community";
   const site = rawDomain.replace(/^https?:\/\//, "").replace(/\/+$/, "");
@@ -23,7 +27,7 @@ export async function GET() {
 
   try {
     // Use the Stats API (v5) as per docs: https://docs.simpleanalytics.com/api/stats
-    const requestUrl = `https://simpleanalytics.com/${site}.json?version=5&fields=pageviews,visitors,pages,referrers`;
+    const requestUrl = `https://simpleanalytics.com/${site}.json?version=5&fields=pageviews,visitors,pages,referrers&start=${start}&end=${end}`;
     const response = await fetch(
       requestUrl,
       {
@@ -70,7 +74,12 @@ export async function GET() {
         : [],
     };
 
-    return corsResponse(normalized, 200);
+    return corsResponse({
+      ...normalized,
+      timeRange,
+      start,
+      end
+    }, 200);
   } catch (error) {
     console.error("Error fetching analytics:", error);
     const message = error instanceof Error ? error.message : String(error);
