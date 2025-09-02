@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 const allowedOrigins = [
   'http://smcstats.com',
   'https://smcstats.com',
-  'https://5.smcstats.com/',
+  'https://5.smcstats.com',
   'http://localhost:3000',
   'https://phoenixtoken.community',
   'https://tracker.phoenixtoken.community'
