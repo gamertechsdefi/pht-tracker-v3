@@ -56,6 +56,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     sdc: "bsc",
     kind: "bsc",
     shibc: "bsc",
+    pcat: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -95,6 +96,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "SIDE CHICK": "sdc",
     "KIND CAT TOKEN": "kind",
     "AIShibCeo": "shibc",
+    "Phenomenal Cat": "pcat",
 };
 
 export default function Header() {

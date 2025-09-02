@@ -35,6 +35,7 @@ const TOKEN_MAP: Record<string, string> = {
   sdc: "0x8cDC41236C567511f84C12Da10805cF50Dcdc27b",
   kind: "0x41f52A42091A6B2146561bF05b722Ad1d0e46f8b",
   shibc: "0x456B1049bA12f906326891486B2BA93e46Ae0369",
+  pcat: "0xFeD56F9Cd29F44e7C61c396DAc95cb3ed33d3546",
 };
 
 interface BurnData {

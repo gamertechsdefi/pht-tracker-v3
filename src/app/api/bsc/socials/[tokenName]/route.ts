@@ -219,6 +219,12 @@ export async function GET(request: NextRequest) {
             twitter: "https://x.com/AIShibCeo",
             telegram: "https://t.me/AISHIBCEOglobal",
             bscscan: "https://bscscan.com/token/0x456B1049bA12f906326891486B2BA93e46Ae0369",
+        },
+        pcat: {
+            website: "https://aishibceo.com",
+            twitter: "https://x.com/phenomenalcat01",
+            telegram: "https://t.me/phenomenalcatcoin",
+            bscscan: "https://bscscan.com/token/0xFeD56F9Cd29F44e7C61c396DAc95cb3ed33d3546",
         }
     };
 

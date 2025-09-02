@@ -41,6 +41,7 @@ const TOKEN_MAP: Record<string, TokenMapEntry> = {
   mars: { address: "" },
   sdc: { address: "0x8cDC41236C567511f84C12Da10805cF50Dcdc27b" },
   kind: { address: "0x41f52A42091A6B2146561bF05b722Ad1d0e46f8b" },
+  
 };
 
 interface MoralisHoldersResponse {

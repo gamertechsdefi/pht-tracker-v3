@@ -33,7 +33,7 @@ const TOKEN_MAP: Record<string, TokenMapEntry> = {
   bob: { address: "0x51363f073b1e4920fda7aa9e9d84ba97ede1560e" },
   surv: { address: "0xAfF713b62e642b25898e24d5Be6561f863582144" },
   tut: { address: "0xCAAE2A2F939F51d97CdFa9A86e79e3F085b799f3" },
-  puffcat: { address: "0x14a8d0AC8Fc456899F2DD33C3f4E32403A78126c"},
+  puffcat: { address: "0x14a8d0AC8Fc456899F2DD33C3f4E32403A78126c" },
   crepe: { address: "0xeb2B7d5691878627eff20492cA7c9a71228d931D" },
   popielno: { address: "0xdc3d92dd5a468edb7a7772452700cc93bb1826ad" },
   spray: { address: "0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575" },
@@ -41,13 +41,14 @@ const TOKEN_MAP: Record<string, TokenMapEntry> = {
   mars: { address: "0x6844b2e9afb002d188a072a3ef0fbb068650f214" },
   sdc: { address: "0x8cDC41236C567511f84C12Da10805cF50Dcdc27b" },
   kind: { address: "0x41f52A42091A6B2146561bF05b722Ad1d0e46f8b" },
-  shibc: {address: "0x456B1049bA12f906326891486B2BA93e46Ae0369" },
+  shibc: { address: "0x456B1049bA12f906326891486B2BA93e46Ae0369" },
+  pcat: { address: "0xFeD56F9Cd29F44e7C61c396DAc95cb3ed33d3546" },
 };
 
 interface DexScreenerResponse {
   pairs: Array<{
     priceChange?: {
-        h24?: string;
+      h24?: string;
     };
   }>;
 }
@@ -82,7 +83,7 @@ export async function GET(_: Request, context: any): Promise<NextResponse> {
     return NextResponse.json({
       priceChange24h: pair.priceChange?.h24,
       lastUpdated: new Date().toISOString(),
-    
+
     });
 
   } catch (error) {
