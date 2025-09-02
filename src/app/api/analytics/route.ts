@@ -1,5 +1,5 @@
 
-// import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { corsResponse } from "../utils/cors";
 import { TimeRange, getTimeRangeDates } from "@/types/analytics";
 
