@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 // import { headers } from "next/headers";
 
-export function corsHeaders(origin: string = "http://localhost:3000") {
+export function corsHeaders(origin: string = "http://smcstats.com/") {
   return {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
