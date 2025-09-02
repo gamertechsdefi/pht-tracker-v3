@@ -97,6 +97,7 @@ const TOKEN_LIST: Record<string, string> = {
     kind: "bsc",
     shibc: "bsc",
     pcat: "bsc",
+    egw: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -141,6 +142,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     kind: "KIND CAT TOKEN",
     shibc: "AIShibCeo",
     pcat: "Phenomenal Cat",
+    egw: "Eagles Wings",
 };
 
 // Define burn interval options

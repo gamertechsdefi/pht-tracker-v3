@@ -221,10 +221,16 @@ export async function GET(request: NextRequest) {
             bscscan: "https://bscscan.com/token/0x456B1049bA12f906326891486B2BA93e46Ae0369",
         },
         pcat: {
-            website: "https://aishibceo.com",
+            website: "#",
             twitter: "https://x.com/phenomenalcat01",
             telegram: "https://t.me/phenomenalcatcoin",
             bscscan: "https://bscscan.com/token/0xFeD56F9Cd29F44e7C61c396DAc95cb3ed33d3546",
+        },
+        egw: {
+            website: "https://eagleswingstoken.com/",
+            twitter: "https://x.com/EaglesWingsBSC",
+            telegram: "https://t.me/EaglesWingsOfficial",
+            bscscan: "https://bscscan.com/token/0x2056d14A4116A7165cfeb7D79dB760a06b57DBCa",
         }
     };
 
