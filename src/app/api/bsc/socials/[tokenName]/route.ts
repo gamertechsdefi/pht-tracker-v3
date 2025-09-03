@@ -231,6 +231,12 @@ export async function GET(request: NextRequest) {
             twitter: "https://x.com/EaglesWingsBSC",
             telegram: "https://t.me/EaglesWingsOfficial",
             bscscan: "https://bscscan.com/token/0x2056d14A4116A7165cfeb7D79dB760a06b57DBCa",
+        },
+        "1000pdf": {
+            website: "https://1000pdf.com/",
+            twitter: "http://t.me/pdf1000group",
+            telegram: "http://x.com/token1000pdf",
+            bscscan: "https://bscscan.com/token/0xCa7930478492CDe4Be997FA898Cd1a6AfB8F41A1",
         }
     };
 

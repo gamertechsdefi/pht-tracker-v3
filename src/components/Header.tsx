@@ -58,6 +58,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     shibc: "bsc",
     pcat: "bsc",
     egw: "bsc",
+    "1000pdf": "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -99,6 +100,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "AIShibCeo": "shibc",
     "Phenomenal Cat": "pcat",
     "Eagles Wings": "egw",
+    "1000PDF Token": "1000pdf",
 };
 
 export default function Header() {

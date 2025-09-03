@@ -98,6 +98,7 @@ const TOKEN_LIST: Record<string, string> = {
     shibc: "bsc",
     pcat: "bsc",
     egw: "bsc",
+    "1000pdf": "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -143,6 +144,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     shibc: "AIShibCeo",
     pcat: "Phenomenal Cat",
     egw: "Eagles Wings",
+    "1000pdf": "1000PDF",
 };
 
 // Define burn interval options
