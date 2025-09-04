@@ -7,7 +7,8 @@ const allowedOrigins = [
   'https://5.smcstats.com',
   'http://localhost:3000',
   'https://phoenixtoken.community',
-  'https://tracker.phoenixtoken.community'
+  'https://tracker.phoenixtoken.community',
+  'https://firescreener.com'
 ];
 
 export function corsHeaders(requestOrigin?: string) {

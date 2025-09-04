@@ -237,7 +237,13 @@ export async function GET(request: NextRequest) {
             twitter: "http://t.me/pdf1000group",
             telegram: "http://x.com/token1000pdf",
             bscscan: "https://bscscan.com/token/0xCa7930478492CDe4Be997FA898Cd1a6AfB8F41A1",
-        }
+        },
+        aidove: {
+            website: "https://www.aidovecoin.com/",
+            twitter: "https://x.com/Aidovecoin",
+            telegram: "https://t.me/aidovecoin",
+            bscscan: "https://bscscan.com/token/0xe9E3CDB871D315fEE80aF4c9FcD4886782694856",
+        },
     };
 
     const socialLinks = tokenSocialMapping[tokenName] ?? {

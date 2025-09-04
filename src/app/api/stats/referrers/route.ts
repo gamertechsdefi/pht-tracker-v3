@@ -9,7 +9,7 @@ export async function GET() {
   // The Stats API expects the site hostname only (no protocol). Example:
   // https://simpleanalytics.com/<site>.json?version=5&fields=referrers
   const rawDomain =
-    process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN || "tracker.phoenixtoken.community";
+    process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN || "firescreener.com";
   const site = rawDomain.replace(/^https?:\/\//, "").replace(/\/+$/, "");
   const apiKey = process.env.SIMPLE_ANALYTICS_API_KEY;
   const userId = "sa_user_id_2162b862-5dea-4aa1-8101-6c969fc8583b"; // Replace if different

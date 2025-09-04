@@ -19,28 +19,28 @@ interface TokenData {
 }
 
 interface CoinGeckoMarketData {
-    id: string;
-    symbol: string;
-    name: string;
-    image: string;
-    current_price: number;
-    market_cap: number;
-    total_volume: number;
-    price_change_percentage_24h: number;
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number;
+  market_cap: number;
+  total_volume: number;
+  price_change_percentage_24h: number;
 }
 
 interface CoinGeckoCoinData {
-    id: string;
-    symbol: string;
-    name: string;
-    image: { large: string; };
-    market_data: {
-        current_price: { usd: number; };
-        market_cap: { usd: number; };
-        total_volume: { usd: number; };
-        price_change_percentage_24h: number;
-        ath_market_cap: { usd: number; };
-    };
+  id: string;
+  symbol: string;
+  name: string;
+  image: { large: string; };
+  market_data: {
+    current_price: { usd: number; };
+    market_cap: { usd: number; };
+    total_volume: { usd: number; };
+    price_change_percentage_24h: number;
+    ath_market_cap: { usd: number; };
+  };
 }
 
 // Token list with chain mapping
@@ -76,6 +76,13 @@ const TOKEN_LIST: { [key: string]: string } = {
   popielno: "bsc",
   spray: "bsc",
   mars: "bsc",
+  sdc: "bsc",
+  kind: "bsc",
+  shibc: "bsc",
+  pcat: "bsc",
+  egw: "bsc",
+  "1000pdf": "bsc",
+
 };
 
 // Full name to symbol mapping
@@ -111,6 +118,12 @@ const FULL_NAME_MAP: { [key: string]: string } = {
   "POPIELNO": "popielno",
   "SPRAY LOTTERY TOKEN": "spray",
   "Matara Token": "mars",
+  "sdc": "SIDE CHICK",
+  "kind": "KIND CAT TOKEN",
+  "shibc": "AIShibCeo",
+  "pcat": "Phenomenal Cat",
+  "egw": "Eagles Wings",
+  "1000pdf": "1000PDF",
 };
 
 const TOKENS = Object.entries(TOKEN_LIST).map(([symbol, chain]) => {
@@ -159,34 +172,34 @@ const PriceComparison = () => {
     const isPlatformToken = TOKENS.some(t => t.id === tokenId);
 
     if (isPlatformToken) {
-        try {
-            const response = await fetch(`/api/bsc/token-profile/${tokenId}`);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch data for ${tokenId}`);
-            }
-            const data = await response.json();
-            if (data.error) {
-                console.error(`Token data not found: ${data.message}`);
-                return null;
-            }
-            if (timeframe === 'ath') {
-                console.warn(`ATH market cap is not available for platform token ${tokenId}. Using current market cap.`);
-            }
-            const tokenInfo = TOKENS.find(t => t.id === tokenId)
-            return {
-                id: tokenId,
-                symbol: tokenInfo?.symbol || '',
-                name: tokenInfo?.name || '',
-                price: data.price === 'N/A' ? '0' : data.price,
-                marketCap: data.marketCap === 'N/A' ? '0' : data.marketCap,
-                volume24h: data.volume === 'N/A' ? '0' : data.volume,
-                priceChange24h: data.change === 'N/A' ? '0' : data.change,
-                image: data.profileImage
-            };
-        } catch (err) {
-            console.error(`Error fetching ${tokenId}:`, err);
-            return null;
+      try {
+        const response = await fetch(`/api/bsc/token-profile/${tokenId}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data for ${tokenId}`);
         }
+        const data = await response.json();
+        if (data.error) {
+          console.error(`Token data not found: ${data.message}`);
+          return null;
+        }
+        if (timeframe === 'ath') {
+          console.warn(`ATH market cap is not available for platform token ${tokenId}. Using current market cap.`);
+        }
+        const tokenInfo = TOKENS.find(t => t.id === tokenId)
+        return {
+          id: tokenId,
+          symbol: tokenInfo?.symbol || '',
+          name: tokenInfo?.name || '',
+          price: data.price === 'N/A' ? '0' : data.price,
+          marketCap: data.marketCap === 'N/A' ? '0' : data.marketCap,
+          volume24h: data.volume === 'N/A' ? '0' : data.volume,
+          priceChange24h: data.change === 'N/A' ? '0' : data.change,
+          image: data.profileImage
+        };
+      } catch (err) {
+        console.error(`Error fetching ${tokenId}:`, err);
+        return null;
+      }
     } else {
       // It might be a coingecko token
       try {
@@ -197,8 +210,8 @@ const PriceComparison = () => {
         const data: CoinGeckoCoinData = await response.json();
         const athMarketCap = data.market_data.ath_market_cap?.usd;
         const marketCap = timeframe === 'ath' && athMarketCap !== undefined && athMarketCap !== null
-            ? athMarketCap.toString()
-            : data.market_data.market_cap.usd.toString();
+          ? athMarketCap.toString()
+          : data.market_data.market_cap.usd.toString();
 
         return {
           id: data.id,
@@ -222,7 +235,7 @@ const PriceComparison = () => {
   const fetchTokenLists = useCallback(async () => {
     try {
       setLoadingTokens(true);
-      const platformTokens = TOKENS.map(token => ({...token, isTop100: false, isMeme: false}));
+      const platformTokens = TOKENS.map(token => ({ ...token, isTop100: false, isMeme: false }));
 
       const response = await fetch(
         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=200&page=1&sparkline=false'
@@ -280,24 +293,24 @@ const PriceComparison = () => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const [dataA, dataB] = await Promise.all([
-                fetchTokenData(cryptoA, 'now'),
-                fetchTokenData(cryptoB, timeframe)
-            ]);
-            setCryptoAData(dataA);
-            setCryptoBData(dataB);
-        } catch (err) {
-            setError('Failed to fetch data. Please try again later.');
-            console.error('Error:', err);
-        } finally {
-            setLoading(false);
-        }
+      setLoading(true);
+      setError(null);
+      try {
+        const [dataA, dataB] = await Promise.all([
+          fetchTokenData(cryptoA, 'now'),
+          fetchTokenData(cryptoB, timeframe)
+        ]);
+        setCryptoAData(dataA);
+        setCryptoBData(dataB);
+      } catch (err) {
+        setError('Failed to fetch data. Please try again later.');
+        console.error('Error:', err);
+      } finally {
+        setLoading(false);
+      }
     };
-    if(tokens.length > 0) {
-        fetchInitialData();
+    if (tokens.length > 0) {
+      fetchInitialData();
     }
   }, [cryptoA, cryptoB, fetchTokenData, tokens, timeframe]);
 
@@ -366,15 +379,15 @@ const PriceComparison = () => {
     );
 
     const handleSelect = (tokenId: string) => {
-        setSelectedToken(tokenId);
-        const tokenInfo = tokens.find(t => t.id === tokenId);
-        setSearchTerm(tokenInfo?.name || '');
-        setShowDropdown(false);
+      setSelectedToken(tokenId);
+      const tokenInfo = tokens.find(t => t.id === tokenId);
+      setSearchTerm(tokenInfo?.name || '');
+      setShowDropdown(false);
     };
 
     const handleFocus = () => {
-        setShowDropdown(true);
-        setSearchTerm('');
+      setShowDropdown(true);
+      setSearchTerm('');
     };
 
     return (
@@ -514,7 +527,7 @@ const PriceComparison = () => {
     return (
       <div className="text-center">
         <div className="flex items-center justify-center mb-2 space-x-2">
-          {cryptoAData.image && <img src={cryptoAData.image} alt={cryptoAData.name} className="w-8 h-8 rounded-md" /> }
+          {cryptoAData.image && <img src={cryptoAData.image} alt={cryptoAData.name} className="w-8 h-8 rounded-md" />}
           <h2 className="text-xl md:text-2xl font-bold">
             {cryptoAData.symbol} (${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })})
           </h2>

@@ -99,6 +99,7 @@ const TOKEN_LIST: Record<string, string> = {
     pcat: "bsc",
     egw: "bsc",
     "1000pdf": "bsc",
+    aidove: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -111,7 +112,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     btcdragon: "BTCDragon Token",
     ocicat: "Ocicat Token",
     nene: "Nene Token",
-    twc: "TiwiCat Coin",
+    twc: "TIWICAT",
     durt: "Dutch Rabbit Token",
     gtan: "Giant Token",
     zedek: "Zedek Token",
@@ -145,6 +146,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     pcat: "Phenomenal Cat",
     egw: "Eagles Wings",
     "1000pdf": "1000PDF",
+    aidove: "AiDove"
 };
 
 // Define burn interval options
@@ -370,7 +372,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     function formatEvmAddress(address: string, shorten: boolean = true, chars: number = 5): string {
         // Normalize to lowercase and remove '0x' prefix if present
         const normalized = address.toLowerCase().replace(/^0x/i, '');
-        if (normalized.length !== 40 || !/^[0-9a-f]{40}$/.test(normalized)) {
+        if (normalized.length < 40 ) {
             throw new Error("Invalid EVM address. Must be 40 hexadecimal characters.");
         }
 

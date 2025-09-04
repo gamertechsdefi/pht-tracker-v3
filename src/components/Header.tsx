@@ -59,6 +59,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     pcat: "bsc",
     egw: "bsc",
     "1000pdf": "bsc",
+    aidove: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -101,6 +102,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "Phenomenal Cat": "pcat",
     "Eagles Wings": "egw",
     "1000PDF Token": "1000pdf",
+    "AiDove": "aidove",
 };
 
 export default function Header() {

@@ -96,6 +96,7 @@ const TOKEN_MAP: TokenMap = {
   "pcat": { address: "0xFeD56F9Cd29F44e7C61c396DAc95cb3ed33d3546" },
   "egw": { address: "0x2056d14A4116A7165cfeb7D79dB760a06b57DBCa" },
   "1000pdf": { address: "0xCa7930478492CDe4Be997FA898Cd1a6AfB8F41A1" },
+  "aidove": { address: "0xe9E3CDB871D315fEE80aF4c9FcD4886782694856" },
 };
 
 export async function GET(
