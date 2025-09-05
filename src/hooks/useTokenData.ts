@@ -8,6 +8,7 @@ interface TokenData {
     lSupply: string | number;
     holders: string | number;
     marketCap: string | number;
+    fdv: string | number;
     volume: string | number;
     burn5min: string | number;
     burn15min: string | number;
@@ -125,6 +126,7 @@ export function useTokenData(chain: string | null, tokenName: string | null) {
                 lSupply: metricsData?.lockedSupply || "N/A",
                 holders: holdersData?.totalHolders || "N/A",
                 marketCap: priceData?.marketCap || "N/A",
+                fdv: priceData?.fdv || "N/A",
                 volume: priceData?.volume || "N/A",
                 burn5min: burnsData?.burn5min || "No burns",
                 burn15min: burnsData?.burn15min || "No burns",

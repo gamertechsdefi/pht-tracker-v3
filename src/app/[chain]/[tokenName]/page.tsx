@@ -20,6 +20,7 @@ interface TokenData {
     lSupply: string | number;
     holders: string | number;
     marketCap: string | number;
+    fdv: string | number;
     volume: string | number;
     burn5min: string | number;
     burn15min: string | number;
@@ -247,6 +248,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     lSupply: metricsData?.lockedSupply || "N/A",
                     holders: holdersData?.totalHolders || "N/A",
                     marketCap: priceData?.marketCap || "N/A",
+                    fdv: priceData?.fdv || "N/A",
                     volume: priceData?.volume || "N/A",
                     burn5min: burnsData?.burn5min || "No burns",
                     burn15min: burnsData?.burn15min || "No burns",
@@ -492,10 +494,14 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         </div>
 
 
-                                        <div className="mt-4 grid grid-cols-3 gap-4">
+                                        <div className="mt-4 grid grid-cols-2 gap-4">
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                <h1>MarketCap:</h1>
+                                                <h1>Market Cap:</h1>
                                                 <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
+                                            </div>
+                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>FDV:</h1>
+                                                <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.fdv)}</h1>
                                             </div>
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>Liquidity:</h1>
@@ -671,10 +677,14 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </h1>
                                         </div>
 
-                                        <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                <h1>MarketCap:</h1>
+                                                <h1>Market Cap:</h1>
                                                 <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
+                                            </div>
+                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>FDV:</h1>
+                                                <h1 className="font-medium text-xl">${formatLargeNumber(tokenData.fdv)}</h1>
                                             </div>
                                             <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>Liquidity:</h1>

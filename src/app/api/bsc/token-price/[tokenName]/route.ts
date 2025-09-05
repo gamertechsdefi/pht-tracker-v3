@@ -26,7 +26,8 @@ interface Liquidity {
 
 interface TokenPair {
   priceUsd?: string;
-  fdv?: string;
+  fdv?: number;
+  marketCap?: number;
   volume?: Volume;
   priceChange?: PriceChange;
   liquidity?: Liquidity;
@@ -40,6 +41,7 @@ interface TokenPriceResponse {
   token: string;
   price: string;
   marketCap: string;
+  fdv: string;
   volume: string;
   change24h: string;
   change6h: string,
@@ -136,7 +138,8 @@ export async function GET(
     return NextResponse.json({
       token: tokenAddress,
       price: pair.priceUsd || "N/A",
-      marketCap: pair.fdv || "N/A",
+      marketCap: pair.marketCap !== undefined ? String(pair.marketCap) : "N/A",
+      fdv: pair.fdv !== undefined ? String(pair.fdv) : "N/A",
       volume: pair.volume?.h24 || "N/A",
       change24h: pair.priceChange?.h24 || "N/A",
       change6h: pair.priceChange?.h6 || "N/A",
