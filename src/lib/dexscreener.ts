@@ -80,7 +80,7 @@ export async function getTokenData(tokenName: string) {
         return {
           token: tokenAddress,
           price: pair.priceUsd || "N/A",
-          marketCap: pair.fdv || "N/A",
+          marketCap: pair.marketCap || "N/A",
           volume: pair.volume?.h24 || "N/A",
           change24h: pair.priceChange?.h24 || "N/A",
           change6h: pair.priceChange?.h6 || "N/A",
