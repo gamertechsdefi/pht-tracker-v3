@@ -1,28 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 type BurnApiResponse = {
-  tokenName: string;
-  tokenAddress: string;
   burn24h: number;
   lastUpdated: string;
-  // other fields exist, but we only need the above here
-  fromCache?: boolean;
-  stale?: boolean;
-  message?: string;
 };
 
 type Row = {
   token: string;
   burn24h: number | "N/A";
   lastUpdated: string | "N/A";
-  status: "OK" | "No data" | "Error";
 };
 
 const TOKEN_ENABLE_MAP: Record<string, boolean> = {
-  // Toggle tokens here: set to false to temporarily hide tokens without burns
   pht: true,
   wkc: true,
   war: true,
@@ -104,7 +96,6 @@ function formatRelativeTime(iso: string | "N/A"): string {
 }
 
 export default function BurnsLeaderboardPage() {
-  const [tokens, setTokens] = useState<string[]>(DEFAULT_TOKENS);
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -116,10 +107,8 @@ export default function BurnsLeaderboardPage() {
     return () => clearInterval(id);
   }, []);
 
-  const activeTokens = useMemo(
-    () => tokens.filter((t) => TOKEN_ENABLE_MAP[t]),
-    [tokens]
-  );
+  // Active tokens follow the order in TOKEN_ENABLE_MAP (already filtered by DEFAULT_TOKENS)
+  const activeTokens = DEFAULT_TOKENS;
 
   useEffect(() => {
     let isMounted = true;
@@ -133,15 +122,12 @@ export default function BurnsLeaderboardPage() {
           activeTokens.map(async (t) => {
             try {
               const chain = TOKEN_CHAIN_MAP[t] ?? "bsc";
-              // We already have an API for this that reads Firestore
               const resp = await fetch(`/api/${chain}/total-burnt/${t}`);
               if (!resp.ok) {
-                // 404 -> No data; other statuses -> Error
                 return {
                   token: t,
                   burn24h: "N/A" as const,
                   lastUpdated: "N/A" as const,
-                  status: resp.status === 404 ? ("No data" as const) : ("Error" as const),
                 };
               }
               const data = (await resp.json()) as BurnApiResponse;
@@ -152,14 +138,12 @@ export default function BurnsLeaderboardPage() {
                     ? data.burn24h
                     : (0 as number),
                 lastUpdated: data.lastUpdated ?? "N/A",
-                status: "OK" as const,
               };
             } catch {
               return {
                 token: t,
                 burn24h: "N/A" as const,
                 lastUpdated: "N/A" as const,
-                status: "Error" as const,
               };
             }
           })
