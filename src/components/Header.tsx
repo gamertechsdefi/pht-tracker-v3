@@ -60,6 +60,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     egw: "bsc",
     "1000pdf": "bsc",
     aidove: "bsc",
+    hmt: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -103,6 +104,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "Eagles Wings": "egw",
     "1000PDF Token": "1000pdf",
     "AiDove": "aidove",
+    "HawkMoon Token": "hmt",
 };
 
 export default function Header() {

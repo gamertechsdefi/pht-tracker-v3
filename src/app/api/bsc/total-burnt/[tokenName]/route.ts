@@ -39,6 +39,7 @@ const TOKEN_MAP: Record<string, string> = {
   egw: "0x2056d14A4116A7165cfeb7D79dB760a06b57DBCa",
   "1000pdf": "0xCa7930478492CDe4Be997FA898Cd1a6AfB8F41A1",
   aidove: "0xe9E3CDB871D315fEE80aF4c9FcD4886782694856",
+  hmt: "0x360f2cf415d9be6e82a7252681ac116fb63d2fa2",
 };
 
 interface BurnData {
