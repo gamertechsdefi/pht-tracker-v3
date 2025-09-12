@@ -51,6 +51,7 @@ const TOKEN_ENABLE_MAP: Record<string, boolean> = {
   egw: false,
   "1000pdf": true,
   aidove: false,
+  rbcat: true,
 };
 
 // If you want to hard-freeze which tokens show by default, keep this list in sync

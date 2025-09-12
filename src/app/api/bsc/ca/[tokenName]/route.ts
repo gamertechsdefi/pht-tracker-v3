@@ -41,6 +41,7 @@ const TOKEN_MAP: Record<string, { address: string }> = {
   "1000pdf": { address: "0xCa7930478492CDe4Be997FA898Cd1a6AfB8F41A1" },
   aidove: { address: "0xe9E3CDB871D315fEE80aF4c9FcD48867826948560" },
   hmt: { address: "0x360f2cf415d9be6e82a7252681ac116fb63d2fa2" },
+  rbcat: { address: "0x14A2db256Ef18c4f7165d5E48f65a528b4155100" },
 };
 
 export async function GET(

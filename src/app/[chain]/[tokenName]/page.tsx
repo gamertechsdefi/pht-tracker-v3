@@ -102,6 +102,7 @@ const TOKEN_LIST: Record<string, string> = {
     "1000pdf": "bsc",
     aidove: "bsc",
     hmt: "bsc",
+    rbcat: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -150,6 +151,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     "1000pdf": "1000PDF",
     aidove: "AiDove",
     hmt: "HawkMoon Token",
+    rbcat: "Russian Blue Cat",
 };
 
 // Define burn interval options

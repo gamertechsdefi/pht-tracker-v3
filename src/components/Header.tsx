@@ -61,6 +61,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     "1000pdf": "bsc",
     aidove: "bsc",
     hmt: "bsc",
+    rbcat: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -105,6 +106,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "1000PDF Token": "1000pdf",
     "AiDove": "aidove",
     "HawkMoon Token": "hmt",
+    "Russian Blue Cat": "rbcat",
 };
 
 export default function Header() {

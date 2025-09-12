@@ -244,6 +244,12 @@ export async function GET(request: NextRequest) {
             telegram: "https://t.me/aidovecoin",
             bscscan: "https://bscscan.com/token/0xe9E3CDB871D315fEE80aF4c9FcD4886782694856",
         },
+        rbcat: {
+            website: "https://www.rbcat.xyz/",
+            twitter: "https://x.com/rbcat_bsc",
+            telegram: "https://t.me/RBCAT_BSC",
+            bscscan: "https://bscscan.com/token/0x14A2db256Ef18c4f7165d5E48f65a528b4155100",
+        },
     };
 
     const socialLinks = tokenSocialMapping[tokenName] ?? {
