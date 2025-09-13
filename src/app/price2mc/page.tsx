@@ -124,6 +124,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
   "pcat": "Phenomenal Cat",
   "egw": "Eagles Wings",
   "1000pdf": "1000PDF",
+  "peso": "Panda Peso",
 };
 
 const TOKENS = Object.entries(TOKEN_LIST).map(([symbol, chain]) => {

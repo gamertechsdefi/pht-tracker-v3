@@ -250,6 +250,12 @@ export async function GET(request: NextRequest) {
             telegram: "https://t.me/RBCAT_BSC",
             bscscan: "https://bscscan.com/token/0x14A2db256Ef18c4f7165d5E48f65a528b4155100",
         },
+        peso: {
+            website: "https://hungrypandapeso.fun/",
+            twitter: "https://x.com/pandapeso_cto",
+            telegram: "https://t.me/pandapeso",
+            bscscan: "https://bscscan.com/token/0xC54CA14328d5b61E4BDc8A4d4b08b6B8D06BC372",
+        }
     };
 
     const socialLinks = tokenSocialMapping[tokenName] ?? {
