@@ -35,6 +35,9 @@ export default function RootLayout({
         {children}
       </body>
       <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
+      <Script data-goatcounter="https://firescreener.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js" />
+      
       <Analytics />
     </html>
   );
