@@ -73,6 +73,14 @@ const TOKEN_LIST: Record<string, string> = {
     mbc: "bsc",
     mars: "bsc",
     sdc: "bsc",
+    kind: "bsc",
+    shibc: "bsc",
+    pcat: "bsc",
+    egw: "bsc",
+    "1000pdf": "bsc",
+    aidove: "bsc",
+    hmt: "bsc",
+    rbcat: "bsc",
 };
 
 export function useTokenData(chain: string | null, tokenName: string | null) {

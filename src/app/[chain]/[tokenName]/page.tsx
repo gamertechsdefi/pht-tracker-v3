@@ -103,7 +103,6 @@ const TOKEN_LIST: Record<string, string> = {
     aidove: "bsc",
     hmt: "bsc",
     rbcat: "bsc",
-    peso: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -153,7 +152,6 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     aidove: "AiDove",
     hmt: "HawkMoon Token",
     rbcat: "Russian Blue Cat",
-    peso: "Panda Peso",
 };
 
 // Define burn interval options

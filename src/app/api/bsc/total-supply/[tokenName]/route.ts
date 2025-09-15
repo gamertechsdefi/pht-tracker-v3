@@ -50,7 +50,6 @@ const TOKEN_MAP: Record<string, string> = {
   aidove: "0xe9E3CDB871D315fEE80aF4c9FcD4886782694856",
   hmt: "0x360f2cf415d9be6e82a7252681ac116fb63d2fa2",
   rbcat: "0x14A2db256Ef18c4f7165d5E48f65a528b4155100",
-  peso: "0xC54CA14328d5b61E4BDc8A4d4b08b6B8D06BC372",
 };
 
 // ERC-20 ABI for required functions
