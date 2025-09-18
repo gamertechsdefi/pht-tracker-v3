@@ -81,6 +81,7 @@ const TOKEN_LIST: Record<string, string> = {
     aidove: "bsc",
     hmt: "bsc",
     rbcat: "bsc",
+    bbcat: "bsc",
 };
 
 export function useTokenData(chain: string | null, tokenName: string | null) {

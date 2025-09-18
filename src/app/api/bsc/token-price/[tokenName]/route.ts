@@ -101,6 +101,7 @@ const TOKEN_MAP: TokenMap = {
   "aidove": { address: "0xe9E3CDB871D315fEE80aF4c9FcD4886782694856" },
   "hmt": { address: "0x360f2cf415d9be6e82a7252681ac116fb63d2fa2" },
   "rbcat": { address: "0x14A2db256Ef18c4f7165d5E48f65a528b4155100" },
+  "bbcat": { address: "0x32Eb603F30ba75052f608CFcbAC45e39B5eF9beC" },
  
 };
 

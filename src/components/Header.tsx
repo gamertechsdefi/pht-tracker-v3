@@ -62,6 +62,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     aidove: "bsc",
     hmt: "bsc",
     rbcat: "bsc",
+    bbcat: "bsc",
 
 };
 
@@ -108,6 +109,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "AiDove": "aidove",
     "HawkMoon Token": "hmt",
     "Russian Blue Cat": "rbcat",
+    "Baby BilliCat": "bbcat",
 };
 
 export default function Header() {
