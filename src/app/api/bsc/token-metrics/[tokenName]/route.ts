@@ -51,6 +51,7 @@ const TOKEN_MAP: Record<string, string> = {
   hmt: "0x360f2cf415d9be6e82a7252681ac116fb63d2fa2",
   rbcat: "0x14A2db256Ef18c4f7165d5E48f65a528b4155100",
   bbcat: "0x32Eb603F30ba75052f608CFcbAC45e39B5eF9beC",
+  cct: "0x8489c022a10a8d2a65eb5aF2b0E4aE0191e7916D",
 };
 
 // ERC-20 ABI for required functions

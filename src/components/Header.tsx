@@ -63,7 +63,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     hmt: "bsc",
     rbcat: "bsc",
     bbcat: "bsc",
-
+    cct: "bsc",
 };
 
 // Full name to symbol mapping for suggestions
@@ -110,6 +110,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "HawkMoon Token": "hmt",
     "Russian Blue Cat": "rbcat",
     "Baby BilliCat": "bbcat",
+    "CatCake Token": "cct",
 };
 
 export default function Header() {

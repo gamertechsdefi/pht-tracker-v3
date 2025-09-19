@@ -261,6 +261,12 @@ export async function GET(request: NextRequest) {
             twitter: "https://x.com/BBillicat",
             telegram: "https://t.me/babybillicat",
             bscscan: "https://bscscan.com/token/0x14A2db256Ef18c4f7165d5E48f65a528b4155100",
+        },
+        cct: {
+            website: "#",
+            twitter: "https://x.com/CatCakeToken",
+            telegram: "https://t.me/catcaketokencct",
+            bscscan: "https://bscscan.com/token/0x8489c022a10a8d2a65eb5aF2b0E4aE0191e7916D",
         }
     };
 
