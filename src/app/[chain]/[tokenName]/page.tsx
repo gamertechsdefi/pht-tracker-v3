@@ -105,6 +105,7 @@ const TOKEN_LIST: Record<string, string> = {
     rbcat: "bsc",
     bbcat: "bsc",
     cct: "bsc",
+    talent: "bsc",
 };
 
 // Token abbreviation to full name mapping
@@ -156,6 +157,7 @@ const TOKEN_FULL_NAMES: Record<string, string> = {
     rbcat: "Russian Blue Cat",
     bbcat: "Baby BilliCat",
     cct: "CatCake Token",
+    talent: "Talent Token",
 };
 
 // Define burn interval options
