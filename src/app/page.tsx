@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import { getTokenBySymbol } from '@/lib/tokenRegistry';
+// import { getTokenBySymbol } from '@/lib/tokenRegistry';
 
 interface Token {
   symbol: string;

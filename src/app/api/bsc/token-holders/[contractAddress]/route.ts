@@ -8,14 +8,14 @@ interface RouteParams {
   contractAddress: string;
 }
 
-interface MoralisHoldersResponse {
-  totalHolders: number;
-  holders: Array<{
-    address: string;
-    balance: string;
-    percentage: number;
-  }>;
-}
+// interface MoralisHoldersResponse {
+//   totalHolders: number;
+//   holders: Array<{
+//     address: string;
+//     balance: string;
+//     percentage: number;
+//   }>;
+// }
 
 export async function GET(
   _req: NextRequest,

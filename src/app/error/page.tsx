@@ -42,7 +42,7 @@ export default function ErrorPage() {
 
       {errorType === 'duplicate_symbol' && identifier && chain && (
         <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-md">
-          <h3 className="font-semibold text-yellow-800 mb-2">Available tokens with symbol "{identifier}":</h3>
+          <h3 className="font-semibold text-yellow-800 mb-2">Available tokens with symbol &quot{identifier}&quot:</h3>
           <div className="space-y-2">
             {getTokensBySymbol(identifier)
               .filter(token => token.chain === chain)
