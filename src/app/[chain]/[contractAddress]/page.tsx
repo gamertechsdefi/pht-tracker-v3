@@ -108,7 +108,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
             try {
                 // Use the token symbol for API calls (for backward compatibility with existing APIs)
-                const tokenSymbol = metadata.symbol;
+                // const tokenSymbol = metadata.symbol;
                 const apiEndpoints = [
                     `/api/${chainLower}/token-metrics/${contractAddress}`,
                     `/api/${chainLower}/token-holders/${contractAddress}`,
@@ -128,7 +128,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     )
                 );
 
-                const [metricsData, holdersData, priceData, burnsData, profileData, socialData, contractData] = responses;
+                const [metricsData, holdersData, priceData, burnsData, profileData, socialData] = responses;
 
                 setTokenData({
                     price: priceData?.price || "N/A",
