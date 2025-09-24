@@ -1,8 +1,9 @@
 "use client";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getTokenBySymbol, getTokensBySymbol } from "@/lib/tokenRegistry";
 
-export default function ErrorPage() {
+function ErrorPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const errorType = searchParams.get('type');
@@ -82,5 +83,17 @@ export default function ErrorPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function ErrorPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    }>
+      <ErrorPageContent />
+    </Suspense>
   );
 }
