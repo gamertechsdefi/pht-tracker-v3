@@ -84,6 +84,7 @@ const TOKEN_LIST: Record<string, string> = {
     bbcat: "bsc",
     cct: "bsc",
     talent: "bsc",
+    "p-cat": "bsc",
 };
 
 export function useTokenData(chain: string | null, tokenName: string | null) {

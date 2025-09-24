@@ -1,17 +1,22 @@
 import { NextResponse } from 'next/server';
-import { getTokenData, TOKEN_MAP } from '../../../lib/dexscreener';
+import { getTokenData } from '../../../lib/dexscreener';
+import { TOKEN_REGISTRY } from '../../../lib/tokenRegistry';
 
 export async function GET() {
-  const tokens = Object.keys(TOKEN_MAP);
+  // Get all BSC tokens from the registry (including duplicates)
+  const bscTokens = TOKEN_REGISTRY.filter(token => token.chain === 'bsc');
 
-  const tokenDataPromises = tokens.map(token => getTokenData(token));
+  const tokenDataPromises = bscTokens.map(token => getTokenData(token.address));
   const results = await Promise.all(tokenDataPromises);
 
   const tokenData = results
     .map((data, index) => {
       if (data) {
+        const token = bscTokens[index];
         return {
-          symbol: tokens[index],
+          symbol: token.symbol,
+          name: token.name,
+          address: token.address,
           price: data.price,
           marketCap: data.marketCap,
         };

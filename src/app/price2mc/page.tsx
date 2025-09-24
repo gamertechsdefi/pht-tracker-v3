@@ -86,6 +86,9 @@ const TOKEN_LIST: { [key: string]: string } = {
   hmt: "bsc",
   rbcat: "bsc",
   bbcat: "bsc",
+  talent: "bsc",
+  "p-cat": "bsc",
+
 
 };
 
@@ -133,6 +136,8 @@ const FULL_NAME_MAP: { [key: string]: string } = {
   "hmt": "HawkMoon Token",
   "rbcat": "Russian Blue Cat",
   "bbcat": "Baby BilliCat",
+  "talent": "Talent Token",
+  "p-cat": "Persian Cat Token",
 };
 
 const TOKENS = Object.entries(TOKEN_LIST).map(([symbol, chain]) => {

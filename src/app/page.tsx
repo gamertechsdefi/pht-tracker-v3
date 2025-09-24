@@ -3,9 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import { getTokenBySymbol } from '@/lib/tokenRegistry';
 
 interface Token {
   symbol: string;
+  name: string;
+  address: string;
   price: string | number;
   marketCap: string | number;
 }
@@ -116,12 +119,12 @@ export default function Home() {
                   </tr>
                 ) : (
                   tokens.map((token: Token) => (
-                    <tr key={token.symbol} className="border-b border-neutral-800 hover:bg-neutral-800 transition-colors">
+                    <tr key={token.address} className="border-b border-neutral-800 hover:bg-neutral-800 transition-colors">
                       {/* Token column - sticky on mobile */}
                       <td className="px-5 py-4 text-sm sticky left-0 bg-neutral-900 z-10 min-w-[120px]">
-                        <Link href={`/bsc/${token.symbol}`} className="flex items-center hover:opacity-80">
+                        <Link href={`/bsc/${token.address}`} className="flex items-center hover:opacity-80">
                           <img
-                            src={`/api/bsc/logo/${token.symbol}`}
+                            src={`/api/bsc/logo/${token.address}`}
                             alt={token.symbol}
                             width={24}
                             height={24}
@@ -130,9 +133,14 @@ export default function Home() {
                               (e.target as HTMLImageElement).src = '/logo.png';
                             }}
                           />
-                          <span className="text-white whitespace-nowrap font-medium">
-                            {token.symbol.toUpperCase()}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="text-white whitespace-nowrap font-medium">
+                              {token.symbol.toUpperCase()}
+                            </span>
+                            <span className="text-gray-400 text-xs whitespace-nowrap">
+                              {token.name}
+                            </span>
+                          </div>
                         </Link>
                       </td>
                       

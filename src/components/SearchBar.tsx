@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { getTokenBySymbol, TOKEN_REGISTRY } from "@/lib/tokenRegistry";
 
 // Define interfaces for data structures
 interface Token {
@@ -16,67 +17,16 @@ interface Suggestion {
   symbol: string;
 }
 
-// Token list with chain mapping (consistent with TokenPage)
-const TOKEN_LIST: { [key: string]: string } = {
-  pht: "bsc",
-  wkc: "bsc",
-  dtg: "bsc",
-  war: "bsc",
-  yukan: "bsc",
-  btcdragon: "bsc",
-  ocicat: "bsc",
-  nene: "bsc",
-  twc: "bsc",
-  durt: "bsc",
-  gtan: "bsc",
-  zedek: "bsc",
-  tkc: "bsc",
-  twd: "bsc",
-  bcat: "bsc",
-  bengcat: "bsc",
-  nct: "bsc",
-  scat: "sol",
-  nuke: "sol",
-  petros: "sol",
-  venus: "sol",
-  kitsune: "bsc",
-  bft: "bsc",
-  crystalstones: "bsc",
-  cross: "bsc",
-  thc: "bsc",
-  bbft: "bsc",
-};
+// Create mappings from the centralized registry
+const TOKEN_LIST: { [key: string]: string } = TOKEN_REGISTRY.reduce((acc, token) => {
+  acc[token.symbol] = token.chain;
+  return acc;
+}, {} as { [key: string]: string });
 
-// Full name to symbol mapping for suggestions (lowercase to match TokenPage)
-const FULL_NAME_MAP: { [key: string]: string } = {
-  "Phoenix Token": "pht",
-  "WikiCat Coin ": "wkc",
-  "Defi Tiger Token": "dtg",
-  "Water Rabbit Token": "war",
-  "Yukan Token": "yukan",
-  "BTC Dragon Token": "btcdragon",
-  "OciCat Token": "ocicat",
-  Nene: "nene",
-  "TIWI CAT": "twc",
-  "The Word Token": "twd",
-  "The Kingdom Coin": "tkc",
-  "Dutch Rabbit": "durt",
-  "Giant Token": "gtan",
-  "Zedek Token": "zedek",
-  "Billicat Token ": "bcat",
-  "Bengal Cat Token": "bengcat",
-  "New Cat Token": "nct",
-  "Baby Simon Cat": "scat",
-  Nuke: "nuke",
-  "Petros Token": "petros",
-  "Two Face Cat": "venus",
-  "Kitsune Token": "kitsune",
-  "Crystal Stones": "crystalstones",
-  "The Big Five Token": "bft",
-  "Cross Token": "cross",
-  "Transhuman Coin": "thc",
-  "Baby BFT": "bbft",
-};
+const FULL_NAME_MAP: { [key: string]: string } = TOKEN_REGISTRY.reduce((acc, token) => {
+  acc[token.name] = token.symbol;
+  return acc;
+}, {} as { [key: string]: string });
 
 // Define props interface
 interface SearchBarPopupProps {
@@ -192,12 +142,13 @@ export default function SearchBarPopup({
         console.log("handleSearch triggered with:", symbol);
       } else {
         console.error("handleSearch is not a function");
-        const chain = TOKEN_LIST[symbol];
-        if (chain) {
-          console.log("Fallback navigation to:", `/${chain}/${symbol}`);
-          router.push(`/${chain}/${symbol}`);
+        // Get token metadata to navigate with contract address
+        const tokenMetadata = getTokenBySymbol(symbol);
+        if (tokenMetadata) {
+          console.log("Fallback navigation to:", `/${tokenMetadata.chain}/${tokenMetadata.address}`);
+          router.push(`/${tokenMetadata.chain}/${tokenMetadata.address}`);
         } else {
-          console.log("Token not found in TOKEN_LIST:", symbol);
+          console.log("Token not found in registry:", symbol);
           router.push("/error");
         }
       }
@@ -215,12 +166,13 @@ export default function SearchBarPopup({
         handleSearch(token);
       } else {
         console.error("handleSearch is not a function");
-        const chain = TOKEN_LIST[token];
-        if (chain) {
-          console.log("Fallback navigation to:", `/${chain}/${token}`);
-          router.push(`/${chain}/${token}`);
+        // Get token metadata to navigate with contract address
+        const tokenMetadata = getTokenBySymbol(token);
+        if (tokenMetadata) {
+          console.log("Fallback navigation to:", `/${tokenMetadata.chain}/${tokenMetadata.address}`);
+          router.push(`/${tokenMetadata.chain}/${tokenMetadata.address}`);
         } else {
-          console.log("Token not found in TOKEN_LIST:", token);
+          console.log("Token not found in registry:", token);
           router.push("/error");
         }
       }
