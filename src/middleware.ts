@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getTokenBySymbol, getTokensBySymbol, isValidContractAddress } from './lib/tokenRegistry';
+import { getTokensBySymbol, isValidContractAddress } from './lib/tokenRegistry';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
