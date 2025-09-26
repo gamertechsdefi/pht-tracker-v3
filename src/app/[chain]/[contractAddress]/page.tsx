@@ -476,7 +476,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         <div className="flex-1">
                                             {tokenMetadata && <BurnIntervals tokenName={tokenMetadata.symbol} />}
                                         </div>
-                                        {tokenMetadata && chain && <BurnsDisplay tokenName={tokenMetadata.symbol} chain={chain} />}
+                                        {tokenMetadata && chain && <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />}
                                     </section>
                                 </div>
 
@@ -654,7 +654,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         </div>
 
                                         <div className="mt-8">
-                                            {tokenMetadata && chain && <BurnsDisplay tokenName={tokenMetadata.symbol} chain={chain} />}
+                                            {tokenMetadata && chain && <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />}
                                         </div>
                                     </div>
                                 </section>
