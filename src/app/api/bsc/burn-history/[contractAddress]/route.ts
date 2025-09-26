@@ -9,7 +9,7 @@ interface RouteParams {
 type BscscanApiResponse = {
     status: string;
     message: string;
-    result: BscscanTransaction[];
+    result: BscscanTransaction[] | string; // result can be a string when there's an error
 };
 
 type BscscanTransaction = {
@@ -43,8 +43,8 @@ type FormattedTransaction = {
 };
 
 // Environment variables
-const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY as string;
-const BSCSCAN_API_URL = "https://api.bscscan.com/api";
+const BSCSCAN_API_KEY = "I6XTQJEUJ34ZKZYKAY92HCNPJV9TGRG3EC";
+const BSCSCAN_API_URL = "https://api.etherscan.io/v2/api?chainid=56";
 const DEAD_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 
 /**
@@ -84,28 +84,49 @@ export async function GET(
   context: { params: Promise<RouteParams> }
 ): Promise<NextResponse> {
   try {
+    console.log('Starting burn history API call...');
+    
     const params = await context.params;
     const { contractAddress } = params;
+    console.log('Contract address:', contractAddress);
 
     if (!contractAddress) {
+      console.log('Missing contract address');
       return NextResponse.json({ error: 'Missing contract address' }, { status: 400 });
     }
 
     const addressLower = contractAddress.toLowerCase();
+    console.log('Normalized address:', addressLower);
 
     // Validate contract address format
-    if (!isValidContractAddress(addressLower, 'bsc')) {
-      return NextResponse.json({ error: 'Invalid contract address format' }, { status: 400 });
+    try {
+      if (!isValidContractAddress(addressLower, 'bsc')) {
+        console.log('Invalid contract address format');
+        return NextResponse.json({ error: 'Invalid contract address format' }, { status: 400 });
+      }
+    } catch (validationError) {
+      console.error('Error validating contract address:', validationError);
+      return NextResponse.json({ error: 'Error validating contract address' }, { status: 500 });
     }
 
     // Verify token exists in registry
-    const tokenMetadata = getTokenByAddress(addressLower);
+    let tokenMetadata;
+    try {
+      tokenMetadata = getTokenByAddress(addressLower);
+      console.log('Token metadata:', tokenMetadata);
+    } catch (registryError) {
+      console.error('Error fetching token from registry:', registryError);
+      return NextResponse.json({ error: 'Error accessing token registry' }, { status: 500 });
+    }
+
     if (!tokenMetadata) {
+      console.log('Token not found in registry');
       return NextResponse.json({ error: 'Token not found in registry' }, { status: 404 });
     }
 
     // Verify it's a BSC token
     if (tokenMetadata.chain !== 'bsc') {
+      console.log(`Token is on ${tokenMetadata.chain}, not BSC`);
       return NextResponse.json({
         error: `Token is on ${tokenMetadata.chain.toUpperCase()}, not BSC`
       }, { status: 400 });
@@ -121,39 +142,123 @@ export async function GET(
     }
 
     // Fetch burn transactions from BSCScan API
-    const url = `${BSCSCAN_API_URL}?module=account&action=tokentx&contractaddress=${contractAddress}&address=${DEAD_ADDRESS}&sort=desc&offset=50&page=1&apikey=${BSCSCAN_API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json() as BscscanApiResponse;
+    const url = `${BSCSCAN_API_URL}&module=account&action=tokentx&contractaddress=${contractAddress}&address=${DEAD_ADDRESS}&sort=desc&offset=50&page=1&apikey=${BSCSCAN_API_KEY}`;
+    console.log('Fetching from BSCScan URL:', url);
 
+    let response;
+    let data: BscscanApiResponse;
+    
+    try {
+      response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'BurnTracker/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        console.error(`BSCScan API HTTP error: ${response.status} ${response.statusText}`);
+        return NextResponse.json(
+          { error: "BSCScan API request failed", message: `HTTP ${response.status}` },
+          { status: 500 }
+        );
+      }
+
+      data = await response.json() as BscscanApiResponse;
+      console.log('BSCScan API response status:', data.status);
+      console.log('BSCScan API message:', data.message);
+      
+    } catch (fetchError) {
+      console.error("Error fetching from BSCScan:", fetchError);
+      return NextResponse.json(
+        { error: "Failed to fetch from BSCScan", message: (fetchError as Error).message },
+        { status: 500 }
+      );
+    }
+
+    // Handle BSCScan API errors or empty results
     if (data.status !== "1") {
+      if (data.message === "No transactions found") {
+        console.log('No burn transactions found for this token');
+        // Return empty results instead of error
+        const burnData = {
+          contractAddress: contractAddress,
+          symbol: tokenMetadata.symbol,
+          name: tokenMetadata.name,
+          burnHistory: [],
+          totalBurnEvents: 0,
+          totalBurned: "0",
+          lastUpdated: new Date().toISOString()
+        };
+        return NextResponse.json(burnData);
+      }
+      
+      console.error("BSCScan API error:", data.message);
       return NextResponse.json(
         { error: "Failed to fetch burn transactions", message: data.message },
         { status: 500 }
       );
     }
 
-    // Format the transactions
-    const transactions: FormattedTransaction[] = data.result.map((tx: BscscanTransaction) => {
-      // Ensure values are properly converted
-      const tokenDecimal = Number(tx.tokenDecimal);
-      const txValue = tx.value;
-      const timeStamp = Number(tx.timeStamp);
+    // Check if result is an array (successful response) or string (error)
+    if (!Array.isArray(data.result)) {
+      console.error("Unexpected BSCScan response format:", data.result);
+      return NextResponse.json(
+        { error: "Unexpected API response format", message: "Invalid response structure" },
+        { status: 500 }
+      );
+    }
 
-      // Handle potential NaN issues with safe conversions
-      const amount = !isNaN(tokenDecimal) && txValue ?
-        Number(txValue) / Math.pow(10, tokenDecimal) : 0;
+    console.log(`Found ${data.result.length} burn transactions`);
 
-      const txTimestamp = !isNaN(timeStamp) ?
-        new Date(timeStamp * 1000) : new Date();
+    // Format the transactions with better error handling
+    const transactions: FormattedTransaction[] = [];
+    
+    for (const tx of data.result) {
+      try {
+        // Ensure values are properly converted with validation
+        const tokenDecimal = parseInt(tx.tokenDecimal) || 0;
+        const txValue = tx.value || "0";
+        const timeStamp = parseInt(tx.timeStamp) || 0;
 
-      return {
-        from: tx.from,
-        to: tx.to,
-        amount: amount,
-        timestamp: formatTimeAgo(txTimestamp),
-        transactionHash: tx.hash,
-      };
-    });
+        // Handle potential conversion issues with safe parsing
+        let amount = 0;
+        try {
+          if (tokenDecimal > 0 && txValue !== "0") {
+            const divisor = Math.pow(10, tokenDecimal);
+            amount = parseFloat(txValue) / divisor;
+            
+            // Validate the result
+            if (!isFinite(amount) || isNaN(amount)) {
+              amount = 0;
+            }
+          }
+        } catch (amountError) {
+          console.warn('Error calculating amount for tx:', tx.hash, amountError);
+          amount = 0;
+        }
+
+        const txTimestamp = timeStamp > 0 ? new Date(timeStamp * 1000) : new Date();
+
+        transactions.push({
+          from: tx.from || '',
+          to: tx.to || '',
+          amount: amount,
+          timestamp: formatTimeAgo(txTimestamp),
+          transactionHash: tx.hash || '',
+        });
+
+      } catch (txError) {
+        console.warn('Error processing transaction:', tx.hash, txError);
+        // Continue processing other transactions
+      }
+    }
+
+    // Calculate total burned with safe math
+    const totalBurned = transactions.reduce((sum: number, burn: FormattedTransaction) => {
+      const amount = burn.amount || 0;
+      return sum + (isFinite(amount) ? amount : 0);
+    }, 0);
 
     const burnData = {
       contractAddress: contractAddress,
@@ -161,19 +266,32 @@ export async function GET(
       name: tokenMetadata.name,
       burnHistory: transactions,
       totalBurnEvents: transactions.length,
-      totalBurned: transactions.reduce((sum: number, burn: FormattedTransaction) => sum + burn.amount, 0).toString(),
+      totalBurned: totalBurned.toString(),
       lastUpdated: new Date().toISOString()
     };
+
+    console.log('Successfully processed burn data:', {
+      totalEvents: burnData.totalBurnEvents,
+      totalBurned: burnData.totalBurned
+    });
 
     return NextResponse.json(burnData);
 
   } catch (error) {
-    // Properly type the error
+    // Enhanced error logging
     const typedError = error as Error;
-    console.error("Burn history API error:", typedError);
+    console.error("Burn history API error:", {
+      message: typedError.message,
+      stack: typedError.stack,
+      name: typedError.name
+    });
 
     return NextResponse.json(
-      { error: "Failed to fetch burn history", message: typedError.message },
+      { 
+        error: "Failed to fetch burn history", 
+        message: typedError.message,
+        ...(process.env.NODE_ENV === 'development' && { stack: typedError.stack })
+      },
       { status: 500 }
     );
   }
