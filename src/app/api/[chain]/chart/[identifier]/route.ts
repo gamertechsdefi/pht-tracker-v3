@@ -53,6 +53,7 @@ const TOKEN_POOL_MAPPING: Record<string, string> = {
   bbcat: "0x32Eb603F30ba75052f608CFcbAC45e39B5eF9beC",
   cct: "0x8489c022a10a8d2a65eb5aF2b0E4aE0191e7916D",
   talent: "0x38Aec84f305564cB2625430A294382Cf33e3c317",
+  bp: "0xF8418D9144172d43d12938caB74AFa695984062A",
 };
 
 export async function GET(
