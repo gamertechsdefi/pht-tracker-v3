@@ -186,32 +186,41 @@ const PriceComparison = () => {
     const isPlatformToken = TOKENS.some(t => t.id === tokenId);
 
     if (isPlatformToken) {
+      // Find the contract address for the platform token
+      // Try to match by symbol (id) in the registry
+      const tokenRegistry = require('@/lib/tokenRegistry');
+      const tokenMeta = tokenRegistry.TOKEN_REGISTRY.find(
+        (t: any) => t.symbol.toLowerCase() === tokenId.toLowerCase() && t.chain === 'bsc'
+      );
+      if (!tokenMeta) {
+        console.error(`No contract address found for platform token: ${tokenId}`);
+        return null;
+      }
       try {
-        const response = await fetch(`/api/bsc/token-profile/${tokenId}`);
+        // Fetch directly from Dexscreener API using the contract address
+        const url = `https://api.dexscreener.com/latest/dex/tokens/${tokenMeta.address}`;
+        const response = await fetch(url);
         if (!response.ok) {
-          throw new Error(`Failed to fetch data for ${tokenId}`);
+          throw new Error(`Failed to fetch data from Dexscreener for ${tokenId}`);
         }
-        const data = await response.json();
-        if (data.error) {
-          console.error(`Token data not found: ${data.message}`);
-          return null;
+        const dexData = await response.json();
+        // Parse Dexscreener response (assume first pair is the most relevant)
+        const pair = dexData.pairs && dexData.pairs.length > 0 ? dexData.pairs[0] : null;
+        if (!pair) {
+          throw new Error(`No pair data found on Dexscreener for ${tokenId}`);
         }
-        if (timeframe === 'ath') {
-          console.warn(`ATH market cap is not available for platform token ${tokenId}. Using current market cap.`);
-        }
-        const tokenInfo = TOKENS.find(t => t.id === tokenId)
         return {
           id: tokenId,
-          symbol: tokenInfo?.symbol || '',
-          name: tokenInfo?.name || '',
-          price: data.price === 'N/A' ? '0' : data.price,
-          marketCap: data.marketCap === 'N/A' ? '0' : data.marketCap,
-          volume24h: data.volume === 'N/A' ? '0' : data.volume,
-          priceChange24h: data.change === 'N/A' ? '0' : data.change,
-          image: data.profileImage
+          symbol: pair.baseToken?.symbol || tokenMeta.symbol.toUpperCase() || '',
+          name: pair.baseToken?.name || tokenMeta.name || '',
+          price: pair.priceUsd || '0',
+          marketCap: pair.fdv || '0',
+          volume24h: pair.volume?.h24 || '0',
+          priceChange24h: pair.priceChange?.h24 || '0',
+          image: pair.baseToken?.logoURI || '',
         };
       } catch (err) {
-        console.error(`Error fetching ${tokenId}:`, err);
+        console.error(`Error fetching Dexscreener data for ${tokenId}:`, err);
         return null;
       }
     } else {
@@ -393,10 +402,10 @@ const PriceComparison = () => {
     );
 
     const handleSelect = (tokenId: string) => {
-      setSelectedToken(tokenId);
-      const tokenInfo = tokens.find(t => t.id === tokenId);
-      setSearchTerm(tokenInfo?.name || '');
-      setShowDropdown(false);
+  setSelectedToken(tokenId);
+  const tokenInfo = tokens.find(t => t.id === tokenId);
+  setSearchTerm(tokenInfo?.symbol || ''); // Set to symbol, not name
+  setShowDropdown(false);
     };
 
     const handleFocus = () => {

@@ -1,85 +1,72 @@
-import { ethers } from 'ethers';
 import { NextRequest, NextResponse } from 'next/server';
-import { getTokenByAddress, isValidContractAddress } from '@/lib/tokenRegistry';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/db/firebase';
 
-// Configure for BNB Chain
-const RPC_URL: string = "https://bsc-dataseed.binance.org/";
-const DEAD_ADDRESS: string = "0x000000000000000000000000000000000000dEaD";
-
-interface RouteParams {
-  contractAddress: string;
+interface BurnData {
+  tokenName: string;
+  tokenAddress: string;
+  burn5min: number;
+  burn15min: number;
+  burn30min: number;
+  burn1h: number;
+  burn3h: number;
+  burn6h: number;
+  burn12h: number;
+  burn24h: number;
+  lastUpdated: string;
+  lastProcessedBlock: number;
+  computationTime: number;
 }
 
-// ERC-20 ABI for basic token functions
-const ERC20_ABI = [
-  "function balanceOf(address) view returns (uint256)",
-  "function decimals() view returns (uint8)",
-  "function symbol() view returns (string)",
-  "function name() view returns (string)"
-];
+function isValidAddress(address: string): boolean {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
+}
 
 export async function GET(
-  _req: NextRequest,
-  context: { params: Promise<RouteParams> }
+  request: NextRequest,
+  context: { params: { contractAddress?: string } }
 ): Promise<NextResponse> {
   try {
-    const params = await context.params;
-    const { contractAddress } = params;
-    
-    if (!contractAddress) {
-      return NextResponse.json({ error: 'Missing contract address' }, { status: 400 });
+    const contractAddress = context.params.contractAddress?.toLowerCase();
+
+    if (!contractAddress || !isValidAddress(contractAddress)) {
+      return NextResponse.json(
+        { error: "Valid contract address is required" },
+        { status: 400 }
+      );
     }
 
-    const addressLower = contractAddress.toLowerCase();
-    
-    // Validate contract address format
-    if (!isValidContractAddress(addressLower, 'bsc')) {
-      return NextResponse.json({ error: 'Invalid contract address format' }, { status: 400 });
+    // Use contract address as Firestore doc key
+    const docRef = doc(db, 'burnData', contractAddress);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      return NextResponse.json(
+        {
+          error: "No burn data available",
+          message: `No burn data found for contract address ${contractAddress}`
+        },
+        { status: 404 }
+      );
     }
 
-    // Verify token exists in registry
-    const tokenMetadata = getTokenByAddress(addressLower);
-    if (!tokenMetadata) {
-      return NextResponse.json({ error: 'Token not found in registry' }, { status: 404 });
-    }
+    const burnData = docSnap.data() as BurnData;
 
-    // Verify it's a BSC token
-    if (tokenMetadata.chain !== 'bsc') {
-      return NextResponse.json({ 
-        error: `Token is on ${tokenMetadata.chain.toUpperCase()}, not BSC` 
-      }, { status: 400 });
-    }
-
-    // Connect to BSC network
-    const provider = new ethers.JsonRpcProvider(RPC_URL);
-    const tokenContract = new ethers.Contract(contractAddress, ERC20_ABI, provider);
-
-    // Get burned tokens (tokens sent to dead address)
-    const [deadBalance, decimals] = await Promise.all([
-      tokenContract.balanceOf(DEAD_ADDRESS),
-      tokenContract.decimals()
-    ]);
-
-    // Format the burned amount
-    const divisor = BigInt(10) ** BigInt(decimals);
-    const burnedAmount = BigInt(deadBalance.toString()) / divisor;
-
-    const burnData = {
-      totalBurnt: burnedAmount.toString(),
-      deadAddress: DEAD_ADDRESS,
-      contractAddress: contractAddress,
-      symbol: tokenMetadata.symbol,
-      name: tokenMetadata.name,
-      decimals: decimals.toString(),
-      lastUpdated: new Date().toISOString()
-    };
-
-    return NextResponse.json(burnData);
+    return NextResponse.json({
+      ...burnData,
+      fromCache: true,
+      stale: false,
+      message: "Using cached data from Firestore"
+    });
 
   } catch (error) {
-    console.error('Total burnt API error:', error);
+    console.error(`Error in GET /api/bsc/total-burnt/[contractAddress]:`, error);
     return NextResponse.json(
-      { error: 'Failed to fetch burn data' },
+      {
+        error: "Failed to fetch burn data",
+        details: error instanceof Error ? error.message : 'Unknown error',
+        message: "An error occurred while fetching burn data"
+      },
       { status: 500 }
     );
   }
