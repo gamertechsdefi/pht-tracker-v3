@@ -54,6 +54,7 @@ const TOKEN_POOL_MAPPING: Record<string, string> = {
   cct: "0x8489c022a10a8d2a65eb5aF2b0E4aE0191e7916D",
   talent: "0x38Aec84f305564cB2625430A294382Cf33e3c317",
   bp: "0xF8418D9144172d43d12938caB74AFa695984062A",
+  jawgular: "0x73cD10B66c4EBC6eE77ADFcc4310C03D79a74444",
 };
 
 export async function GET(

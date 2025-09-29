@@ -75,6 +75,7 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0x38Aec84f305564cB2625430A294382Cf33e3c317", symbol: "talent", name: "Talent Token", chain: "bsc" },
   { address: "0x71fd83d49fAaD4612E9d35876A75a97a5aDd4Bc2", symbol: "pcat", name: "Persian Cat Token", chain: "bsc" },
   {address: "0xF8418D9144172d43d12938caB74AFa695984062A", symbol: "bp", name: "Baby Priceless", chain: "bsc" },
+  {address: "0x73cD10B66c4EBC6eE77ADFcc4310C03D79a74444", symbol: "jawgular", name: "JAWGULAR", chain: "bsc" },
   
   // Solana Tokens (placeholder addresses - replace with actual Solana addresses)
   { address: "scat_solana_address_placeholder", symbol: "scat", name: "Solana Cat Token", chain: "sol" },

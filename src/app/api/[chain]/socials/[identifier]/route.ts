@@ -278,6 +278,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "http://x.com/Baby_Priceless0",
     telegram: "http://t.me/baby_pricesless_entry",
     bscscan: "https://bscscan.com/token/0xF8418D9144172d43d12938caB74AFa695984062A",
+  },
+  jawgular: {
+    website: "https://jugular.live",
+    twitter: "https://x.com/Jawgular",
+    telegram: "https://t.me/JAWGULAR",
+    bscscan: "https://bscscan.com/token/0x73cD10B66c4EBC6eE77ADFcc4310C03D79a74444",
   }
 
 };
