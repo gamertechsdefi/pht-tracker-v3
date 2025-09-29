@@ -1,6 +1,8 @@
 "use client";
 
+
 import Header from '@/components/Header';
+import { TOKEN_REGISTRY } from '@/lib/tokenRegistry';
 
 import React, { useState, useEffect, useCallback } from 'react';
 
@@ -188,9 +190,8 @@ const PriceComparison = () => {
     if (isPlatformToken) {
       // Find the contract address for the platform token
       // Try to match by symbol (id) in the registry
-      const tokenRegistry = require('@/lib/tokenRegistry');
-      const tokenMeta = tokenRegistry.TOKEN_REGISTRY.find(
-        (t: any) => t.symbol.toLowerCase() === tokenId.toLowerCase() && t.chain === 'bsc'
+      const tokenMeta = TOKEN_REGISTRY.find(
+        (t) => t.symbol.toLowerCase() === tokenId.toLowerCase() && t.chain === 'bsc'
       );
       if (!tokenMeta) {
         console.error(`No contract address found for platform token: ${tokenId}`);
