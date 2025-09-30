@@ -474,7 +474,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 <div className={activeTab === "burns" ? "" : "hidden"}>
                                     <section className="mt-8 flex flex-col">
                                         <div className="flex-1">
-                                            {tokenMetadata && <BurnIntervals contractAddress={tokenMetadata.address}  /> }
+                                            {tokenMetadata && <BurnIntervals contractAddress={tokenMetadata.address} tokenSymbol={tokenMetadata.name || tokenMetadata.symbol} /> }
                                         </div>
                                         {tokenMetadata && chain && <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />}
                                     </section>
@@ -647,7 +647,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
                                     <div>
                                         <div className=" p-4 rounded-lg shadow-lg">
-                                            {tokenMetadata && <BurnIntervals contractAddress={tokenMetadata.address} />}
+                                            {tokenMetadata && <BurnIntervals contractAddress={tokenMetadata.address} tokenSymbol={tokenMetadata.name || tokenMetadata.symbol} />}
                                         </div>
 
                                         <div className="mt-8 space-y-4">
