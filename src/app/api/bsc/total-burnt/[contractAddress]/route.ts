@@ -21,14 +21,12 @@ interface BurnData {
 function isValidAddress(address: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
-
-export async function GET(
-  request: NextRequest,
-  context: { params: { contractAddress?: string } }
-): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    const { params } = context as { params: { contractAddress?: string } };
-    const contractAddress: string | undefined = params?.contractAddress?.toLowerCase();
+    // Extract contractAddress from the URL pathname
+    const url = new URL(request.url);
+    const match = url.pathname.match(/\/total-burnt\/([^\/]+)/);
+    const contractAddress = match && match[1] ? match[1].toLowerCase() : undefined;
 
     if (!contractAddress || !isValidAddress(contractAddress)) {
       return NextResponse.json(
