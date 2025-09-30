@@ -24,10 +24,11 @@ function isValidAddress(address: string): boolean {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { contractAddress: string } }
+  context: { params: { contractAddress?: string } }
 ): Promise<NextResponse> {
   try {
-  const contractAddress = params.contractAddress?.toLowerCase();
+    const { params } = context as { params: { contractAddress?: string } };
+    const contractAddress: string | undefined = params?.contractAddress?.toLowerCase();
 
     if (!contractAddress || !isValidAddress(contractAddress)) {
       return NextResponse.json(
