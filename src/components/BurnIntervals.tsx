@@ -14,7 +14,8 @@ const INTERVALS = [
 type IntervalKey = typeof INTERVALS[number]['key'];
 
 interface BurnIntervalsProps {
-  tokenName: string;
+  contractAddress: string;
+  tokenSymbol?: string; // Optional, for display
 }
 
 interface BurnData {
@@ -50,7 +51,8 @@ function formatUSDValue(value: number): string {
   return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
+
+export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnIntervalsProps) {
   const [data, setData] = useState<BurnData | null>(null);
   const [tokenPrice, setTokenPrice] = useState<TokenPriceData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
   const [selectedInterval, setSelectedInterval] = useState<IntervalKey>("burn24h");
 
   useEffect(() => {
-    if (!tokenName) return;
+    if (!contractAddress) return;
     let isMounted = true;
 
     const fetchData = () => {
@@ -66,7 +68,7 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
       setError(null);
 
       // Fetch burn data
-      fetch(`/api/bsc/total-burnt/${encodeURIComponent(tokenName)}`)
+      fetch(`/api/bsc/total-burnt/${encodeURIComponent(contractAddress)}`)
         .then((res) => {
           if (!res.ok) throw new Error("Failed to fetch burn intervals");
           return res.json();
@@ -83,7 +85,7 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
         });
 
       // Fetch token price
-      fetch(`/api/bsc/token-price/${encodeURIComponent(tokenName)}`)
+      fetch(`/api/bsc/token-price/${encodeURIComponent(contractAddress)}`)
         .then((res) => {
           if (!res.ok) throw new Error("Failed to fetch token price");
           return res.json();
@@ -113,7 +115,7 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [tokenName]);
+  }, [contractAddress]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedInterval(e.target.value as IntervalKey);
@@ -153,7 +155,7 @@ export default function BurnIntervals({ tokenName }: BurnIntervalsProps) {
 
   return (
     <div className="bg-neutral-900 border-2 border-neutral-600 rounded-lg p-4">
-      <h2 className="text-xl font-bold mb-2">{tokenName.toUpperCase()} Burn Interval</h2>
+      <h2 className="text-xl font-bold mb-2">{(typeof tokenSymbol === 'string' ? tokenSymbol.toUpperCase() : contractAddress)} Burn Interval</h2>
       <div className="flex flex-col items-start mb-2">
         <select
           value={selectedInterval}
