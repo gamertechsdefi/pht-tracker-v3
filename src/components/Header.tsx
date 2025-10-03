@@ -114,6 +114,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "CatCake Token": "cct",
     "Talent Token": "talent",
     "Persian Cat Token": "pcat",
+    
 };
 
 export default function Header() {

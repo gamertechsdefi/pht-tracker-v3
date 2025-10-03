@@ -284,6 +284,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "https://x.com/Jawgular",
     telegram: "https://t.me/JAWGULAR",
     bscscan: "https://bscscan.com/token/0x73cD10B66c4EBC6eE77ADFcc4310C03D79a74444",
+  },
+  dst: {
+    website: "https://www.daystartoken.online/",
+    twitter: "https://x.com/DayStarToken",
+    telegram: "https://t.me/DayStarToken1",
+    bscscan: "https://bscscan.com/token/0x39B4cBC1CE609D736E9aC3BaDd98E95c890731F3",
   }
 
 };
