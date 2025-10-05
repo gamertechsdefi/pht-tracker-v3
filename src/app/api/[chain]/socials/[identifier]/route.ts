@@ -290,6 +290,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "https://x.com/DayStarToken",
     telegram: "https://t.me/DayStarToken1",
     bscscan: "https://bscscan.com/token/0x39B4cBC1CE609D736E9aC3BaDd98E95c890731F3",
+  },
+  peperice: {
+    website: "https://www.peperice.com",
+    twitter: "https://x.com/peperice_bnb",
+    telegram: "https://t.me/peperice",
+    bscscan: "https://bscscan.com/token/0x5f3170D7A37D70FFE92a3e573ec67400b795B854",  
   }
 
 };
