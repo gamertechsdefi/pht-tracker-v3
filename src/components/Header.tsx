@@ -65,6 +65,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     bbcat: "bsc",
     cct: "bsc",
     talent: "bsc",
+    
 };
 
 // Full name to symbol mapping for suggestions
