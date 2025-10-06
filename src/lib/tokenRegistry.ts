@@ -78,6 +78,8 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   {address: "0x73cD10B66c4EBC6eE77ADFcc4310C03D79a74444", symbol: "jawgular", name: "JAWGULAR", chain: "bsc" },
   { address: "0x39B4cBC1CE609D736E9aC3BaDd98E95c890731F3", symbol: "dst", name: "DayStar Token", chain: "bsc"},
   { address: "0x5f3170D7A37D70FFE92a3e573ec67400b795B854", symbol: "peperice", name: "Pepe Rice", chain: "bsc" },
+  { address: "0xfd8eab4F5cf3572Ae62445CAD634226DbaA37F69", symbol: "godinu",  name: "GOD INU", chain: "bsc" },
+  { address: "0x034437C7037317eaAbA782f2aD5B0A54cFcCf726", symbol: "zoe", name: "ZOE Token", chain: "bsc" } ,
   
   // Solana Tokens (placeholder addresses - replace with actual Solana addresses)
   { address: "scat_solana_address_placeholder", symbol: "scat", name: "Solana Cat Token", chain: "sol" },
