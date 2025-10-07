@@ -65,6 +65,13 @@ const TOKEN_LIST: { [key: string]: string } = {
     bbcat: "bsc",
     cct: "bsc",
     talent: "bsc",
+    jawgular: "bsc",
+    dst: "bsc",
+    zoe: "bsc",
+    godinu: "bsc",
+    peperice: "bsc",
+    bp: "bsc",
+
     
 };
 
@@ -115,6 +122,13 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "CatCake Token": "cct",
     "Talent Token": "talent",
     "Persian Cat Token": "pcat",
+    "ZOE Token": "zoe",
+    "JAWGULAR": "jawgular",
+    "GOD INU": "godinu",
+    "Pepe Rice": "peperice",
+    "DayStar Token": "dst",
+    "Baby Priceless": "bp",
+    
     
 };
 
