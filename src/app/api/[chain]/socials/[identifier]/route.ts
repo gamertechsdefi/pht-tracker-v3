@@ -296,7 +296,19 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "https://x.com/peperice_bnb",
     telegram: "https://t.me/peperice",
     bscscan: "https://bscscan.com/token/0x5f3170D7A37D70FFE92a3e573ec67400b795B854",  
-  }
+  },
+  zoe: {
+    website: "https://www.zoetoken.site",
+    twitter: "https://x.com/Zoetoken_zt",
+    telegram: "https://t.me/zoetokens",
+    bscscan: "https://bscscan.com/token/0x034437C7037317eaAbA782f2aD5B0A54cFcCf726",  
+  },
+  godinu: {
+    website: "https://www.godinu.vip",
+    twitter: "https://x.com/GodInuBSC",
+    telegram: "https://t.me/godinubnb",
+    bscscan: "https://bscscan.com/token/0xfd8eab4F5cf3572Ae62445CAD634226DbaA37F69",  
+  },
 
 };
 
