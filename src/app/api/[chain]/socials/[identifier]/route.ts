@@ -309,6 +309,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     telegram: "https://t.me/godinubnb",
     bscscan: "https://bscscan.com/token/0xfd8eab4F5cf3572Ae62445CAD634226DbaA37F69",  
   },
+  lai: {
+    website: "https://www.leadaitoken.com",
+    twitter: "https://x.com/OfficialLeadAI",
+    telegram: "https://t.me/OfficialLeadAI_BSC",
+    bscscan: "https://bscscan.com/token/0x90206Ad9b7d23c672cd75A633CA96b5D9e9AE8Ed",  
+  },
 
 };
 
