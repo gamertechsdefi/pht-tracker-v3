@@ -81,6 +81,7 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0xfd8eab4F5cf3572Ae62445CAD634226DbaA37F69", symbol: "godinu",  name: "GOD INU", chain: "bsc" },
   { address: "0x034437C7037317eaAbA782f2aD5B0A54cFcCf726", symbol: "zoe", name: "ZOE Token", chain: "bsc" } ,
   { address: "0x90206Ad9b7d23c672cd75A633CA96b5D9e9AE8Ed", symbol: "lai", name: "LeadAI Token", chain: "bsc" },
+  { address: "0x45c0f77541d195a6dea20a681e6c02a94ca04dd0", symbol: "babydew", name: "BABY DEW", chain: "bsc" },
   
   // Solana Tokens (placeholder addresses - replace with actual Solana addresses)
   { address: "scat_solana_address_placeholder", symbol: "scat", name: "Solana Cat Token", chain: "sol" },

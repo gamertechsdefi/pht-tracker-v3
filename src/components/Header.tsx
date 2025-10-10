@@ -72,6 +72,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     peperice: "bsc",
     bp: "bsc",
     lai: "bsc",
+    babydew: "bsc",
 
     
 };
@@ -130,6 +131,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "DayStar Token": "dst",
     "Baby Priceless": "bp",
     "LeadAI Token": "lai",
+    "BABY DEW": "babydew",
     
     
 };

@@ -315,6 +315,13 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     telegram: "https://t.me/OfficialLeadAI_BSC",
     bscscan: "https://bscscan.com/token/0x90206Ad9b7d23c672cd75A633CA96b5D9e9AE8Ed",  
   },
+  babydew: {
+    website: "#",
+    twitter: "https://x.com/babydewbsc",
+    telegram: "https://t.me/babydewbsc",
+    bscscan: "https://bscscan.com/token/0x45c0f77541d195a6dea20a681e6c02a94ca04dd0",
+
+  }
 
 };
 
