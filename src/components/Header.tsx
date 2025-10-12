@@ -73,6 +73,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     bp: "bsc",
     lai: "bsc",
     babydew: "bsc",
+    sat: "bsc",
 
     
 };
@@ -132,8 +133,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "Baby Priceless": "bp",
     "LeadAI Token": "lai",
     "BABY DEW": "babydew",
-    
-    
+    "SATERIA": "sat",    
 };
 
 export default function Header() {

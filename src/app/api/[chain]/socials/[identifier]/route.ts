@@ -320,7 +320,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "https://x.com/babydewbsc",
     telegram: "https://t.me/babydewbsc",
     bscscan: "https://bscscan.com/token/0x45c0f77541d195a6dea20a681e6c02a94ca04dd0",
-
+  },
+  sat: {
+    website: "https://www.sateriatoken.com",
+    twitter: "https://x.com/Sateriatoken",
+    telegram: "https://t.me/sateriatoken",
+    bscscan: "https://bscscan.com/token/0x4ff377aAD0C67541aa12ECe8B12d1217F3c94444",
   }
 
 };
