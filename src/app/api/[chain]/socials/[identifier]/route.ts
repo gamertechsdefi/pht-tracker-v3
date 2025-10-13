@@ -326,7 +326,13 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "https://x.com/Sateriatoken",
     telegram: "https://t.me/sateriatoken",
     bscscan: "https://bscscan.com/token/0x4ff377aAD0C67541aa12ECe8B12d1217F3c94444",
-  }
+  },
+  orb: {
+    website: "https://www.orbital.buzz",
+    twitter: "https://X.com/OrbitalBNB",
+    telegram: "https://t.me/Orbitalbsc",
+    bscscan: "https://bscscan.com/token/0x218ce180c6b21a355a55cdbb5b3b3bf7aad5c8a5",
+  },
 
 };
 

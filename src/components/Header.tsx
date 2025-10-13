@@ -74,6 +74,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     lai: "bsc",
     babydew: "bsc",
     sat: "bsc",
+    orb: "bsc",
 
     
 };
@@ -134,6 +135,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "LeadAI Token": "lai",
     "BABY DEW": "babydew",
     "SATERIA": "sat",    
+    "ORBITAL": "orb",
 };
 
 export default function Header() {
