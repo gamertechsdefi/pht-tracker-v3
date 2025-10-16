@@ -333,6 +333,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     telegram: "https://t.me/Orbitalbsc",
     bscscan: "https://bscscan.com/token/0x218ce180c6b21a355a55cdbb5b3b3bf7aad5c8a5",
   },
+  captainbnb: {
+    website: "https://captainbnb.xyz/",
+    twitter: "https://x.com/CaptainBNB_bsc",
+    telegram: "https://t.me/captainbnbportal",
+    bscscan: "https://bscscan.com/token/0x47A1EB0b825b73e6A14807BEaECAFef199d5477c",
+  },
 
 };
 

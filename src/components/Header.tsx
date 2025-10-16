@@ -75,6 +75,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     babydew: "bsc",
     sat: "bsc",
     orb: "bsc",
+    captainbnb: "bsc",
 
     
 };
@@ -136,6 +137,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "BABY DEW": "babydew",
     "SATERIA": "sat",    
     "ORBITAL": "orb",
+    "CaptainBNB": "captainbnb",
 };
 
 export default function Header() {
