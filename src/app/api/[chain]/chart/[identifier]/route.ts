@@ -59,6 +59,11 @@ const TOKEN_POOL_MAPPING: Record<string, string> = {
   peperice: "0x5f3170D7A37D70FFE92a3e573ec67400b795B854",
   godinu: "0xfd8eab4F5cf3572Ae62445CAD634226DbaA37F69",
   zoe: "0x034437C7037317eaAbA782f2aD5B0A54cFcCf726",
+  lai: "0x90206Ad9b7d23c672cd75A633CA96b5D9e9AE8Ed",
+  babydew: "0x45c0f77541d195a6dea20a681e6c02a94ca04dd0",
+  sat: "0x4ff377aad0c67541aa12ece8b12d1217f3c94444",
+  orb: "0x218ce180c6b21a355a55cdbb5b3b3bf7aad5c8a5",
+  captainbnb: "0x47A1EB0b825b73e6A14807BEaECAFef199d5477c",
 };
 
 export async function GET(
