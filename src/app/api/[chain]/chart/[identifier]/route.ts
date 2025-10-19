@@ -64,6 +64,7 @@ const TOKEN_POOL_MAPPING: Record<string, string> = {
   sat: "0x4ff377aad0c67541aa12ece8b12d1217f3c94444",
   orb: "0x218ce180c6b21a355a55cdbb5b3b3bf7aad5c8a5",
   captainbnb: "0x47A1EB0b825b73e6A14807BEaECAFef199d5477c",
+  anndy: "0xDc11726C4efa126CFe9614408CD310B22fe74444",
 };
 
 export async function GET(

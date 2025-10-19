@@ -90,6 +90,19 @@ const TOKEN_LIST: { [key: string]: string } = {
   bbcat: "bsc",
   talent: "bsc",
   "p-cat": "bsc",
+    jawgular: "bsc",
+    dst: "bsc",
+    zoe: "bsc",
+    godinu: "bsc",
+    peperice: "bsc",
+    bp: "bsc",
+    lai: "bsc",
+    babydew: "bsc",
+    sat: "bsc",
+    orb: "bsc",
+    captainbnb: "bsc",
+    anndy: "bsc",
+
 
 
 };
@@ -140,6 +153,18 @@ const FULL_NAME_MAP: { [key: string]: string } = {
   "bbcat": "Baby BilliCat",
   "talent": "Talent Token",
   "p-cat": "Persian Cat Token",
+  "ZOE Token": "zoe",
+    "JAWGULAR": "jawgular",
+    "GOD INU": "godinu",
+    "Pepe Rice": "peperice",
+    "DayStar Token": "dst",
+    "Baby Priceless": "bp",
+    "LeadAI Token": "lai",
+    "BABY DEW": "babydew",
+    "SATERIA": "sat",    
+    "ORBITAL": "orb",
+    "CaptainBNB": "captainbnb",
+    "首席模因官": "anndy",
 };
 
 const TOKENS = Object.entries(TOKEN_LIST).map(([symbol, chain]) => {

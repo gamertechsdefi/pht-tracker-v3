@@ -76,6 +76,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     sat: "bsc",
     orb: "bsc",
     captainbnb: "bsc",
+    anndy: "bsc",
 
     
 };
@@ -138,6 +139,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "SATERIA": "sat",    
     "ORBITAL": "orb",
     "CaptainBNB": "captainbnb",
+    "首席模因官": "anndy",
 };
 
 export default function Header() {
