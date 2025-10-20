@@ -343,7 +343,13 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     website: "#",
     twitter: "",
     telegram: "https://x.com/i/communities/1979037834599371009",
-    bscscan: "https://bscscan.com/token/0xDc11726C4efa126CFe9614408CD310B22fe74444",
+    bscscan: "https://bscscan.com/token/ç",
+  },
+  light: {
+    website: "luminousai.tech",
+    twitter: "https://t.me/+b2jQ_FtYP000Yzk0",
+    telegram: "https://x.com/LeadLuminous",
+    bscscan: "https://bscscan.com/token/0x794BF989b667E718FD4053029397CF8BF8CaC4ca",
   },
 
 };

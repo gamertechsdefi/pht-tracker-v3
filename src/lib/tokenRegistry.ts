@@ -86,6 +86,7 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0x218ce180c6b21a355a55cdbb5b3b3bf7aad5c8a5", symbol: "orb", name: "ORBITAL", chain: "bsc" },
   { address: "0x47A1EB0b825b73e6A14807BEaECAFef199d5477c", symbol: "CaptainBNB", name: "Captain BNB", chain: "bsc" },
   { address: "0xDc11726C4efa126CFe9614408CD310B22fe74444", symbol: "anndy", name: "首席模因官", chain: "bsc" },
+  { address: "0x794BF989b667E718FD4053029397CF8BF8CaC4ca", symbol: "light", name: "Luminous Token", chain: "bsc" },
   
   
   // Solana Tokens (placeholder addresses - replace with actual Solana addresses)
