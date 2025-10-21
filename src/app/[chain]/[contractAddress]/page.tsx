@@ -291,6 +291,23 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     // Check if token has burns enabled
     const showBurns = tokenMetadata?.isBurn === true;
 
+    // Dev logging to verify burn visibility
+    useEffect(() => {
+        if (process.env.NODE_ENV === 'development') {
+            try {
+                const reg = tokenMetadata?.address ? getTokenByAddress(tokenMetadata.address) : undefined;
+                console.log('[TokenPage] Burn visibility debug:', {
+                    contractAddress,
+                    tokenMetadata,
+                    registryLookup: reg,
+                    showBurns
+                });
+            } catch (e) {
+                console.error('Failed registry lookup in TokenPage debug:', e);
+            }
+        }
+    }, [contractAddress, tokenMetadata, showBurns]);
+
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
