@@ -166,7 +166,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "ORBITAL": "orb",
     "CaptainBNB": "captainbnb",
     "首席模因官": "anndy",
-    "Liminous Token": "light",
+    "Liminous Token": "ligh",
 };
 
 const TOKENS = Object.entries(TOKEN_LIST).map(([symbol, chain]) => {
