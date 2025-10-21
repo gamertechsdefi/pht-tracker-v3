@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { getTokenByAddress } from "@/lib/tokenRegistry";
 
 const INTERVALS = [
   { key: "burn5min", label: "5 Minutes" },
@@ -59,8 +60,34 @@ export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnInte
   const [error, setError] = useState<string | null>(null);
   const [selectedInterval, setSelectedInterval] = useState<IntervalKey>("burn24h");
 
+  // Registry lookup to check if burns should be shown
+  const tokenRegistry = useMemo(() => {
+    if (!contractAddress) return undefined;
+    try {
+      return getTokenByAddress(contractAddress);
+    } catch (e) {
+      console.error('Failed to lookup token:', e);
+      return undefined;
+    }
+  }, [contractAddress]);
+
+  // Only show burns if isBurn is true
+  const shouldShowBurns = tokenRegistry?.isBurn === true;
+
+  // Debug logging in development
   useEffect(() => {
-    if (!contractAddress) return;
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[BurnIntervals] Visibility check:', {
+        contractAddress,
+        hasTokenRegistry: !!tokenRegistry,
+        isBurn: tokenRegistry?.isBurn,
+        shouldShow: shouldShowBurns
+      });
+    }
+  }, [contractAddress, tokenRegistry, shouldShowBurns]);
+
+  useEffect(() => {
+    if (!contractAddress || !shouldShowBurns) return;
     let isMounted = true;
 
     const fetchData = () => {
@@ -115,32 +142,18 @@ export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnInte
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [contractAddress]);
+  }, [contractAddress, shouldShowBurns]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedInterval(e.target.value as IntervalKey);
   };
 
-  if (loading) {
-    return (
-      <div className="py-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-2 mx-auto"></div>
-        <div className="text-center">Loading burn intervals...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="text-center text-red-500">Error: {error}</div>;
-  }
-
-  if (!data) return null;
-
-  const value = data[selectedInterval];
+  // Calculate values before render
+  const value = data?.[selectedInterval];
   
   // Calculate USD value
-  const calculateUSDValue = () => {
-    if (!tokenPrice || !tokenPrice.price || tokenPrice.price === "N/A" || !value || isNaN(value)) {
+  const usdValue = useMemo(() => {
+    if (!tokenPrice?.price || tokenPrice.price === "N/A" || !value || isNaN(value)) {
       return "N/A";
     }
     
@@ -149,38 +162,58 @@ export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnInte
     
     const usdValue = value * price;
     return formatUSDValue(usdValue);
-  };
+  }, [tokenPrice, value]);
 
-  const usdValue = calculateUSDValue();
+  // Don't render anything if burns are disabled for this token
+  if (!shouldShowBurns) return null;
 
   return (
     <div className="bg-neutral-900 border-2 border-neutral-600 rounded-lg p-4">
-      <h2 className="text-xl font-bold mb-2">{(typeof tokenSymbol === 'string' ? tokenSymbol.toUpperCase() : contractAddress)} Burn Interval</h2>
-      <div className="flex flex-col items-start mb-2">
-        <select
-          value={selectedInterval}
-          onChange={handleChange}
-          className="bg-neutral-800 mb-2 text-white border border-neutral-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-        >
-          {INTERVALS.map((interval) => (
-            <option key={interval.key} value={interval.key}>
-              {interval.label}
-            </option>
-          ))}
-        </select>
-        <span className="text-2xl md:text-3xl font-bold text-red-500">
-          {typeof value === 'number' ? formatBurnValue(value) : "N/A"}
-        </span>
-        <p className="flex gap-2 items-center text-red-100 mb-2">
-          <span className="text-sm">USD Value: </span>
-          <span className="font-semibold text-lg md:text-xl text-red-500">
-            {usdValue}
-          </span>
-        </p>
-      </div>
-      <div className="text-xs text-gray-500 mt-2">
-        Last updated: {new Date(data.lastUpdated).toLocaleString()}
-      </div>
+      {loading ? (
+        // Loading state
+        <div className="py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-2 mx-auto"></div>
+          <div className="text-center">Loading burn intervals...</div>
+        </div>
+      ) : error ? (
+        // Error state
+        <div className="text-center text-red-500">Error: {error}</div>
+      ) : !data ? (
+        // No data state
+        <div className="text-center text-gray-500">No burn data available</div>
+      ) : (
+        // Main content
+        <>
+          <h2 className="text-xl font-bold mb-2">
+            {(typeof tokenSymbol === 'string' ? tokenSymbol.toUpperCase() : contractAddress)} Burn Interval
+          </h2>
+          <div className="flex flex-col items-start mb-2">
+            <select
+              value={selectedInterval}
+              onChange={handleChange}
+              className="bg-neutral-800 mb-2 text-white border border-neutral-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              {INTERVALS.map((interval) => (
+                <option key={interval.key} value={interval.key}>
+                  {interval.label}
+                </option>
+              ))}
+            </select>
+            <span className="text-2xl md:text-3xl font-bold text-red-500">
+              {typeof value === 'number' ? formatBurnValue(value) : "N/A"}
+            </span>
+            <p className="flex gap-2 items-center text-red-100 mb-2">
+              <span className="text-sm">USD Value: </span>
+              <span className="font-semibold text-lg md:text-xl text-red-500">
+                {usdValue}
+              </span>
+            </p>
+          </div>
+          <div className="text-xs text-gray-500 mt-2">
+            Last updated: {new Date(data.lastUpdated).toLocaleString()}
+          </div>
+        </>
+      )}
     </div>
   );
 } 

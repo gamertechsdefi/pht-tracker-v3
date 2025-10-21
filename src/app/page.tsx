@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import { getTokenByAddress } from '@/lib/tokenRegistry';
 // import { getTokenBySymbol } from '@/lib/tokenRegistry';
 
 interface Token {
@@ -118,7 +119,9 @@ export default function Home() {
                     </td>
                   </tr>
                 ) : (
-                  tokens.map((token: Token) => (
+                  tokens.map((token: Token) => {
+                    const registry = getTokenByAddress(token.address);
+                    return (
                     <tr key={token.address} className="border-b border-neutral-800 hover:bg-neutral-800 transition-colors">
                       {/* Token column - sticky on mobile */}
                       <td className="px-5 py-4 text-sm sticky left-0 bg-neutral-900 z-10 min-w-[120px]">
@@ -135,7 +138,10 @@ export default function Home() {
                           />
                           <div className="flex flex-col">
                             <span className="text-white whitespace-nowrap font-medium">
-                              {token.symbol.toUpperCase()}
+                              {token.symbol.toUpperCase()}{' '}
+                              {registry?.isBurn ? (
+                                <span className="ml-2 text-red-400" title="Burns enabled">🔥</span>
+                              ) : null}
                             </span>
                             <span className="text-gray-400 text-xs whitespace-nowrap">
                               {token.name}
@@ -168,7 +174,8 @@ export default function Home() {
                         </span>
                       </td>
                     </tr>
-                  ))
+                  );
+                  })
                 )}
               </tbody>
             </table>

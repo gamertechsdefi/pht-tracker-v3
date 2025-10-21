@@ -11,7 +11,7 @@ import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
 import Image from "next/image";
 import CurrencyConverter from "@/components/Converter";
-import { getTokenByAddress, isValidContractAddress } from "@/lib/tokenRegistry";
+import { getTokenByAddress, isValidContractAddress, TokenMetadata } from "@/lib/tokenRegistry";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -50,7 +50,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const router = useRouter();
     const [chain, setChain] = useState<string | null>(null);
     const [contractAddress, setContractAddress] = useState<string | null>(null);
-    const [tokenMetadata, setTokenMetadata] = useState<any>(null);
+    const [tokenMetadata, setTokenMetadata] = useState<TokenMetadata | null>(null);
 
     const [tokenData, setTokenData] = useState<TokenData | null>(null);
     const [socialLinks, setSocialLinks] = useState<{ website: string; twitter: string; telegram: string; bscscan: string } | null>(null);
@@ -103,7 +103,13 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                 return;
             }
 
-            setTokenMetadata(metadata);
+            // Ensure isBurn is a boolean
+            const enhancedMetadata = {
+                ...metadata,
+                isBurn: metadata.isBurn === true
+            };
+            
+            setTokenMetadata(enhancedMetadata);
             console.log("Validation passed, fetching data for:", { chain: chainLower, contractAddress, symbol: metadata.symbol });
 
             try {
@@ -281,6 +287,9 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
             alert('Failed to copy address. Please try again.');
         }
     }
+
+    // Check if token has burns enabled
+    const showBurns = tokenMetadata?.isBurn === true;
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -472,12 +481,14 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
                                 {/* Burns Tab */}
                                 <div className={activeTab === "burns" ? "" : "hidden"}>
-                                    <section className="mt-8 flex flex-col">
-                                        <div className="flex-1">
-                                            {tokenMetadata && <BurnIntervals contractAddress={tokenMetadata.address} tokenSymbol={tokenMetadata.symbol} /> }
-                                        </div>
-                                        {tokenMetadata && chain && <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />}
-                                    </section>
+                                    {showBurns && (
+                                        <section className="mt-8 flex flex-col">
+                                            <div className="flex-1">
+                                                {tokenMetadata && <BurnIntervals contractAddress={tokenMetadata.address} tokenSymbol={tokenMetadata.symbol} /> }
+                                            </div>
+                                            {tokenMetadata && chain && <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />}
+                                        </section>
+                                    )}
                                 </div>
 
                                 {activeTab === "chart" && (
@@ -646,16 +657,22 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     </div>
 
                                     <div>
-                                        <div className=" p-4 rounded-lg shadow-lg">
-                                            {tokenMetadata && <BurnIntervals contractAddress={tokenMetadata.address} tokenSymbol={tokenMetadata.symbol} />}
-                                        </div>
+                                        {showBurns && (
+                                            <>
+                                                <div className="p-4 rounded-lg shadow-lg">
+                                                    <BurnIntervals contractAddress={tokenMetadata?.address || ''} tokenSymbol={tokenMetadata?.symbol} />
+                                                </div>
 
-                                        <div className="mt-8 space-y-4">
-                                        </div>
+                                                <div className="mt-8 space-y-4">
+                                                </div>
 
-                                        <div className="mt-8">
-                                            {tokenMetadata && chain && <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />}
-                                        </div>
+                                                <div className="mt-8">
+                                                    {chain && tokenMetadata?.address && (
+                                                        <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 </section>
 
