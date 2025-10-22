@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { getTokenByAddress } from "@/lib/tokenRegistry";
 
 interface BurnTransaction {
   timestamp?: string;
@@ -30,8 +31,34 @@ export default function BurnsDisplay({ contractAddress }: BurnsDisplayProps) {
   const [error, setError] = useState<string | null>(null);
   const MAX_RETRIES = 3;
 
+  // Registry lookup to check if burns should be shown
+  const tokenRegistry = useMemo(() => {
+    if (!contractAddress) return undefined;
+    try {
+      return getTokenByAddress(contractAddress);
+    } catch (e) {
+      console.error('Failed to lookup token:', e);
+      return undefined;
+    }
+  }, [contractAddress]);
+
+  // Only show burns if isBurn is true
+  const shouldShowBurns = tokenRegistry?.isBurn === true;
+
+  // Debug logging in development
   useEffect(() => {
-    if (!contractAddress) return;
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[BurnsDisplay] Visibility check:', {
+        contractAddress,
+        hasTokenRegistry: !!tokenRegistry,
+        isBurn: tokenRegistry?.isBurn,
+        shouldShow: shouldShowBurns
+      });
+    }
+  }, [contractAddress, tokenRegistry, shouldShowBurns]);
+
+  useEffect(() => {
+    if (!contractAddress || !shouldShowBurns) return;
 
     const fetchBurns = async (attempt: number = 1) => {
       setIsLoading(true);
@@ -71,12 +98,15 @@ export default function BurnsDisplay({ contractAddress }: BurnsDisplayProps) {
     };
 
     fetchBurns();
-  }, [contractAddress]);
+  }, [contractAddress, shouldShowBurns]);
 
   const truncateAddress = (address?: string): string => {
     if (!address) return "N/A";
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
   };
+
+  // Don't show anything if burns are disabled
+  if (!shouldShowBurns) return null;
 
   if (isLoading) return <div className="text-center">Loading burns...</div>;
   if (error) return <div className="text-center text-red-500">Error: {error}</div>;

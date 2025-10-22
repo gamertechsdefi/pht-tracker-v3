@@ -12,12 +12,11 @@ const INTERVALS = [
   { key: "burn12h", label: "12 Hours" },
   { key: "burn24h", label: "24 Hours" },
 ] as const;
-
-type IntervalKey = typeof INTERVALS[number]["key"];
+type IntervalKey = typeof INTERVALS[number]['key'];
 
 interface BurnIntervalsProps {
   contractAddress: string;
-  tokenSymbol?: string;
+  tokenSymbol?: string; // Optional, for display
 }
 
 interface BurnData {
@@ -37,21 +36,22 @@ interface TokenPriceData {
   lastUpdated: string;
 }
 
-function formatBurnValue(value: number | null | undefined): string {
-  if (value == null || isNaN(value)) return "N/A";
+function formatBurnValue(value: number): string {
+  if (value === null || value === undefined || isNaN(value)) return "N/A";
   if (Math.abs(value) < 1) {
     return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
   }
   return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function formatUSDValue(value: number | null | undefined): string {
-  if (value == null || isNaN(value)) return "N/A";
+function formatUSDValue(value: number): string {
+  if (value === null || value === undefined || isNaN(value)) return "N/A";
   if (value < 0.01) {
     return `$${value.toFixed(6)}`;
   }
   return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
 
 export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnIntervalsProps) {
   const [data, setData] = useState<BurnData | null>(null);
@@ -60,71 +60,83 @@ export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnInte
   const [error, setError] = useState<string | null>(null);
   const [selectedInterval, setSelectedInterval] = useState<IntervalKey>("burn24h");
 
+  // Registry lookup to check if burns should be shown
   const tokenRegistry = useMemo(() => {
     if (!contractAddress) return undefined;
     try {
       return getTokenByAddress(contractAddress);
     } catch (e) {
-      console.error("Failed to lookup token:", e);
+      console.error('Failed to lookup token:', e);
       return undefined;
     }
   }, [contractAddress]);
 
+  // Only show burns if isBurn is true
   const shouldShowBurns = tokenRegistry?.isBurn === true;
 
+  // Debug logging in development
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      console.log("[BurnIntervals] Visibility check:", {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[BurnIntervals] Visibility check:', {
         contractAddress,
         hasTokenRegistry: !!tokenRegistry,
         isBurn: tokenRegistry?.isBurn,
-        shouldShow: shouldShowBurns,
+        shouldShow: shouldShowBurns
       });
     }
   }, [contractAddress, tokenRegistry, shouldShowBurns]);
 
   useEffect(() => {
-    if (!contractAddress || !shouldShowBurns) {
-      setLoading(false);
-      return;
-    }
-
+    if (!contractAddress || !shouldShowBurns) return;
     let isMounted = true;
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    const fetchData = () => {
+      setLoading(true);
+      setError(null);
 
-        // Fetch burn data and token price concurrently
-        const [burnResponse, priceResponse] = await Promise.all([
-          fetch(`/api/bsc/total-burnt/${encodeURIComponent(contractAddress)}`).then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch burn intervals");
-            return res.json();
-          }),
-          fetch(`/api/bsc/token-price/${encodeURIComponent(contractAddress)}`).then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch token price");
-            return res.json();
-          }),
-        ]);
+      // Fetch burn data
+      fetch(`/api/bsc/total-burnt/${encodeURIComponent(contractAddress)}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch burn intervals");
+          return res.json();
+        })
+        .then((json) => {
+          if (isMounted) {
+            setData(json);
+          }
+        })
+        .catch((err) => {
+          if (isMounted) {
+            setError(err.message);
+          }
+        });
 
-        if (isMounted) {
-          setData(burnResponse);
-          setTokenPrice(priceResponse);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err.message : "An unexpected error occurred");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
+      // Fetch token price
+      fetch(`/api/bsc/token-price/${encodeURIComponent(contractAddress)}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch token price");
+          return res.json();
+        })
+        .then((json) => {
+          if (isMounted) {
+            setTokenPrice(json);
+          }
+        })
+        .catch((err) => {
+          if (isMounted) {
+            console.error("Failed to fetch token price:", err);
+            // Don't set error for price fetch failure, just log it
+          }
+        })
+        .finally(() => {
+          if (isMounted) {
+            setLoading(false);
+          }
+        });
     };
 
     fetchData();
-    const intervalId = setInterval(fetchData, 60000);
+    const intervalId = setInterval(fetchData, 60000); // 60 seconds
 
     return () => {
       isMounted = false;
@@ -136,37 +148,44 @@ export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnInte
     setSelectedInterval(e.target.value as IntervalKey);
   };
 
+  // Calculate values before render
   const value = data?.[selectedInterval];
-
+  
+  // Calculate USD value
   const usdValue = useMemo(() => {
     if (!tokenPrice?.price || tokenPrice.price === "N/A" || !value || isNaN(value)) {
       return "N/A";
     }
-
+    
     const price = parseFloat(tokenPrice.price);
     if (isNaN(price)) return "N/A";
-
+    
     const usdValue = value * price;
     return formatUSDValue(usdValue);
   }, [tokenPrice, value]);
 
+  // Don't render anything if burns are disabled for this token
   if (!shouldShowBurns) return null;
 
   return (
     <div className="bg-neutral-900 border-2 border-neutral-600 rounded-lg p-4">
       {loading ? (
+        // Loading state
         <div className="py-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-2 mx-auto"></div>
           <div className="text-center">Loading burn intervals...</div>
         </div>
       ) : error ? (
+        // Error state
         <div className="text-center text-red-500">Error: {error}</div>
       ) : !data ? (
+        // No data state
         <div className="text-center text-gray-500">No burn data available</div>
       ) : (
+        // Main content
         <>
           <h2 className="text-xl font-bold mb-2">
-            {(typeof tokenSymbol === "string" ? tokenSymbol.toUpperCase() : contractAddress)} Burn Interval
+            {(typeof tokenSymbol === 'string' ? tokenSymbol.toUpperCase() : contractAddress)} Burn Interval
           </h2>
           <div className="flex flex-col items-start mb-2">
             <select
@@ -181,18 +200,20 @@ export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnInte
               ))}
             </select>
             <span className="text-2xl md:text-3xl font-bold text-red-500">
-              {typeof value === "number" ? formatBurnValue(value) : "N/A"}
+              {typeof value === 'number' ? formatBurnValue(value) : "N/A"}
             </span>
             <p className="flex gap-2 items-center text-red-100 mb-2">
               <span className="text-sm">USD Value: </span>
-              <span className="font-semibold text-lg md:text-xl text-red-500">{usdValue}</span>
+              <span className="font-semibold text-lg md:text-xl text-red-500">
+                {usdValue}
+              </span>
             </p>
           </div>
           <div className="text-xs text-gray-500 mt-2">
-            Last updated: {data.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : "N/A"}
+            Last updated: {new Date(data.lastUpdated).toLocaleString()}
           </div>
         </>
       )}
     </div>
   );
-}
+} 

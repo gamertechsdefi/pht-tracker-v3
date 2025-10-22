@@ -11,6 +11,7 @@ import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
 import Image from "next/image";
 import CurrencyConverter from "@/components/Converter";
+import PriceActionChart from "@/components/PriceActionChart";
 import { getTokenByAddress, isValidContractAddress, TokenMetadata } from "@/lib/tokenRegistry";
 
 // Define types for token data and intervals
@@ -289,7 +290,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     }
 
     // Check if token has burns enabled
-    const showBurns = tokenMetadata?.isBurn === true;
+    const showBurns = tokenMetadata?.isBurn;
+    console.log(showBurns);
 
     // Dev logging to verify burn visibility
     useEffect(() => {
@@ -509,24 +511,22 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 </div>
 
                                 {activeTab === "chart" && (
-                                    <div className="h-[48rem] mb-16 -mx-6">
-                                        <iframe
-                                            height="100%"
-                                            width="100%"
-                                            id="geckoterminal-embed"
-                                            title="GeckoTerminal Embed"
-                                            src={`/api/${chain}/chart/${contractAddress}`}
-                                            frameBorder="0"
-                                            allow="clipboard-write"
-                                            allowFullScreen
-                                        ></iframe>
+                                    <div className="mb-16">
+                                        {chain && contractAddress && (
+                                            <PriceActionChart
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol'}
+                                                contractAddress={contractAddress}
+                                            />
+                                        )}
                                     </div>
                                 )}
                             </div>
 
                             {/* Desktop Layout */}
                             <div className="hidden md:block">
+                                {/* Top Section: Token Info + Chart */}
                                 <section className="md:grid md:grid-cols-2 md:gap-8 mb-16">
+                                    {/* Left Side: Token Information */}
                                     <div>
                                         <div className="flex flex-row items-center gap-2 bg-black rounded-md p-4 mb-4">
                                             <img
@@ -673,38 +673,32 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         </div>
                                     </div>
 
+                                    {/* Right Side: Chart */}
                                     <div>
-                                        {showBurns && (
-                                            <>
-                                                <div className="p-4 rounded-lg shadow-lg">
-                                                    <BurnIntervals contractAddress={tokenMetadata?.address || ''} tokenSymbol={tokenMetadata?.symbol} />
-                                                </div>
-
-                                                <div className="mt-8 space-y-4">
-                                                </div>
-
-                                                <div className="mt-8">
-                                                    {chain && tokenMetadata?.address && (
-                                                        <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />
-                                                    )}
-                                                </div>
-                                            </>
+                                        {chain && contractAddress && (
+                                            <PriceActionChart
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol'}
+                                                contractAddress={contractAddress}
+                                            />
                                         )}
                                     </div>
                                 </section>
 
-                                <div className="mt-8 h-[36rem] mb-16 -mx-8">
-                                    <iframe
-                                        height="100%"
-                                        width="100%"
-                                        id="geckoterminal-embed"
-                                        title="GeckoTerminal Embed"
-                                        src={`/api/${chain}/chart/${contractAddress}`}
-                                        frameBorder="0"
-                                        allow="clipboard-write"
-                                        allowFullScreen
-                                    ></iframe>
-                                </div>
+                                {/* Bottom Section: Burns (if enabled) */}
+                                {showBurns && (
+                                    <section className="mt-8 mb-16">
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                            <div className="p-4 rounded-lg shadow-lg">
+                                                <BurnIntervals contractAddress={tokenMetadata?.address || ''} tokenSymbol={tokenMetadata?.symbol} />
+                                            </div>
+                                            <div>
+                                                {chain && tokenMetadata?.address && (
+                                                    <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />
+                                                )}
+                                            </div>
+                                        </div>
+                                    </section>
+                                )}
                             </div>
                         </>
                     )
