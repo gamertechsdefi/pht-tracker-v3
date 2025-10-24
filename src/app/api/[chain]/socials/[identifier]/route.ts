@@ -299,8 +299,8 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
   },
   zoe: {
     website: "https://www.zoetoken.site",
-    twitter: "https://x.com/Zoetoken_zt",
-    telegram: "https://t.me/zoetokens",
+    twitter: "https://x.com/Zoe_token/",
+    telegram: "https://t.me/zoetoken_zt",
     bscscan: "https://bscscan.com/token/0x034437C7037317eaAbA782f2aD5B0A54cFcCf726",  
   },
   godinu: {
@@ -350,6 +350,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "https://t.me/+b2jQ_FtYP000Yzk0",
     telegram: "https://x.com/LeadLuminous",
     bscscan: "https://bscscan.com/token/0x794BF989b667E718FD4053029397CF8BF8CaC4ca",
+  },
+  zonic: {
+    website: "https://www.zioncoin.fun",
+    twitter: " https://x.com/coin_zion63777",
+    telegram: "https://t.me/zioncoinbsc",
+    bscscan: "https://bscscan.com/token/0xC284A77838D09784C79061BA57B7203F8CBF76d9",
   },
 
 };

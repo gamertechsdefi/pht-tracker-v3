@@ -28,13 +28,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script defer src="https://cloud.umami.is/script.js" data-website-id="23de30be-d6d1-4152-b10c-7442a99240ce"></script>
+      </head>
       
       <body
         className={`${nunito.variable} antialiased`}
       >
         {children}
       </body>
-      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
+      <script defer src="https://cloud.umami.is/script.js" data-website-id="23de30be-d6d1-4152-b10c-7442a99240ce"></script>
       <Analytics />
     </html>
   );

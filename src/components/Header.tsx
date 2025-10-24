@@ -78,7 +78,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     captainbnb: "bsc",
     anndy: "bsc",
     light: "bsc",
-
+    zonic: "bsc",
     
 };
 
@@ -142,6 +142,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "CaptainBNB": "captainbnb",
     "首席模因官": "anndy",
     "Luminous Token": "light",
+    "Zion Token": "zonic",
 };
 
 export default function Header() {

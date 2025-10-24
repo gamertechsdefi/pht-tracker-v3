@@ -85,6 +85,21 @@ const TOKEN_LIST: Record<string, string> = {
     cct: "bsc",
     talent: "bsc",
     "p-cat": "bsc",
+    jawgular: "bsc",
+    dst: "bsc",
+    zoe: "bsc",
+    godinu: "bsc",
+    peperice: "bsc",
+    bp: "bsc",
+    lai: "bsc",
+    babydew: "bsc",
+    sat: "bsc",
+    orb: "bsc",
+    captainbnb: "bsc",
+    anndy: "bsc",
+    light: "bsc",
+    zonic: "bsc",
+
     
 };
 
