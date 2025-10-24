@@ -32,7 +32,7 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
       bscscan: "https://bscscan.com/token/0x885c99a787BE6b41cbf964174C771A9f7ec48e04"
     }
   },
-  { address: "0x6Ec90334d89dBdc89E08A133271be3d104128Edb", symbol: "wkc", name: "WikiCat Coin", chain: "bsc", isBurn: false },
+  { address: "0x6Ec90334d89dBdc89E08A133271be3d104128Edb", symbol: "wkc", name: "WikiCat Coin", chain: "bsc", isBurn: true },
   { address: "0x57bfe2af99aeb7a3de3bc0c42c22353742bfd20d", symbol: "war", name: "Water Rabbit Token", chain: "bsc", isBurn: true },
   { address: "0xb1957BDbA889686EbdE631DF970ecE6A7571A1B6", symbol: "dtg", name: "Defi Tiger Token", chain: "bsc", isBurn: true },
   { address: "0xd086B849a71867731D74D6bB5Df4f640de900171", symbol: "yukan", name: "Yukan Token", chain: "bsc", isBurn: true },
