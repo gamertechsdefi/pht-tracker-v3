@@ -1,4 +1,3 @@
-
 import { corsResponse } from "../../utils/cors";
 
 export async function OPTIONS() {
@@ -6,40 +5,38 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
-  // The Stats API expects the site hostname only (no protocol). Example:
-  // https://simpleanalytics.com/<site>.json?version=5&fields=pages
-  const rawDomain =
-    process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN || "firescreener.com";
-  const site = rawDomain.replace(/^https?:\/\//, "").replace(/\/+$/, "");
-  const apiKey = process.env.SIMPLE_ANALYTICS_API_KEY;
-  const userId = "sa_user_id_2162b862-5dea-4aa1-8101-6c969fc8583b"; // Replace if different
+  // Umami API setup
+  const umamiApiUrl = process.env.NEXT_PUBLIC_UMAMI_API_URL || "https://cloud.umami.is/analytics/us"; // e.g., https://analytics.umami.is or self-hosted URL
+  const websiteId = process.env.UMAMI_WEBSITE_ID; // Umami website ID
+  const authToken = "api_OqbRx6x5afmJpL8RI4E2r2Q4MWJsUmzt"; // Umami API token
 
-    if (!apiKey) {
+  if (!authToken || !websiteId || !umamiApiUrl) {
     return corsResponse(
-      { message: "Simple Analytics API key is not set" },
+      {
+        message: "Umami configuration is incomplete (missing API token, website ID, or API URL)",
+      },
       500
     );
-  }  try {
-    // Use the Stats API (v5) with only pages field
-    const requestUrl = `https://simpleanalytics.com/${site}.json?version=5&fields=pages`;
-    const response = await fetch(
-      requestUrl,
-      {
-        method: "GET",
-        headers: {
-          "Api-Key": apiKey,
-          "User-Id": userId,
-        },
-      }
-    );
+  }
+
+  try {
+    // Umami API endpoint for page views
+    const requestUrl = `${umamiApiUrl}/api//me/websites/${websiteId}/metrics?type=url`;
+    const response = await fetch(requestUrl, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        Accept: "application/json",
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Simple Analytics Pages API error:", errorText);
+      console.error("Umami API error:", errorText);
       return corsResponse(
         {
           message: "Error fetching pages data",
-          site,
+          websiteId,
           requestUrl,
           status: response.status,
           body: errorText,
@@ -50,28 +47,28 @@ export async function GET() {
 
     const data = await response.json();
 
-    // Normalize pages response to match frontend expectations
-    const pages = Array.isArray(data?.pages)
-      ? data.pages.map((p: any) => ({
-          page: p?.page ?? p?.value ?? "",
-          pageviews: p?.pageviews ?? 0,
+    // Normalize Umami response to match frontend expectations
+    const pages = Array.isArray(data)
+      ? data.map((p) => ({
+          page: p?.x ?? "", // Umami uses 'x' for the page URL in metrics
+          pageviews: p?.y ?? 0, // Umami uses 'y' for the count (pageviews)
         }))
       : [];
 
     const result = {
-      pages: pages,
+      pages,
     };
 
     return corsResponse(result, 200);
   } catch (error) {
-    console.error("Error fetching pages:", error);
+    console.error("Error fetching pages from Umami:", error);
     const message = error instanceof Error ? error.message : String(error);
     return corsResponse(
-      { 
-        message: "Internal Server Error", 
-        error: message, 
-        site, 
-        requestUrl: `https://simpleanalytics.com/${site}.json?version=5&fields=pages` 
+      {
+        message: "Internal Server Error",
+        error: message,
+        websiteId,
+        requestUrl: `${umamiApiUrl}/api/websites/${websiteId}/metrics?type=url`,
       },
       500
     );
