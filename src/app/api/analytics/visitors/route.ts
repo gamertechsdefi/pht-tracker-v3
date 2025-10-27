@@ -1,4 +1,3 @@
-
 import { corsResponse } from "../../utils/cors";
 
 export async function OPTIONS() {
@@ -6,43 +5,42 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
-  // The Stats API expects the site hostname only (no protocol). Example:
-  // https://simpleanalytics.com/<site>.json?version=5&fields=visitors
-  const rawDomain =
-    process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN || "firescreener.com";
-  const site = rawDomain.replace(/^https?:\/\//, "").replace(/\/+$/, "");
-  const apiKey = process.env.SIMPLE_ANALYTICS_API_KEY;
-  const userId = "sa_user_id_2162b862-5dea-4aa1-8101-6c969fc8583b"; // Replace if different
+  const umamiApiUrl = process.env.UMAMI_API_URL || "https://api.umami.is";
+  const websiteId = "23de30be-d6d1-4152-b10c-7442a99240ce";
+  const authToken = process.env.UMAMI_API_KEY;
 
-  if (!apiKey) {
+  if (!authToken || !websiteId || !umamiApiUrl) {
     return corsResponse(
-      { message: "Simple Analytics API key is not set" },
+      { message: "Umami configuration is incomplete" },
       500
     );
   }
 
+  const endAt = Date.now();
+  const startAt = endAt - (30 * 24 * 60 * 60 * 1000); // Last 30 days
+
+  // Use /stats endpoint to get total visitors
+  const requestUrl = new URL(`${umamiApiUrl.replace(/\/+$/, "")}/v1/websites/${websiteId}/stats`);
+  requestUrl.searchParams.append("startAt", startAt.toString());
+  requestUrl.searchParams.append("endAt", endAt.toString());
+
   try {
-    // Use the Stats API (v5) with only visitors field
-    const requestUrl = `https://simpleanalytics.com/${site}.json?version=5&fields=visitors`;
-    const response = await fetch(
-      requestUrl,
-      {
-        method: "GET",
-        headers: {
-          "Api-Key": apiKey,
-          "User-Id": userId,
-        },
-      }
-    );
+    const response = await fetch(requestUrl.toString(), {
+      method: "GET",
+      headers: {
+        "x-umami-api-key": authToken,
+        "Accept": "application/json",
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Simple Analytics Visitors API error:", errorText);
+      console.error("Umami Visitors API error:", errorText);
       return corsResponse(
         {
           message: "Error fetching visitors data",
-          site,
-          requestUrl,
+          websiteId,
+          requestUrl: requestUrl.toString(),
           status: response.status,
           body: errorText,
         },
@@ -52,9 +50,9 @@ export async function GET() {
 
     const data = await response.json();
 
-    // Return only visitors count
+    // Umami /stats endpoint returns an object with { visitors: { value: number }, ... }
     const result = {
-      visitors: data?.visitors ?? 0,
+      visitors: data?.visitors?.value ?? 0,
     };
 
     return corsResponse(result, 200);
@@ -62,11 +60,11 @@ export async function GET() {
     console.error("Error fetching visitors:", error);
     const message = error instanceof Error ? error.message : String(error);
     return corsResponse(
-      { 
-        message: "Internal Server Error", 
-        error: message, 
-        site, 
-        requestUrl: `https://simpleanalytics.com/${site}.json?version=5&fields=visitors` 
+      {
+        message: "Internal Server Error",
+        error: message,
+        websiteId,
+        requestUrl: requestUrl.toString(),
       },
       500
     );

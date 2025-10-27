@@ -1,4 +1,3 @@
-
 import { corsResponse } from "../../utils/cors";
 
 export async function OPTIONS() {
@@ -8,48 +7,51 @@ export async function OPTIONS() {
 export async function GET() {
   console.log("--- Pageviews API Route Handler ---");
 
-  const rawDomain =
-    process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN || "firescreener.com";
-  const site = rawDomain.replace(/^https?:\/\//, "").replace(/\/+$/, "");
-  const apiKey = process.env.SIMPLE_ANALYTICS_API_KEY;
-  const userId = "sa_user_id_2162b862-5dea-4aa1-8101-6c969fc8583b"; // Replace if different
+  const umamiApiUrl = process.env.UMAMI_API_URL || "https://api.umami.is";
+  const websiteId = "23de30be-d6d1-4152-b10c-7442a99240ce";
+  const authToken = process.env.UMAMI_API_KEY;
 
-  console.log("NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN:", process.env.NEXT_PUBLIC_SIMPLE_ANALYTICS_DOMAIN);
-  console.log("SIMPLE_ANALYTICS_API_KEY:", apiKey ? "Set" : "Not Set");
+  console.log("UMAMI_API_URL:", umamiApiUrl);
+  console.log("UMAMI_API_KEY:", authToken ? "Set" : "Not Set");
+  console.log("Website ID:", websiteId);
 
-  if (!apiKey) {
-    console.error("Simple Analytics API key is not set");
+  if (!authToken || !websiteId || !umamiApiUrl) {
+    console.error("Umami configuration is incomplete");
     return corsResponse(
-      { message: "Simple Analytics API key is not set" },
+      { message: "Umami configuration is incomplete" },
       500
     );
   }
 
-  const requestUrl = `https://simpleanalytics.com/${site}.json?version=5&fields=pageviews`;
-  console.log("Request URL:", requestUrl);
+  const endAt = Date.now();
+  const startAt = endAt - (30 * 24 * 60 * 60 * 1000); // Last 30 days
+
+  // Use /stats endpoint to get total pageviews
+  const requestUrl = new URL(`${umamiApiUrl.replace(/\/+$/, "")}/v1/websites/${websiteId}/stats`);
+  requestUrl.searchParams.append("startAt", startAt.toString());
+  requestUrl.searchParams.append("endAt", endAt.toString());
+
+  console.log("Request URL:", requestUrl.toString());
 
   try {
-    const response = await fetch(
-      requestUrl,
-      {
-        method: "GET",
-        headers: {
-          "Api-Key": apiKey,
-          "User-Id": userId,
-        },
-      }
-    );
+    const response = await fetch(requestUrl.toString(), {
+      method: "GET",
+      headers: {
+        "x-umami-api-key": authToken,
+        "Accept": "application/json",
+      },
+    });
 
-    console.log("Simple Analytics API Response Status:", response.status);
+    console.log("Umami API Response Status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Simple Analytics Pageviews API error:", errorText);
+      console.error("Umami Pageviews API error:", errorText);
       return corsResponse(
         {
           message: "Error fetching pageviews data",
-          site,
-          requestUrl,
+          websiteId,
+          requestUrl: requestUrl.toString(),
           status: response.status,
           body: errorText,
         },
@@ -58,9 +60,10 @@ export async function GET() {
     }
 
     const data = await response.json();
-    console.log("Simple Analytics API Response Data:", data);
+    console.log("Umami API Response Data:", data);
 
-    const pageviews = data?.pageviews ?? 0;
+    // Umami /stats endpoint returns an object with { pageviews: { value: number }, ... }
+    const pageviews = data?.pageviews?.value ?? 0;
     const result = { pageviews };
 
     console.log("Final Response to Frontend:", result);
@@ -70,11 +73,11 @@ export async function GET() {
     console.error("Error fetching pageviews:", error);
     const message = error instanceof Error ? error.message : String(error);
     return corsResponse(
-      { 
-        message: "Internal Server Error", 
-        error: message, 
-        site, 
-        requestUrl 
+      {
+        message: "Internal Server Error",
+        error: message,
+        websiteId,
+        requestUrl: requestUrl.toString(),
       },
       500
     );
