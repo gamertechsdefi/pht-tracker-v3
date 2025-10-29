@@ -131,7 +131,7 @@ export function useTokenData(chain: string | null, tokenName: string | null) {
                 `/api/${chainLower}/token-metrics/${token}`,
                 `/api/${chainLower}/token-holders/${token}`,
                 `/api/${chainLower}/token-price/${token}`,
-                `/api/${chainLower}/total-burnt/${token}`,
+                `/api/${chainLower}/burns-interval/${token}`,
                 `/api/${chainLower}/token-profile/${token}`,
                 `/api/${chainLower}/socials/${token}`,
                 `/api/${chainLower}/ca/${token}`,

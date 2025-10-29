@@ -25,7 +25,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     // Extract contractAddress from the URL pathname
     const url = new URL(request.url);
-    const match = url.pathname.match(/\/total-burnt\/([^\/]+)/);
+    const match = url.pathname.match(/\/burns-interval\/([^\/]+)/);
     const contractAddress = match && match[1] ? match[1].toLowerCase() : undefined;
 
     if (!contractAddress || !isValidAddress(contractAddress)) {
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
 
   } catch (error) {
-    console.error(`Error in GET /api/bsc/total-burnt/[contractAddress]:`, error);
+    console.error(`Error in GET /api/bsc/burns-interval/[contractAddress]:`, error);
     return NextResponse.json(
       {
         error: "Failed to fetch burn data",

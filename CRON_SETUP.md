@@ -15,7 +15,7 @@ The cron job system:
 - `src/lib/cron-burn-service.ts` - Core burn calculation service
 - `src/lib/cron-setup.ts` - Cron job scheduling
 - `src/app/api/cron/update-burn-data/route.ts` - Manual trigger endpoint
-- Updated `src/app/api/bsc/total-burnt/[tokenName]/route.ts` - Uses cached data
+- Updated `src/app/api/bsc/burns-interval/[tokenName]/route.ts` - Uses cached data
 - Updated `src/app/api/bsc/burns/[tokenName]/route.ts` - Uses cached data
 
 ## Setup Options
