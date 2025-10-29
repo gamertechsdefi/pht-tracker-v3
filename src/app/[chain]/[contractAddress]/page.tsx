@@ -121,7 +121,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     `/api/${chainLower}/token-metrics/${contractAddress}`,
                     `/api/${chainLower}/token-holders/${contractAddress}`,
                     `/api/${chainLower}/token-price/${contractAddress}`, // Now using contract address
-                    `/api/${chainLower}/total-burnt/${contractAddress}`,
+                    `/api/${chainLower}/burns-interval/${contractAddress}`,
                     `/api/${chainLower}/token-profile/${contractAddress}`,
                     `/api/${chainLower}/socials/${contractAddress}`,
                     `/api/${chainLower}/ca/${contractAddress}`,
@@ -154,7 +154,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     burn6h: burnsData?.burn6h || "No burns",
                     burn12h: burnsData?.burn12h || "No burns",
                     burn24h: burnsData?.burn24h || "No burns",
-                    totalburnt: metricsData?.totalBurnt || "N/A",
+                    totalburnt: metricsData?.burnedSupply || "N/A",
                     priceChange24h: priceData?.change24h || "N/A",
                     priceChange6h: priceData?.change6h || "N/A",
                     priceChange3h: priceData?.change3h || "N/A",
