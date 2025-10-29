@@ -17,7 +17,10 @@ interface MarketChartResponse {
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 interface CryptoCompareResponse {
   Data: {
     Data: Array<{
@@ -32,6 +35,9 @@ interface CryptoCompareResponse {
   };
 }
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 const TIMEFRAMES = [
   { label: "1D", days: 1 },
@@ -41,6 +47,11 @@ const TIMEFRAMES = [
 ] as const;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+type DataSource = "coingecko" | "cryptocompare" | null;
+
+>>>>>>> Stashed changes
 =======
 type DataSource = "coingecko" | "cryptocompare" | null;
 
@@ -50,7 +61,10 @@ function getPlatformId(chain: SupportedChain): string {
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 function getSymbolFromChain(chain: SupportedChain): string {
   // This is a simplified approach - in production you'd want to map contract addresses to symbols
   return chain === "bsc" ? "BNB" : "SOL";
@@ -69,6 +83,9 @@ function getHistoLimit(days: number): number {
   return 90;
 }
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 export default function PriceActionChart({ chain, contractAddress }: PriceActionChartProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -79,6 +96,10 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<number>(1);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+  const [dataSource, setDataSource] = useState<DataSource>(null);
+>>>>>>> Stashed changes
 =======
   const [dataSource, setDataSource] = useState<DataSource>(null);
 >>>>>>> Stashed changes
@@ -88,8 +109,11 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
   )}/market_chart?vs_currency=usd&days=${selectedTimeframe}`;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   // Fetch data
 =======
+=======
+>>>>>>> Stashed changes
   // Fetch from CryptoCompare as fallback
   async function fetchFromCryptoCompare(): Promise<{ prices: number[]; labels: string[] }> {
     const symbol = getSymbolFromChain(chain);
@@ -173,12 +197,16 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
   }
 
   // Fetch data with fallback logic
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
         setError(null);
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
         console.log('Fetching data from:', coingeckoUrl);
         
@@ -224,6 +252,8 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
         console.error('Error loading data:', e);
         setError(e instanceof Error ? e.message : "Unknown error");
 =======
+=======
+>>>>>>> Stashed changes
         setDataSource(null);
         
         // Try CoinGecko first
@@ -245,6 +275,9 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
       } catch (e) {
         console.error('All data sources failed:', e);
         setError(e instanceof Error ? e.message : "Failed to fetch price data from all sources");
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       } finally {
         setLoading(false);
@@ -255,7 +288,11 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
       loadData();
     }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   }, [coingeckoUrl, contractAddress]);
+=======
+  }, [coingeckoUrl, contractAddress, selectedTimeframe]);
+>>>>>>> Stashed changes
 =======
   }, [coingeckoUrl, contractAddress, selectedTimeframe]);
 >>>>>>> Stashed changes
@@ -353,6 +390,7 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
   }, [isChartReady, data]);
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   const formatPrice = (price: number): string => {
     if (price < 0.01) {
       return `$${price.toExponential(4)}`;
@@ -360,6 +398,8 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
     return `$${price.toLocaleString(undefined, { maximumFractionDigits: 6 })}`;
   };
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   return (
@@ -382,7 +422,13 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Price Action</h3>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <span className="text-xs text-gray-400">Source: CoinGecko</span>
+=======
+        <span className="text-xs text-gray-400">
+          Source: {dataSource === "coingecko" ? "CoinGecko" : dataSource === "cryptocompare" ? "CryptoCompare" : "..."}
+        </span>
+>>>>>>> Stashed changes
 =======
         <span className="text-xs text-gray-400">
           Source: {dataSource === "coingecko" ? "CoinGecko" : dataSource === "cryptocompare" ? "CryptoCompare" : "..."}
@@ -411,7 +457,11 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
       {process.env.NODE_ENV === 'development' && (
         <div className="text-xs text-gray-500 mb-2">
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           Debug: Chart Ready: {isChartReady ? 'Yes' : 'No'}, Data: {data ? `${data.prices.length} points` : 'None'}, Loading: {loading ? 'Yes' : 'No'}
+=======
+          Debug: Chart Ready: {isChartReady ? 'Yes' : 'No'}, Data: {data ? `${data.prices.length} points` : 'None'}, Loading: {loading ? 'Yes' : 'No'}, Source: {dataSource || 'None'}
+>>>>>>> Stashed changes
 =======
           Debug: Chart Ready: {isChartReady ? 'Yes' : 'No'}, Data: {data ? `${data.prices.length} points` : 'None'}, Loading: {loading ? 'Yes' : 'No'}, Source: {dataSource || 'None'}
 >>>>>>> Stashed changes
