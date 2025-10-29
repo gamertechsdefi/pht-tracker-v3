@@ -16,11 +16,6 @@ interface MarketChartResponse {
   market_caps: [number, number][]; // [timestamp(ms), market_cap]
 }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
 interface CryptoCompareResponse {
   Data: {
     Data: Array<{
@@ -35,10 +30,6 @@ interface CryptoCompareResponse {
   };
 }
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 const TIMEFRAMES = [
   { label: "1D", days: 1 },
   { label: "7D", days: 7 },
@@ -46,25 +37,12 @@ const TIMEFRAMES = [
   { label: "90D", days: 90 },
 ] as const;
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
 type DataSource = "coingecko" | "cryptocompare" | null;
 
->>>>>>> Stashed changes
-=======
-type DataSource = "coingecko" | "cryptocompare" | null;
-
->>>>>>> Stashed changes
 function getPlatformId(chain: SupportedChain): string {
   return chain === "bsc" ? "binance-smart-chain" : "solana";
 }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
 function getSymbolFromChain(chain: SupportedChain): string {
   // This is a simplified approach - in production you'd want to map contract addresses to symbols
   return chain === "bsc" ? "BNB" : "SOL";
@@ -83,10 +61,6 @@ function getHistoLimit(days: number): number {
   return 90;
 }
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 export default function PriceActionChart({ chain, contractAddress }: PriceActionChartProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const chartRef = useRef<any>(null);
@@ -95,25 +69,12 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
   const [isChartReady, setIsChartReady] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<number>(1);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
   const [dataSource, setDataSource] = useState<DataSource>(null);
->>>>>>> Stashed changes
-=======
-  const [dataSource, setDataSource] = useState<DataSource>(null);
->>>>>>> Stashed changes
 
   const coingeckoUrl = `https://api.coingecko.com/api/v3/coins/${getPlatformId(chain)}/contract/${encodeURIComponent(
     contractAddress
   )}/market_chart?vs_currency=usd&days=${selectedTimeframe}`;
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  // Fetch data
-=======
-=======
->>>>>>> Stashed changes
   // Fetch from CryptoCompare as fallback
   async function fetchFromCryptoCompare(): Promise<{ prices: number[]; labels: string[] }> {
     const symbol = getSymbolFromChain(chain);
@@ -197,63 +158,11 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
   }
 
   // Fetch data with fallback logic
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
         setError(null);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        console.log('Fetching data from:', coingeckoUrl);
-        
-        const resp = await fetch(coingeckoUrl, { cache: "no-store" });
-        if (!resp.ok) {
-          throw new Error(`Failed to fetch: ${resp.status}`);
-        }
-        
-        const json = (await resp.json()) as MarketChartResponse;
-        console.log('API Response:', json);
-        
-        if (!json.prices || json.prices.length === 0) {
-          throw new Error('No price data received');
-        }
-        
-        const prices: number[] = [];
-        const labels: string[] = [];
-        
-        json.prices.forEach(([timestamp, price]) => {
-          prices.push(price);
-          
-          // Format timestamp based on timeframe
-          const date = new Date(timestamp);
-          let timeLabel: string;
-          
-          if (selectedTimeframe <= 1) {
-            // For 1D, show hours
-            timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          } else if (selectedTimeframe <= 7) {
-            // For 7D, show days
-            timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-          } else {
-            // For 30D/90D, show dates
-            timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-          }
-          
-          labels.push(timeLabel);
-        });
-        
-        console.log('Extracted data:', { prices: prices.slice(0, 5), labels: labels.slice(0, 5) });
-        setData({ prices, labels });
-      } catch (e) {
-        console.error('Error loading data:', e);
-        setError(e instanceof Error ? e.message : "Unknown error");
-=======
-=======
->>>>>>> Stashed changes
         setDataSource(null);
         
         // Try CoinGecko first
@@ -275,10 +184,6 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
       } catch (e) {
         console.error('All data sources failed:', e);
         setError(e instanceof Error ? e.message : "Failed to fetch price data from all sources");
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
       } finally {
         setLoading(false);
       }
@@ -287,15 +192,7 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
     if (contractAddress) {
       loadData();
     }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  }, [coingeckoUrl, contractAddress]);
-=======
   }, [coingeckoUrl, contractAddress, selectedTimeframe]);
->>>>>>> Stashed changes
-=======
-  }, [coingeckoUrl, contractAddress, selectedTimeframe]);
->>>>>>> Stashed changes
 
   // Create chart
   useEffect(() => {
@@ -389,19 +286,6 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
     }
   }, [isChartReady, data]);
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  const formatPrice = (price: number): string => {
-    if (price < 0.01) {
-      return `$${price.toExponential(4)}`;
-    }
-    return `$${price.toLocaleString(undefined, { maximumFractionDigits: 6 })}`;
-  };
-
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
   return (
     <div className="mt-4 bg-neutral-900 border border-neutral-700 rounded-md p-4">
       {/* Load Chart.js */}
@@ -421,19 +305,9 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Price Action</h3>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        <span className="text-xs text-gray-400">Source: CoinGecko</span>
-=======
         <span className="text-xs text-gray-400">
           Source: {dataSource === "coingecko" ? "CoinGecko" : dataSource === "cryptocompare" ? "CryptoCompare" : "..."}
         </span>
->>>>>>> Stashed changes
-=======
-        <span className="text-xs text-gray-400">
-          Source: {dataSource === "coingecko" ? "CoinGecko" : dataSource === "cryptocompare" ? "CryptoCompare" : "..."}
-        </span>
->>>>>>> Stashed changes
       </div>
 
       {/* Timeframe selector */}
@@ -456,15 +330,7 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
       {/* Debug info */}
       {process.env.NODE_ENV === 'development' && (
         <div className="text-xs text-gray-500 mb-2">
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-          Debug: Chart Ready: {isChartReady ? 'Yes' : 'No'}, Data: {data ? `${data.prices.length} points` : 'None'}, Loading: {loading ? 'Yes' : 'No'}
-=======
           Debug: Chart Ready: {isChartReady ? 'Yes' : 'No'}, Data: {data ? `${data.prices.length} points` : 'None'}, Loading: {loading ? 'Yes' : 'No'}, Source: {dataSource || 'None'}
->>>>>>> Stashed changes
-=======
-          Debug: Chart Ready: {isChartReady ? 'Yes' : 'No'}, Data: {data ? `${data.prices.length} points` : 'None'}, Loading: {loading ? 'Yes' : 'No'}, Source: {dataSource || 'None'}
->>>>>>> Stashed changes
         </div>
       )}
 
