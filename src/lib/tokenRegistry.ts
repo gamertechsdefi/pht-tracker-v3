@@ -58,7 +58,7 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0xAfF713b62e642b25898e24d5Be6561f863582144", symbol: "surv", name: "Survarium", chain: "bsc", isBurn: true },
   { address: "0xCAAE2A2F939F51d97CdFa9A86e79e3F085b799f3", symbol: "tut", name: "Tutorial Token", chain: "bsc", isBurn: true },
   { address: "0x14a8d0AC8Fc456899F2DD33C3f4E32403A78126c", symbol: "puffcat", name: "PuffCat Token", chain: "bsc", isBurn: true },
-  { address: "0xeb2B7d5691878627eff20492cA7c9a71228d931D", symbol: "crepe", name: "CREPE", chain: "bsc", isBurn: true },
+  { address: "0xeb2B7d5691878627eff20492cA7c9a71228d931D", symbol: "crepe", name: "CREPE", chain: "bsc", isBurn: false },
   { address: "0xdc3d92dd5a468edb7a7772452700cc93bb1826ad", symbol: "popielno", name: "POPIELNO", chain: "bsc", isBurn: true },
   { address: "0x6C0D4adAc8fb85CC336C669C08b44f2e1d492575", symbol: "spray", name: "SPRAY LOTTERY TOKEN", chain: "bsc", isBurn: true },
   { address: "0x170f044f9c7a41ff83caccad6ccca1b941d75af7", symbol: "mbc", name: "Mamba Token", chain: "bsc", isBurn: true },
