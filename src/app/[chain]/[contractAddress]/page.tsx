@@ -297,7 +297,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     useEffect(() => {
         if (process.env.NODE_ENV === 'development') {
             try {
-                const reg = tokenMetadata?.address ? getTokenByAddress(tokenMetadata.address) : undefined;
+                // const reg = tokenMetadata?.address ? getTokenByAddress(tokenMetadata.address) : undefined;
                 // console.log('[TokenPage] Burn visibility debug:', {
                 //     contractAddress,
                 //     tokenMetadata,
