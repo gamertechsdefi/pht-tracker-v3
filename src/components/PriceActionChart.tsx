@@ -75,90 +75,90 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
     contractAddress
   )}/market_chart?vs_currency=usd&days=${selectedTimeframe}`;
 
-  // Fetch from CryptoCompare as fallback
-  async function fetchFromCryptoCompare(): Promise<{ prices: number[]; labels: string[] }> {
-    const symbol = getSymbolFromChain(chain);
-    const endpoint = getHistoEndpoint(selectedTimeframe);
-    const limit = getHistoLimit(selectedTimeframe);
-    
-    const url = `https://min-api.cryptocompare.com/data/v2/${endpoint}?fsym=${symbol}&tsym=USD&limit=${limit}`;
-    
-    console.log('Fetching from CryptoCompare:', url);
-    
-    const resp = await fetch(url);
-    if (!resp.ok) {
-      throw new Error(`CryptoCompare API failed: ${resp.status}`);
-    }
-    
-    const json = (await resp.json()) as CryptoCompareResponse;
-    
-    if (!json.Data?.Data || json.Data.Data.length === 0) {
-      throw new Error('No data from CryptoCompare');
-    }
-    
-    const prices: number[] = [];
-    const labels: string[] = [];
-    
-    json.Data.Data.forEach((dataPoint) => {
-      prices.push(dataPoint.close);
-      
-      const date = new Date(dataPoint.time * 1000); // Convert seconds to milliseconds
-      let timeLabel: string;
-      
-      if (selectedTimeframe <= 1) {
-        timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      } else if (selectedTimeframe <= 7) {
-        timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      } else {
-        timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      }
-      
-      labels.push(timeLabel);
-    });
-    
-    return { prices, labels };
-  }
-
-  // Fetch from CoinGecko first, fallback to CryptoCompare
-  async function fetchFromCoinGecko(): Promise<{ prices: number[]; labels: string[] }> {
-    console.log('Fetching from CoinGecko:', coingeckoUrl);
-    
-    const resp = await fetch(coingeckoUrl, { cache: "no-store" });
-    if (!resp.ok) {
-      throw new Error(`CoinGecko API failed: ${resp.status}`);
-    }
-    
-    const json = (await resp.json()) as MarketChartResponse;
-    
-    if (!json.prices || json.prices.length === 0) {
-      throw new Error('No price data from CoinGecko');
-    }
-    
-    const prices: number[] = [];
-    const labels: string[] = [];
-    
-    json.prices.forEach(([timestamp, price]) => {
-      prices.push(price);
-      
-      const date = new Date(timestamp);
-      let timeLabel: string;
-      
-      if (selectedTimeframe <= 1) {
-        timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      } else if (selectedTimeframe <= 7) {
-        timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      } else {
-        timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      }
-      
-      labels.push(timeLabel);
-    });
-    
-    return { prices, labels };
-  }
-
   // Fetch data with fallback logic
   useEffect(() => {
+    // Fetch from CoinGecko
+    async function fetchFromCoinGecko(): Promise<{ prices: number[]; labels: string[] }> {
+      console.log('Fetching from CoinGecko:', coingeckoUrl);
+      
+      const resp = await fetch(coingeckoUrl, { cache: "no-store" });
+      if (!resp.ok) {
+        throw new Error(`CoinGecko API failed: ${resp.status}`);
+      }
+      
+      const json = (await resp.json()) as MarketChartResponse;
+      
+      if (!json.prices || json.prices.length === 0) {
+        throw new Error('No price data from CoinGecko');
+      }
+      
+      const prices: number[] = [];
+      const labels: string[] = [];
+      
+      json.prices.forEach(([timestamp, price]) => {
+        prices.push(price);
+        
+        const date = new Date(timestamp);
+        let timeLabel: string;
+        
+        if (selectedTimeframe <= 1) {
+          timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else if (selectedTimeframe <= 7) {
+          timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        } else {
+          timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        }
+        
+        labels.push(timeLabel);
+      });
+      
+      return { prices, labels };
+    }
+
+    // Fetch from CryptoCompare as fallback
+    async function fetchFromCryptoCompare(): Promise<{ prices: number[]; labels: string[] }> {
+      const symbol = getSymbolFromChain(chain);
+      const endpoint = getHistoEndpoint(selectedTimeframe);
+      const limit = getHistoLimit(selectedTimeframe);
+      
+      const url = `https://min-api.cryptocompare.com/data/v2/${endpoint}?fsym=${symbol}&tsym=USD&limit=${limit}`;
+      
+      console.log('Fetching from CryptoCompare:', url);
+      
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        throw new Error(`CryptoCompare API failed: ${resp.status}`);
+      }
+      
+      const json = (await resp.json()) as CryptoCompareResponse;
+      
+      if (!json.Data?.Data || json.Data.Data.length === 0) {
+        throw new Error('No data from CryptoCompare');
+      }
+      
+      const prices: number[] = [];
+      const labels: string[] = [];
+      
+      json.Data.Data.forEach((dataPoint) => {
+        prices.push(dataPoint.close);
+        
+        const date = new Date(dataPoint.time * 1000); // Convert seconds to milliseconds
+        let timeLabel: string;
+        
+        if (selectedTimeframe <= 1) {
+          timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else if (selectedTimeframe <= 7) {
+          timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        } else {
+          timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        }
+        
+        labels.push(timeLabel);
+      });
+      
+      return { prices, labels };
+    }
+
     async function loadData() {
       try {
         setLoading(true);
@@ -192,7 +192,7 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
     if (contractAddress) {
       loadData();
     }
-  }, [coingeckoUrl, contractAddress, selectedTimeframe]);
+  }, [coingeckoUrl, contractAddress, selectedTimeframe, chain]);
 
   // Create chart
   useEffect(() => {
