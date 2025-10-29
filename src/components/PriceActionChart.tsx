@@ -231,7 +231,6 @@ export default function PriceActionChart({
       return;
     }
 
-    // @ts-ignore
     const Chart = (window as any).Chart;
     if (!Chart) {
       console.log('Chart.js not available');
