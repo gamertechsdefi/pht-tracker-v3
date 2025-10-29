@@ -209,7 +209,7 @@ export default function PriceActionChart({ chain, contractAddress }: PriceAction
       return;
     }
 
-    // @ts-ignore
+    // @ts-expect-error
     const Chart = (window as any).Chart;
     if (!Chart) {
       console.log('Chart.js not available');
