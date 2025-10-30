@@ -72,7 +72,7 @@ export default function PriceActionChart({
   const cacheRef = useRef<Map<string, { prices: number[]; labels: string[]; ts: number }>>(new Map());
   const [data, setData] = useState<{ prices: number[]; labels: string[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isChartReady, setIsChartReady] = useState<boolean>(true);
+  const isChartReady = true; // Chart.js is available via ESM import
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<number>(1);
   const [dataSource, setDataSource] = useState<DataSource>(null);
