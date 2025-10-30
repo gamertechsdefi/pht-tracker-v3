@@ -23,9 +23,9 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
     const fetchRates = async () => {
       try {
         console.log('Fetching rates for token:', tokenAddress);
-        // Using the correct CoinGecko API endpoint for BNB Smart Chain tokens
+        // Using DexScreener API to get token data from BSC
         const response = await fetch(
-          `https://api.coingecko.com/api/v3/simple/token_price/binance-smart-chain?contract_addresses=${tokenAddress}&vs_currencies=usd&include_24hr_change=true`
+          `https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`
         );
         
         if (!response.ok) {
@@ -34,23 +34,36 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
         }
         
         const data = await response.json();
-        console.log('API Response:', data);
+        console.log('DexScreener API Response:', data);
         
-        // Get BNB price in USD for conversion
-        const bnbResponse = await fetch(
-          'https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd'
-        );
-        const bnbData = await bnbResponse.json();
-        const bnbPriceInUsd = bnbData.binancecoin?.usd || 0;
+        // DexScreener returns pairs, we'll use the first BSC pair or the one with highest liquidity
+        const bscPairs = data.pairs?.filter((pair: any) => 
+          pair.chainId === 'bsc' || pair.chainId === 'binance'
+        ) || [];
         
-        // Parse the response to get token price in USD
-        const tokenData = data[tokenAddress.toLowerCase()];
-        const usdRate = tokenData?.usd || 0;
+        // Sort by liquidity and get the most liquid pair
+        const mainPair = bscPairs.sort((a: any, b: any) => 
+          (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)
+        )[0];
         
-        // Calculate BNB rate based on USD price and BNB/USD rate
-        const bnbRate = bnbPriceInUsd > 0 ? usdRate / bnbPriceInUsd : 0;
+        if (!mainPair) {
+          console.error('No BSC pairs found for this token');
+          setLoading(false);
+          return;
+        }
+        
+        // Get USD price directly from DexScreener
+        const usdRate = parseFloat(mainPair.priceUsd) || 0;
+        
+        // Get BNB price - priceNative is typically in BNB for BSC pairs
+        const bnbRate = parseFloat(mainPair.priceNative) || 0;
         
         console.log('Parsed rates - USD:', usdRate, 'BNB:', bnbRate);
+        console.log('Pair info:', {
+          dex: mainPair.dexId,
+          liquidity: mainPair.liquidity?.usd,
+          pairAddress: mainPair.pairAddress
+        });
         
         setRates({
           usd: usdRate,
@@ -107,8 +120,13 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
           {tokenLogoUrl && (
             <img
               src={tokenLogoUrl}
-              alt={`${tokenSymbol} logo`}
-              className="w-5 h-5 mr-2 rounded-full"
+              alt={`${tokenSymbol} logo`
+              }
+              className="w-5 h-5 mr-2 rounded-full object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/file.svg';
+                (e.target as HTMLImageElement).alt = 'Default Logo';
+              }}
             />
           )}
           {tokenSymbol}

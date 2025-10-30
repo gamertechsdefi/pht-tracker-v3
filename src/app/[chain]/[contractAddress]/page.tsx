@@ -457,11 +457,11 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </h1>
                                         </div>
 
-                                        {tokenData.contract && (
+                                        {tokenData.contract && chain && (
                                             <CurrencyConverter
                                                 tokenSymbol={tokenMetadata.symbol.toUpperCase()}
                                                 tokenAddress={tokenData.contract}
-                                                tokenLogoUrl={tokenData.profile}
+                                                tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
                                             />
                                         )}
                                     </section>
@@ -637,11 +637,11 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </h1>
                                         </div>
 
-                                        {tokenData.contract && tokenMetadata && (
+                                        {tokenData.contract && tokenMetadata && chain && (
                                             <CurrencyConverter
                                                 tokenSymbol={tokenMetadata.symbol.toUpperCase()}
                                                 tokenAddress={tokenData.contract}
-                                                tokenLogoUrl={tokenData.profile}
+                                                tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
                                             />
                                         )}
 

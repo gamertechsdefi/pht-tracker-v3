@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Script from "next/script";
+import Chart from 'chart.js/auto';
 
 type SupportedChain = "bsc" | "sol";
 
@@ -69,9 +69,10 @@ export default function PriceActionChart({
 }: PriceActionChartProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const chartRef = useRef<any>(null);
+  const cacheRef = useRef<Map<string, { prices: number[]; labels: string[]; ts: number }>>(new Map());
   const [data, setData] = useState<{ prices: number[]; labels: string[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isChartReady, setIsChartReady] = useState<boolean>(false);
+  const [isChartReady, setIsChartReady] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<number>(1);
   const [dataSource, setDataSource] = useState<DataSource>(null);
@@ -83,48 +84,59 @@ export default function PriceActionChart({
     contractAddress
   )}/market_chart?vs_currency=usd&days=${selectedTimeframe}`;
 
-  // Fetch data with fallback logic
+  // Chart.js is available via ESM import
+
+  // Fetch data with fallback logic, retries, and abort handling
   useEffect(() => {
     // Fetch from CoinGecko
-    async function fetchFromCoinGecko(): Promise<{ prices: number[]; labels: string[] }> {
+    async function fetchFromCoinGecko(signal: AbortSignal): Promise<{ prices: number[]; labels: string[] }> {
       console.log('Fetching from CoinGecko:', coingeckoUrl);
-      
-      const resp = await fetch(coingeckoUrl, { cache: "no-store" });
-      if (!resp.ok) {
-        throw new Error(`CoinGecko API failed: ${resp.status}`);
-      }
-      
-      const json = (await resp.json()) as MarketChartResponse;
-      
-      if (!json.prices || json.prices.length === 0) {
-        throw new Error('No price data from CoinGecko');
-      }
-      
-      const prices: number[] = [];
-      const labels: string[] = [];
-      
-      json.prices.forEach(([timestamp, price]) => {
-        prices.push(price);
-        
-        const date = new Date(timestamp);
-        let timeLabel: string;
-        
-        if (selectedTimeframe <= 1) {
-          timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else if (selectedTimeframe <= 7) {
-          timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-        } else {
-          timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+
+      // Retry with simple backoff for 429/5xx
+      const maxAttempts = 3;
+      let lastErr: any = null;
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          const resp = await fetch(coingeckoUrl, { cache: 'no-store', signal });
+          if (!resp.ok) {
+            if ([429, 500, 502, 503, 504].includes(resp.status) && attempt < maxAttempts) {
+              const delay = 300 * attempt;
+              await new Promise((r) => setTimeout(r, delay));
+              continue;
+            }
+            throw new Error(`CoinGecko API failed: ${resp.status}`);
+          }
+          const json = (await resp.json()) as MarketChartResponse;
+          if (!json.prices || json.prices.length === 0) {
+            throw new Error('No price data from CoinGecko');
+          }
+
+          const prices: number[] = [];
+          const labels: string[] = [];
+
+          json.prices.forEach(([timestamp, price]) => {
+            prices.push(price);
+            const date = new Date(timestamp);
+            let timeLabel: string;
+            if (selectedTimeframe <= 1) {
+              timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else {
+              timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            }
+            labels.push(timeLabel);
+          });
+          return { prices, labels };
+        } catch (err: any) {
+          if (signal.aborted) throw err;
+          lastErr = err;
+          if (attempt === maxAttempts) throw err;
         }
-        
-        labels.push(timeLabel);
-      });
-      
-      return { prices, labels };
+      }
+      throw lastErr || new Error('CoinGecko failed');
     }
 
     // Fetch from CryptoCompare as fallback
-    async function fetchFromCryptoCompare(): Promise<{ prices: number[]; labels: string[] }> {
+    async function fetchFromCryptoCompare(signal: AbortSignal): Promise<{ prices: number[]; labels: string[] }> {
       const symbol = getSymbolFromChain(chain);
       const endpoint = getHistoEndpoint(selectedTimeframe);
       const limit = getHistoLimit(selectedTimeframe);
@@ -137,12 +149,27 @@ export default function PriceActionChart({
       }
       
       console.log('Fetching from CryptoCompare:', url.replace(cryptocompareApiKey || '', '***'));
-      
-      const resp = await fetch(url);
-      if (!resp.ok) {
-        throw new Error(`CryptoCompare API failed: ${resp.status}`);
+      // Retry with backoff for 429/5xx
+      const maxAttempts = 2;
+      let resp: Response | null = null;
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          resp = await fetch(url, { signal });
+          if (!resp.ok) {
+            if ([429, 500, 502, 503, 504].includes(resp.status) && attempt < maxAttempts) {
+              const delay = 300 * attempt;
+              await new Promise((r) => setTimeout(r, delay));
+              continue;
+            }
+            throw new Error(`CryptoCompare API failed: ${resp.status}`);
+          }
+          break;
+        } catch (err) {
+          if (signal.aborted) throw err;
+          if (attempt === maxAttempts) throw err;
+        }
       }
-      
+      if (!resp) throw new Error('CryptoCompare: no response');
       const json = (await resp.json()) as CryptoCompareResponse;
       
       // Check for API error response
@@ -177,18 +204,29 @@ export default function PriceActionChart({
       return { prices, labels };
     }
 
+    const abortController = new AbortController();
+    const { signal } = abortController;
+    let cancelled = false;
+
     async function loadData() {
       try {
         setLoading(true);
         setError(null);
         setDataSource(null);
+        const key = `${chain}:${contractAddress}:${selectedTimeframe}`;
+        // Serve stale cache immediately if present
+        const cached = cacheRef.current.get(key);
+        if (cached && !cancelled) {
+          setData({ prices: cached.prices, labels: cached.labels });
+        }
         
         // Try CoinGecko first
         try {
-          const coinGeckoData = await fetchFromCoinGecko();
+          const coinGeckoData = await fetchFromCoinGecko(signal);
           console.log('CoinGecko data loaded:', coinGeckoData.prices.length, 'points');
           setData(coinGeckoData);
           setDataSource("coingecko");
+          cacheRef.current.set(key, { ...coinGeckoData, ts: Date.now() });
           return;
         } catch (cgError) {
           console.warn('CoinGecko failed, trying CryptoCompare:', cgError);
@@ -198,10 +236,11 @@ export default function PriceActionChart({
             throw new Error('CoinGecko failed and no CryptoCompare API key provided. Get a free key at https://www.cryptocompare.com/cryptopian/api-keys');
           }
           
-          const cryptoCompareData = await fetchFromCryptoCompare();
+          const cryptoCompareData = await fetchFromCryptoCompare(signal);
           console.log('CryptoCompare data loaded:', cryptoCompareData.prices.length, 'points');
           setData(cryptoCompareData);
           setDataSource("cryptocompare");
+          cacheRef.current.set(key, { ...cryptoCompareData, ts: Date.now() });
         }
       } catch (e) {
         console.error('All data sources failed:', e);
@@ -214,6 +253,10 @@ export default function PriceActionChart({
     if (contractAddress) {
       loadData();
     }
+    return () => {
+      cancelled = true;
+      abortController.abort();
+    };
   }, [coingeckoUrl, contractAddress, selectedTimeframe, chain, cryptocompareApiKey]);
 
   // Create chart
@@ -228,12 +271,6 @@ export default function PriceActionChart({
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) {
       console.log('No canvas context');
-      return;
-    }
-
-    const Chart = (window as any).Chart;
-    if (!Chart) {
-      console.log('Chart.js not available');
       return;
     }
 
@@ -276,7 +313,17 @@ export default function PriceActionChart({
             y: {
               display: true,
               ticks: {
-                callback: (val: any) => `$${Number(val).toFixed(6)}`,
+                callback: (val: any) => {
+                  const price = Number(val);
+                  // Determine appropriate decimal places based on price magnitude
+                  if (price === 0) return '$0';
+                  if (price >= 1000) return `$${price.toFixed(2)}`;
+                  if (price >= 1) return `$${price.toFixed(4)}`;
+                  if (price >= 0.01) return `$${price.toFixed(6)}`;
+                  // For very small prices, use scientific notation or more decimals
+                  if (price < 0.000001) return `$${price.toExponential(2)}`;
+                  return `$${price.toFixed(8)}`;
+                },
                 color: "#9ca3af",
               },
               grid: {
@@ -305,23 +352,19 @@ export default function PriceActionChart({
       console.error('Chart creation failed:', chartError);
       setError('Failed to create chart');
     }
+    return () => {
+      try {
+        if (chartRef.current) {
+          chartRef.current.destroy();
+          chartRef.current = null;
+        }
+      } catch {}
+    };
   }, [isChartReady, data]);
 
   return (
     <div className="mt-4 bg-neutral-900 border border-neutral-700 rounded-md p-4">
-      {/* Load Chart.js */}
-      <Script
-        src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          console.log('Chart.js loaded');
-          setIsChartReady(true);
-        }}
-        onError={(e) => {
-          console.error('Chart.js failed to load:', e);
-          setError('Failed to load chart library');
-        }}
-      />
+      {/* Chart.js is loaded dynamically in a useEffect */}
 
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
