@@ -11,6 +11,7 @@ import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
 import Image from "next/image";
 import CurrencyConverter from "@/components/Converter";
+import PriceActionChart from "@/components/PriceActionChart";
 import { getTokenByAddress, isValidContractAddress, TokenMetadata } from "@/lib/tokenRegistry";
 
 // Define types for token data and intervals
@@ -58,6 +59,9 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>("info");
 
+    const cryptocompareApiKey = process.env.CRYPTO_COMPARE_API_KEY;
+    console.log(cryptocompareApiKey);
+
     useEffect(() => {
         if (paramsPromise) {
             Promise.resolve(paramsPromise).then((resolvedParams) => {
@@ -70,10 +74,9 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
     useEffect(() => {
         async function fetchTokenData() {
-            console.log("Params received:", { chain, contractAddress });
-
+            
             if (!chain || !contractAddress) {
-                console.log("Missing chain or contractAddress:", { chain, contractAddress });
+                
                 setError("Invalid chain or contract address");
                 setLoading(false);
                 return;
@@ -83,7 +86,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
             
             // Validate contract address format
             if (!isValidContractAddress(contractAddress, chainLower)) {
-                console.log(`Invalid contract address format: ${contractAddress} for chain: ${chainLower}`);
+                
                 router.push(`/error?type=invalid_address&identifier=${encodeURIComponent(contractAddress)}&chain=${chainLower}`);
                 return;
             }
@@ -91,14 +94,14 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
             // Get token metadata from registry
             const metadata = getTokenByAddress(contractAddress);
             if (!metadata) {
-                console.log(`Token not found in registry: ${contractAddress}`);
+                
                 router.push(`/error?type=token_not_found&identifier=${encodeURIComponent(contractAddress)}&chain=${chainLower}`);
                 return;
             }
 
             // Verify chain matches
             if (metadata.chain !== chainLower) {
-                console.log(`Chain mismatch: expected "${metadata.chain}", got "${chainLower}"`);
+               
                 router.push(`/error?type=chain_mismatch&identifier=${encodeURIComponent(contractAddress)}&chain=${chainLower}`);
                 return;
             }
@@ -110,8 +113,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
             };
             
             setTokenMetadata(enhancedMetadata);
-            console.log("Validation passed, fetching data for:", { chain: chainLower, contractAddress, symbol: metadata.symbol });
-
+            
             try {
                 // Use the token symbol for API calls (for backward compatibility with existing APIs)
                 // const tokenSymbol = metadata.symbol;
@@ -119,13 +121,12 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     `/api/${chainLower}/token-metrics/${contractAddress}`,
                     `/api/${chainLower}/token-holders/${contractAddress}`,
                     `/api/${chainLower}/token-price/${contractAddress}`, // Now using contract address
-                    `/api/${chainLower}/total-burnt/${contractAddress}`,
+                    `/api/${chainLower}/burns-interval/${contractAddress}`,
                     `/api/${chainLower}/token-profile/${contractAddress}`,
                     `/api/${chainLower}/socials/${contractAddress}`,
                     `/api/${chainLower}/ca/${contractAddress}`,
                 ];
-                console.log("API endpoints:", apiEndpoints);
-
+                
                 const responses = await Promise.all(
                     apiEndpoints.map((endpoint) =>
                         fetch(endpoint)
@@ -153,7 +154,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     burn6h: burnsData?.burn6h || "No burns",
                     burn12h: burnsData?.burn12h || "No burns",
                     burn24h: burnsData?.burn24h || "No burns",
-                    totalburnt: metricsData?.totalBurnt || "N/A",
+                    totalburnt: metricsData?.burnedSupply || "N/A",
                     priceChange24h: priceData?.change24h || "N/A",
                     priceChange6h: priceData?.change6h || "N/A",
                     priceChange3h: priceData?.change3h || "N/A",
@@ -280,7 +281,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     async function copyAddress(address: string): Promise<void> {
         try {
             await navigator.clipboard.writeText(address);
-            console.log('Address copied to clipboard:', address);
+            
             alert('Address copied to clipboard!');
         } catch (error) {
             console.error('Failed to copy address:', error);
@@ -289,19 +290,20 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     }
 
     // Check if token has burns enabled
-    const showBurns = tokenMetadata?.isBurn === true;
+    const showBurns = tokenMetadata?.isBurn;
+    
 
     // Dev logging to verify burn visibility
     useEffect(() => {
         if (process.env.NODE_ENV === 'development') {
             try {
-                const reg = tokenMetadata?.address ? getTokenByAddress(tokenMetadata.address) : undefined;
-                console.log('[TokenPage] Burn visibility debug:', {
-                    contractAddress,
-                    tokenMetadata,
-                    registryLookup: reg,
-                    showBurns
-                });
+                // const reg = tokenMetadata?.address ? getTokenByAddress(tokenMetadata.address) : undefined;
+                // console.log('[TokenPage] Burn visibility debug:', {
+                //     contractAddress,
+                //     tokenMetadata,
+                //     registryLookup: reg,
+                //     showBurns
+                // });
             } catch (e) {
                 console.error('Failed registry lookup in TokenPage debug:', e);
             }
@@ -455,11 +457,11 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </h1>
                                         </div>
 
-                                        {tokenData.contract && (
+                                        {tokenData.contract && chain && (
                                             <CurrencyConverter
                                                 tokenSymbol={tokenMetadata.symbol.toUpperCase()}
                                                 tokenAddress={tokenData.contract}
-                                                tokenLogoUrl={tokenData.profile}
+                                                tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
                                             />
                                         )}
                                     </section>
@@ -509,24 +511,22 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 </div>
 
                                 {activeTab === "chart" && (
-                                    <div className="h-[48rem] mb-16 -mx-6">
-                                        <iframe
-                                            height="100%"
-                                            width="100%"
-                                            id="geckoterminal-embed"
-                                            title="GeckoTerminal Embed"
-                                            src={`/api/${chain}/chart/${contractAddress}`}
-                                            frameBorder="0"
-                                            allow="clipboard-write"
-                                            allowFullScreen
-                                        ></iframe>
+                                    <div className="mb-16">
+                                        {chain && contractAddress && (
+                                            <PriceActionChart
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol'}
+                                                contractAddress={contractAddress}
+                                            />
+                                        )}
                                     </div>
                                 )}
                             </div>
 
                             {/* Desktop Layout */}
                             <div className="hidden md:block">
+                                {/* Top Section: Token Info + Chart */}
                                 <section className="md:grid md:grid-cols-2 md:gap-8 mb-16">
+                                    {/* Left Side: Token Information */}
                                     <div>
                                         <div className="flex flex-row items-center gap-2 bg-black rounded-md p-4 mb-4">
                                             <img
@@ -637,11 +637,11 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </h1>
                                         </div>
 
-                                        {tokenData.contract && tokenMetadata && (
+                                        {tokenData.contract && tokenMetadata && chain && (
                                             <CurrencyConverter
                                                 tokenSymbol={tokenMetadata.symbol.toUpperCase()}
                                                 tokenAddress={tokenData.contract}
-                                                tokenLogoUrl={tokenData.profile}
+                                                tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
                                             />
                                         )}
 
@@ -673,45 +673,39 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         </div>
                                     </div>
 
+                                    {/* Right Side: Chart */}
                                     <div>
-                                        {showBurns && (
-                                            <>
-                                                <div className="p-4 rounded-lg shadow-lg">
-                                                    <BurnIntervals contractAddress={tokenMetadata?.address || ''} tokenSymbol={tokenMetadata?.symbol} />
-                                                </div>
-
-                                                <div className="mt-8 space-y-4">
-                                                </div>
-
-                                                <div className="mt-8">
-                                                    {chain && tokenMetadata?.address && (
-                                                        <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />
-                                                    )}
-                                                </div>
-                                            </>
+                                        {chain && contractAddress && (
+                                            <PriceActionChart
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol'}
+                                                contractAddress={contractAddress}
+                                            />
                                         )}
                                     </div>
                                 </section>
 
-                                <div className="mt-8 h-[36rem] mb-16 -mx-8">
-                                    <iframe
-                                        height="100%"
-                                        width="100%"
-                                        id="geckoterminal-embed"
-                                        title="GeckoTerminal Embed"
-                                        src={`/api/${chain}/chart/${contractAddress}`}
-                                        frameBorder="0"
-                                        allow="clipboard-write"
-                                        allowFullScreen
-                                    ></iframe>
-                                </div>
+                                {/* Bottom Section: Burns (if enabled) */}
+                                {showBurns && (
+                                    <section className="mt-8 mb-16">
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                            <div className="p-4 rounded-lg shadow-lg">
+                                                <BurnIntervals contractAddress={tokenMetadata?.address || ''} tokenSymbol={tokenMetadata?.symbol} />
+                                            </div>
+                                            <div>
+                                                {chain && tokenMetadata?.address && (
+                                                    <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />
+                                                )}
+                                            </div>
+                                        </div>
+                                    </section>
+                                )}
                             </div>
                         </>
                     )
                 )}
             </main>
             <div className="md:hidden">
-                <Footer onTabChange={setActiveTab} activeTab={activeTab} />
+                <Footer onTabChange={setActiveTab} activeTab={activeTab} showBurns={!!showBurns} />
             </div>
         </div>
     );

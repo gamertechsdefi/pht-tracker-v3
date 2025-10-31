@@ -123,7 +123,7 @@ export default function BurnsLeaderboardPage() {
           activeTokens.map(async (t) => {
             try {
               const chain = TOKEN_CHAIN_MAP[t] ?? "bsc";
-              const resp = await fetch(`/api/${chain}/total-burnt/${t}`);
+              const resp = await fetch(`/api/${chain}/burns-interval/${t}`);
               if (!resp.ok) {
                 return {
                   token: t,

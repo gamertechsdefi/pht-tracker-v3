@@ -173,11 +173,6 @@ export default function Home() {
               </tbody>
             </table>
           </div>
-          
-          {/* Optional: Scroll indicator for mobile */}
-          <div className="md:hidden bg-neutral-800 px-4 py-2 text-xs text-neutral-400 text-center">
-            ← Swipe to see more columns →
-          </div>
         </div>
       </div>
     </div>
