@@ -99,10 +99,10 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     bscscan: "https://bscscan.com/token/0x47a9b109cfb8f89d16e8b34036150ee112572435"
   },
   nct: {
-    website: "#",
-    twitter: "#",
-    telegram: "#",
-    bscscan: "#"
+    website: "http://newcatcoin.com",
+    twitter: "https://x.com/Official_NewCat",
+    telegram: "https://t.me/+AcuzdNDPd0FmN2E0",
+    bscscan: "https://bscscan.com/token/0xb5499B14Aca2A9B27F0E1E263186d93379485B64"
   },
   kitsune: {
     website: "https://kitsunetoken.xyz",

@@ -47,8 +47,13 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0xCbEaaD74dcB3a4227D0E6e67302402E06c119271", symbol: "zedek", name: "Zedek Token", chain: "bsc", isBurn: true },
   { address: "0xD000815DB567372C3C3d7070bEF9fB7a9532F9e8", symbol: "bengcat", name: "Bengal Cat Token", chain: "bsc", isBurn: true },
   { address: "0x47a9B109Cfb8f89D16e8B34036150eE112572435", symbol: "bcat", name: "BilliCat Token", chain: "bsc", isBurn: true },
+<<<<<<< Updated upstream
   { address: "0x9F1f27179fB25F11e1F8113Be830cfF5926C4605", symbol: "nct", name: "New Cat Token", chain: "bsc", isBurn: true },
   { address: "0xb6623B503d269f415B9B5c60CDDa3Aa4fE34Fd22", symbol: "kitsune", name: "Kitsune Token", chain: "bsc", isBurn: true },
+=======
+  { address: "0xb5499B14Aca2A9B27F0E1E263186d93379485B64", symbol: "nct", name: "New Cat Token", chain: "bsc", isBurn: false },
+  { address: "0xb6623B503d269f415B9B5c60CDDa3Aa4fE34Fd22", symbol: "kitsune", name: "Kitsune Token", chain: "bsc", isBurn: false },
+>>>>>>> Stashed changes
   { address: "0xe252FCb1Aa2E0876E9B5f3eD1e15B9b4d11A0b00", symbol: "crystalstones", name: "Crystal Stones", chain: "bsc", isBurn: true },
   { address: "0x4b87F578d6FaBf381f43bd2197fBB2A877da6ef8", symbol: "bft", name: "Big Five Token", chain: "bsc", isBurn: true },
   { address: "0x72928a49c4E88F382b0b6fF3E561F56Dd75485F9", symbol: "cross", name: "Cross Token", chain: "bsc", isBurn: true },
