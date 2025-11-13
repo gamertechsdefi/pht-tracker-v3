@@ -11,7 +11,6 @@ interface AssetChainTokenResponse {
   symbol: string;
   decimals: string;
   total_supply: string;
-  circulating_market_cap?: string;  // Common field name
   exchange_rate?: string;  // Sometimes used instead of coin_price
   coin_price?: string;
   holders: string;
