@@ -82,7 +82,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                 return;
             }
 
-            const chainLower = chain.toLowerCase() as 'bsc' | 'sol';
+            const chainLower = chain.toLowerCase() as 'bsc' | 'sol' | 'rwa';
             
             // Validate contract address format
             if (!isValidContractAddress(contractAddress, chainLower)) {
@@ -514,7 +514,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     <div className="mb-16">
                                         {chain && contractAddress && (
                                             <PriceActionChart
-                                                chain={chain.toLowerCase() as 'bsc' | 'sol'}
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
                                                 contractAddress={contractAddress}
                                             />
                                         )}
@@ -677,7 +677,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     <div>
                                         {chain && contractAddress && (
                                             <PriceActionChart
-                                                chain={chain.toLowerCase() as 'bsc' | 'sol'}
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
                                                 contractAddress={contractAddress}
                                             />
                                         )}

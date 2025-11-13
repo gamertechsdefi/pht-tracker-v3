@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
     const [, chain, identifier] = tokenPageMatch;
 
     // ALWAYS allow direct contract address access - no redirects needed
-    if (isValidContractAddress(identifier, chain as 'bsc' | 'sol')) {
+    if (isValidContractAddress(identifier, chain as 'bsc' | 'sol' | 'rwa')) {
       return NextResponse.next();
     }
 

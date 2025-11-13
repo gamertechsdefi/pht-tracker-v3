@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Chart from 'chart.js/auto';
 
-type SupportedChain = "bsc" | "sol";
+type SupportedChain = "bsc" | "sol" | "rwa";
 
 interface PriceActionChartProps {
   chain: SupportedChain;
