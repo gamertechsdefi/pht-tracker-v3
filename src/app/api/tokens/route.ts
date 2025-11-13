@@ -4,9 +4,6 @@ import { NextRequest, NextResponse } from 'next/server';
 const DEXSCREENER_API_URL = "https://api.dexscreener.com/latest/dex/tokens";
 const ASSETCHAIN_LIQUIDITY_API = "https://liquidity-pool-api.assetchain.org/tokens";
 
-// Re-export for backward compatibility
-export { TOKEN_MAP, getTokenBySymbol, getTokenByAddress };
-
 interface DexScreenerPair {
   priceUsd?: string;
   marketCap?: number;
@@ -191,7 +188,7 @@ function mergeTokenData(
 }
 
 // Enhanced function that fetches from BOTH APIs simultaneously
-export async function getTokenData(tokenIdentifier: string): Promise<TokenData | null> {
+async function getTokenData(tokenIdentifier: string): Promise<TokenData | null> {
   try {
     let tokenAddress: string;
 
@@ -234,17 +231,17 @@ export async function getTokenData(tokenIdentifier: string): Promise<TokenData |
 }
 
 // Legacy function for backward compatibility
-export async function getTokenDataBySymbol(tokenName: string): Promise<TokenData | null> {
+async function getTokenDataBySymbol(tokenName: string): Promise<TokenData | null> {
   return getTokenData(tokenName);
 }
 
 // New function specifically for contract addresses
-export async function getTokenDataByAddress(contractAddress: string): Promise<TokenData | null> {
+async function getTokenDataByAddress(contractAddress: string): Promise<TokenData | null> {
   return getTokenData(contractAddress);
 }
 
 // New function to fetch from specific source only
-export async function getTokenDataFromSource(
+async function getTokenDataFromSource(
   tokenIdentifier: string, 
   source: 'dexscreener' | 'assetchain'
 ): Promise<Partial<TokenData> | null> {
