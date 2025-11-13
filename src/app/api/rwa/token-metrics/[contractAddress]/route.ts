@@ -117,25 +117,3 @@ export async function GET(
     );
   }
 }
-
-// Helper function to calculate market cap if not provided
-function calculateMarketCap(tokenData: AssetChainTokenResponse): string {
-  try {
-    const price = parseFloat(tokenData.coin_price || tokenData.exchange_rate || "0");
-    const totalSupply = parseFloat(tokenData.total_supply || "0");
-    const decimals = parseInt(tokenData.decimals || "18");
-    
-    if (price === 0 || totalSupply === 0) {
-      return "0";
-    }
-    
-    // Adjust supply based on decimals
-    const adjustedSupply = totalSupply / Math.pow(10, decimals);
-    const marketCap = price * adjustedSupply;
-    
-    return marketCap.toString();
-  } catch (error) {
-    console.error("Market cap calculation error:", error);
-    return "0";
-  }
-}
