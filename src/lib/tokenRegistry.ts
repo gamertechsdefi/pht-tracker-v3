@@ -44,39 +44,39 @@ if (!supabaseUrl || !supabaseKey) {
   console.warn('Missing Supabase environment variables, falling back to empty registry');
 }
 
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+// const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 // In-memory cache to reduce database queries
-interface TokenCache {
-  data: Map<string, TokenMetadata>;
-  lastFetch: number;
-  ttl: number; // Time to live in milliseconds
-}
+// interface TokenCache {
+//   data: Map<string, TokenMetadata>;
+//   lastFetch: number;
+//   ttl: number; // Time to live in milliseconds
+// }
 
-const tokenCache: TokenCache = {
-  data: new Map(),
-  lastFetch: 0,
-  ttl: 5 * 60 * 1000, // 5 minutes
-};
+// const tokenCache: TokenCache = {
+//   data: new Map(),
+//   lastFetch: 0,
+//   ttl: 5 * 60 * 1000, // 5 minutes
+// };
 
 // Helper function to convert database token to TokenMetadata
-function dbTokenToMetadata(dbToken: DbToken): TokenMetadata {
-  const socials: SocialLinks = {};
-  if (dbToken.website) socials.website = dbToken.website;
-  if (dbToken.twitter) socials.twitter = dbToken.twitter;
-  if (dbToken.telegram) socials.telegram = dbToken.telegram;
-  if (dbToken.bscscan) socials.bscscan = dbToken.bscscan;
+// function dbTokenToMetadata(dbToken: DbToken): TokenMetadata {
+//   const socials: SocialLinks = {};
+//   if (dbToken.website) socials.website = dbToken.website;
+//   if (dbToken.twitter) socials.twitter = dbToken.twitter;
+//   if (dbToken.telegram) socials.telegram = dbToken.telegram;
+//   if (dbToken.bscscan) socials.bscscan = dbToken.bscscan;
 
-  return {
-    address: dbToken.address,
-    symbol: dbToken.symbol,
-    name: dbToken.name,
-    chain: dbToken.chain as 'bsc' | 'sol',
-    decimals: dbToken.decimals || 18,
-    socials: Object.keys(socials).length > 0 ? socials : undefined,
-    isBurn: dbToken.is_burn || false,
-  };
-}
+//   return {
+//     address: dbToken.address,
+//     symbol: dbToken.symbol,
+//     name: dbToken.name,
+//     chain: dbToken.chain as 'bsc' | 'sol',
+//     decimals: dbToken.decimals || 18,
+//     socials: Object.keys(socials).length > 0 ? socials : undefined,
+//     isBurn: dbToken.is_burn || false,
+//   };
+// }
 
 // Centralized token registry - single source of truth
 export const TOKEN_REGISTRY: TokenMetadata[] = [
@@ -159,7 +159,7 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   {address: "0xEc6943BB984AED25eC96986898721a7f8aB6212E", symbol: "", name: "WiCrypt Network", chain:"rwa", isBurn: false},
   { address: "0x7923C0f6FA3d1BA6EAFCAedAaD93e737Fd22FC4F", symbol: "cNGN", name: "cNGN", chain: "rwa", isBurn: false},
   {address: "0xbe231A8492487aAe6096278A97050FAe6B9d5BEc", symbol: "weth", name: "Wrapped Ether", chain: "rwa", isBurn: false},
-  
+
 ];
 
 // Utility functions for token lookups
