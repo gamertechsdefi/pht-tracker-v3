@@ -1,4 +1,4 @@
-import { TOKEN_MAP, getTokenBySymbol, getTokenByAddress, TOKEN_REGISTRY } from '@/lib/tokenRegistry';
+import { TOKEN_MAP, TOKEN_REGISTRY } from '@/lib/tokenRegistry';
 import { NextRequest, NextResponse } from 'next/server';
 
 const DEXSCREENER_API_URL = "https://api.dexscreener.com/latest/dex/tokens";
@@ -228,16 +228,6 @@ async function getTokenData(tokenIdentifier: string): Promise<TokenData | null> 
     console.error(`Failed to fetch token data for ${tokenIdentifier}:`, error);
     return null;
   }
-}
-
-// Legacy function for backward compatibility
-async function getTokenDataBySymbol(tokenName: string): Promise<TokenData | null> {
-  return getTokenData(tokenName);
-}
-
-// New function specifically for contract addresses
-async function getTokenDataByAddress(contractAddress: string): Promise<TokenData | null> {
-  return getTokenData(contractAddress);
 }
 
 // New function to fetch from specific source only
