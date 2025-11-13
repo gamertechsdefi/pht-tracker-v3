@@ -12,7 +12,6 @@ interface AssetChainTokenResponse {
   decimals: string;
   total_supply: string;
   circulating_market_cap?: string;  // Common field name
-  market_cap?: string;
   exchange_rate?: string;  // Sometimes used instead of coin_price
   coin_price?: string;
   holders: string;
@@ -97,16 +96,7 @@ export async function GET(
     // Log the raw response to debug (remove in production)
     console.log('AssetChain API Response:', JSON.stringify(tokenData, null, 2));
 
-    // Try multiple field names for market cap
-    const marketCap = tokenData.market_cap 
-      || tokenData.circulating_market_cap 
-      || calculateMarketCap(tokenData);
-
-    // Try multiple field names for price
-    const price = tokenData.coin_price 
-      || tokenData.exchange_rate 
-      || "0";
-
+ 
     const tokenPriceData: TokenPriceResponse = {
       token: tokenData.symbol?.toUpperCase() || tokenMetadata.symbol.toUpperCase(),
       contractAddress: tokenAddress,

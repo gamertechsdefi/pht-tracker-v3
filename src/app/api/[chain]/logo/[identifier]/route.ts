@@ -112,7 +112,7 @@ export async function GET(
               console.log(`Found logo in local files: ${filename}`);
               break;
             }
-          } catch (err) {
+          } catch {
             // File doesn't exist locally, continue
           }
         }
