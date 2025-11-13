@@ -1,5 +1,5 @@
 // Database-powered token registry using Supabase
-import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@supabase/supabase-js';
 
 // Types
 export interface SocialLinks {
@@ -20,29 +20,29 @@ export interface TokenMetadata {
 }
 
 // Database token type (matches Supabase table structure)
-interface DbToken {
-  id: number;
-  address: string;
-  symbol: string;
-  name: string;
-  chain: string;
-  decimals?: number;
-  is_burn?: boolean;
-  website?: string;
-  twitter?: string;
-  telegram?: string;
-  bscscan?: string;
-  created_at: string;
-  updated_at: string;
-}
+// interface DbToken {
+//   id: number;
+//   address: string;
+//   symbol: string;
+//   name: string;
+//   chain: string;
+//   decimals?: number;
+//   is_burn?: boolean;
+//   website?: string;
+//   twitter?: string;
+//   telegram?: string;
+//   bscscan?: string;
+//   created_at: string;
+//   updated_at: string;
+// }
 
 // Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+// const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn('Missing Supabase environment variables, falling back to empty registry');
-}
+// if (!supabaseUrl || !supabaseKey) {
+//   console.warn('Missing Supabase environment variables, falling back to empty registry');
+// }
 
 // const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
