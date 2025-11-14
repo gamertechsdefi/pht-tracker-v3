@@ -10,14 +10,14 @@ interface AssetChainTokenResponse {
   name: string;
   symbol: string;
   decimals: string;
-  total_supply: string;
+  totalSupply: string;
   exchange_rate?: string;  // Sometimes used instead of coin_price
   coin_price?: string;
   holders: string;
   type: string;
 }
 
-interface TokenPriceResponse {
+interface TokenMetricsResponse {
   token: string;
   contractAddress: string;
   totalSupply: string;
@@ -25,18 +25,19 @@ interface TokenPriceResponse {
   decimals: string;
   name: string;
   type: string;
+  circulatingSupply: string;
 }
 
 interface ErrorResponse {
   error: string;
 }
 
-const ASSETCHAIN_API_BASE = "https://scan.assetchain.org/api/v2";
+const ASSETCHAIN_API_BASE = "https://liquidity-pool-api.assetchain.org";
 
 export async function GET(
   _request: NextRequest,
   context: { params: Promise<RouteParams> }
-): Promise<NextResponse<TokenPriceResponse | ErrorResponse>> {
+): Promise<NextResponse<TokenMetricsResponse | ErrorResponse>> {
   try {
     const params = await context.params;
     const { contractAddress } = params;
@@ -91,23 +92,20 @@ export async function GET(
     }
 
     const tokenData: AssetChainTokenResponse = await tokenResponse.json();
-
-    // Log the raw response to debug (remove in production)
-    console.log('AssetChain API Response:', JSON.stringify(tokenData, null, 2));
-
  
-    const tokenPriceData: TokenPriceResponse = {
+    const tokenMetricsData: TokenMetricsResponse = {
       token: tokenData.symbol?.toUpperCase() || tokenMetadata.symbol.toUpperCase(),
       contractAddress: tokenAddress,
 
-      totalSupply: tokenData.total_supply || "0",
+      totalSupply: tokenData.totalSupply || "0",
       holders: tokenData.holders || "0",
       decimals: tokenData.decimals || "18",
       name: tokenData.name || tokenMetadata.name,
       type: tokenData.type || "ERC-20",
+      circulatingSupply: tokenData.totalSupply,
     };
 
-    return NextResponse.json(tokenPriceData);
+    return NextResponse.json(tokenMetricsData);
 
   } catch (error) {
     console.error("Token price API error:", error);

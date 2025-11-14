@@ -112,15 +112,6 @@ export default function ChainPage({ params }: PageProps) {
     <div className="container mx-auto">
       <Header />
       <div className="px-4 pt-8">
-        {/* Chain Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            {chain.toUpperCase()} Tokens
-          </h1>
-          <p className="text-gray-400">
-            Showing {tokens.length} token{tokens.length !== 1 ? 's' : ''} on {chain.toUpperCase()}
-          </p>
-        </div>
 
         <div className="shadow rounded-lg overflow-hidden">
           {/* Mobile: Horizontal scroll wrapper */}
@@ -140,9 +131,7 @@ export default function ChainPage({ params }: PageProps) {
                   <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[120px]">
                     24h Volume
                   </th>
-                  <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[100px]">
-                    24h Change
-                  </th>
+                
                 </tr>
               </thead>
               <tbody>
@@ -222,22 +211,7 @@ export default function ChainPage({ params }: PageProps) {
                           {token.volume === 'N/A' ? 'N/A' : `$${formatMarketCap(token.volume)}`}
                         </span>
                       </td>
-
-                      {/* 24h Change column */}
-                      <td className="px-5 py-4 text-sm min-w-[100px]">
-                        {token.change24h === 'N/A' ? (
-                          <span className="text-gray-400">N/A</span>
-                        ) : (
-                          <span className={`whitespace-nowrap ${
-                            parseFloat(String(token.change24h)) >= 0 
-                              ? 'text-green-400' 
-                              : 'text-red-400'
-                          }`}>
-                            {parseFloat(String(token.change24h)) >= 0 ? '+' : ''}
-                            {parseFloat(String(token.change24h)).toFixed(2)}%
-                          </span>
-                        )}
-                      </td>
+                     
                     </tr>
                   ))
                 )}
