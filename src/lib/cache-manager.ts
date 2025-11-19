@@ -3,40 +3,40 @@ import { redis } from './redis';
 /**
  * Cache Statistics Interface
  */
-interface CacheStats {
-  totalKeys: number;
-  keysByType: {
-    logos: number;
-    dexscreener: number;
-    assetchain: number;
-    tokenData: number;
-    other: number;
-  };
-  estimatedSize: string;
-}
+// interface CacheStats {
+//   totalKeys: number;
+//   keysByType: {
+//     logos: number;
+//     dexscreener: number;
+//     assetchain: number;
+//     tokenData: number;
+//     other: number;
+//   };
+//   estimatedSize: string;
+// }
 
 /**
  * Get all cache keys
  */
-async function getAllCacheKeys(): Promise<string[]> {
-  try {
-    // Note: Upstash Redis doesn't support SCAN in REST API
-    // We'll need to track keys manually or use a different approach
-    // For now, we'll return empty array and recommend using specific clear functions
-    console.warn('Getting all keys is not supported in Upstash REST API');
-    return [];
-  } catch (error) {
-    console.error('Error getting cache keys:', error);
-    return [];
-  }
-}
+// async function getAllCacheKeys(): Promise<string[]> {
+//   try {
+//     // Note: Upstash Redis doesn't support SCAN in REST API
+//     // We'll need to track keys manually or use a different approach
+//     // For now, we'll return empty array and recommend using specific clear functions
+//     console.warn('Getting all keys is not supported in Upstash REST API');
+//     return [];
+//   } catch (error) {
+//     console.error('Error getting cache keys:', error);
+//     return [];
+//   }
+// }
 
 /**
  * Clear all DexScreener cache
  */
 export async function clearDexScreenerCache(): Promise<number> {
   console.log('Clearing DexScreener cache...');
-  let count = 0;
+  const count = 0;
   
   // Since we can't scan keys, we'll need to clear based on known tokens
   // This would require importing TOKEN_REGISTRY, but to avoid circular deps,
@@ -50,7 +50,7 @@ export async function clearDexScreenerCache(): Promise<number> {
  */
 export async function clearAssetChainCache(): Promise<number> {
   console.log('Clearing AssetChain cache...');
-  let count = 0;
+  const count = 0;
   
   return count;
 }
@@ -113,7 +113,7 @@ export async function getTokenCacheInfo(tokenAddress: string) {
     try {
       const cached = await redis.get(key);
       results[source] = !!cached;
-    } catch (error) {
+    } catch {
       results[source] = false;
     }
   }
