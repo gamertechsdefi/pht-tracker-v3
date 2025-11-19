@@ -1,8 +1,12 @@
 import { TOKEN_MAP, TOKEN_REGISTRY } from '@/lib/tokenRegistry';
 import { NextRequest, NextResponse } from 'next/server';
+import { redis } from '@/lib/redis';
 
 const DEXSCREENER_API_URL = "https://api.dexscreener.com/latest/dex/tokens";
 const ASSETCHAIN_LIQUIDITY_API = "https://liquidity-pool-api.assetchain.org/tokens";
+
+// Cache TTL in seconds
+const CACHE_TTL = 60; // 1 minute for price data (needs to be fresh)
 
 interface DexScreenerPair {
   priceUsd?: string;
@@ -61,9 +65,19 @@ interface TokenData {
   };
 }
 
-// Fetch from AssetChain Liquidity Pool API
+// Fetch from AssetChain Liquidity Pool API with caching
 async function fetchFromAssetChain(tokenAddress: string): Promise<Partial<TokenData> | null> {
+  const cacheKey = `assetchain:${tokenAddress.toLowerCase()}`;
+
   try {
+    // Try cache first
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log(`✓ AssetChain cache hit: ${tokenAddress}`);
+      return cached as Partial<TokenData>;
+    }
+
+    // Fetch from API
     const url = `${ASSETCHAIN_LIQUIDITY_API}?address=${tokenAddress}`;
     const response = await fetch(url);
 
@@ -80,7 +94,7 @@ async function fetchFromAssetChain(tokenAddress: string): Promise<Partial<TokenD
 
     const tokenData = data.items[0];
 
-    return {
+    const result: Partial<TokenData> = {
       token: tokenData.address,
       price: tokenData.usdPrice || "N/A",
       marketCap: tokenData.marketCap || "N/A",
@@ -91,15 +105,31 @@ async function fetchFromAssetChain(tokenAddress: string): Promise<Partial<TokenD
       isVerified: tokenData.isVerified,
       iconUrl: tokenData.iconUrl,
     };
+
+    // Cache the result
+    await redis.setex(cacheKey, CACHE_TTL, result);
+    console.log(`✓ AssetChain cached: ${tokenAddress}`);
+
+    return result;
   } catch (error) {
     console.error(`Failed to fetch from AssetChain for ${tokenAddress}:`, error);
     return null;
   }
 }
 
-// Fetch from DexScreener API
+// Fetch from DexScreener API with caching
 async function fetchFromDexScreener(tokenAddress: string): Promise<Partial<TokenData> | null> {
+  const cacheKey = `dexscreener:${tokenAddress.toLowerCase()}`;
+
   try {
+    // Try cache first
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log(`✓ DexScreener cache hit: ${tokenAddress}`);
+      return cached as Partial<TokenData>;
+    }
+
+    // Fetch from API
     const url = `${DEXSCREENER_API_URL}/${tokenAddress}`;
     const response = await fetch(url);
 
@@ -116,7 +146,7 @@ async function fetchFromDexScreener(tokenAddress: string): Promise<Partial<Token
 
     const pair = data.pairs[0];
 
-    return {
+    const result: Partial<TokenData> = {
       token: tokenAddress,
       price: pair.priceUsd || "N/A",
       marketCap: pair.marketCap?.toString() || "N/A",
@@ -124,6 +154,12 @@ async function fetchFromDexScreener(tokenAddress: string): Promise<Partial<Token
       change24h: pair.priceChange?.h24 || "N/A",
       liquidity: pair.liquidity?.usd || "N/A",
     };
+
+    // Cache the result
+    await redis.setex(cacheKey, CACHE_TTL, result);
+    console.log(`✓ DexScreener cached: ${tokenAddress}`);
+
+    return result;
   } catch (error) {
     console.error(`Failed to fetch from DexScreener for ${tokenAddress}:`, error);
     return null;

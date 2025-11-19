@@ -6,12 +6,14 @@ interface CurrencyConverterProps {
   tokenSymbol: string;
   tokenAddress: string;
   tokenLogoUrl?: string;
+  chain?: string;
 }
 
 const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
   tokenSymbol,
   tokenAddress,
-  tokenLogoUrl
+  tokenLogoUrl,
+  chain = 'bsc'
 }) => {
   const [inputValue, setInputValue] = useState('1');
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
@@ -19,11 +21,44 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
   const [rates, setRates] = useState<{ usd: number; bnb: number }>({ usd: 0, bnb: 0 });
   const [loading, setLoading] = useState(true);
 
+  // Determine native currency label based on chain
+  const nativeCurrency = chain === 'sol' ? 'SOL' : 'WBNB';
+  const showNativeCurrency = chain !== 'rwa'; // Hide native currency for RWA
+
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        console.log('Fetching rates for token:', tokenAddress);
-        // Using DexScreener API to get token data from BSC
+        console.log('Fetching rates for token:', tokenAddress, 'chain:', chain);
+        
+        // For RWA tokens, use the internal API which handles AssetChain
+        if (chain === 'rwa') {
+          const response = await fetch(`/api/${chain}/token-price/${tokenAddress}`);
+          
+          if (!response.ok) {
+            console.error('API Error:', await response.text());
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log('RWA Token Price API Response:', data);
+          
+          // The API returns { price: number, lastUpdated: string }
+          const usdRate = data.price || 0;
+          
+          // For RWA, we don't have BNB pricing, set to 0
+          const bnbRate = 0;
+          
+          console.log('Parsed RWA rates - USD:', usdRate);
+          
+          setRates({
+            usd: usdRate,
+            bnb: bnbRate,
+          });
+          setLoading(false);
+          return;
+        }
+        
+        // For BSC/SOL tokens, use DexScreener API
         const response = await fetch(
           `https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`
         );
@@ -36,18 +71,19 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
         const data = await response.json();
         console.log('DexScreener API Response:', data);
         
-        // DexScreener returns pairs, we'll use the first BSC pair or the one with highest liquidity
-        const bscPairs = data.pairs?.filter((pair: any) => 
-          pair.chainId === 'bsc' || pair.chainId === 'binance'
+        // DexScreener returns pairs, filter by chain
+        const chainId = chain === 'bsc' ? ['bsc', 'binance'] : [chain];
+        const pairs = data.pairs?.filter((pair: any) => 
+          chainId.includes(pair.chainId)
         ) || [];
         
         // Sort by liquidity and get the most liquid pair
-        const mainPair = bscPairs.sort((a: any, b: any) => 
+        const mainPair = pairs.sort((a: any, b: any) => 
           (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)
         )[0];
         
         if (!mainPair) {
-          console.error('No BSC pairs found for this token');
+          console.error(`No ${chain} pairs found for this token`);
           setLoading(false);
           return;
         }
@@ -55,10 +91,10 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
         // Get USD price directly from DexScreener
         const usdRate = parseFloat(mainPair.priceUsd) || 0;
         
-        // Get BNB price - priceNative is typically in BNB for BSC pairs
+        // Get native token price (BNB for BSC, SOL for Solana)
         const bnbRate = parseFloat(mainPair.priceNative) || 0;
         
-        console.log('Parsed rates - USD:', usdRate, 'BNB:', bnbRate);
+        console.log('Parsed rates - USD:', usdRate, 'Native:', bnbRate);
         console.log('Pair info:', {
           dex: mainPair.dexId,
           liquidity: mainPair.liquidity?.usd,
@@ -76,7 +112,7 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
       }
     };
     fetchRates();
-  }, [tokenAddress]);
+  }, [tokenAddress, chain]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -147,7 +183,9 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
           className="bg-green-600 text-white px-3 py-1 rounded-md appearance-none focus:outline-none"
         >
           <option value="USD">USD</option>
-          <option value="WBNB">WBNB</option>
+          {showNativeCurrency && (
+            <option value="WBNB">{nativeCurrency}</option>
+          )}
         </select>
       </div>
     </div>

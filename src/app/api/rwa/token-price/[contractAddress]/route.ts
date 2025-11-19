@@ -13,7 +13,7 @@ interface LiquidityPoolTokenItem {
   pastDayVolume: string;
   iconUrl: string;
   description: string;
-  liquidity: string;
+  currentTvl: string;
 }
 
 interface LiquidityPoolApiResponse {
@@ -102,7 +102,7 @@ export async function GET(
       price: tokenData.usdPrice,
       marketCap: tokenData.marketCap,
       priceChangePercentage: "0", // Not directly available - needs historical tracking
-      liquidity: tokenData.liquidity,
+      liquidity: tokenData.currentTvl,
       volume: tokenData.pastDayVolume,
       fdv: tokenData.marketCap,
     };

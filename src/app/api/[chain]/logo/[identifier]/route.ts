@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTokenByAddress, getTokenBySymbol, isValidContractAddress } from "@/lib/tokenRegistry";
 import { downloadFile, getContentType } from "@/lib/supabase";
+import { redis } from "@/lib/redis";
 import { readFile } from "fs/promises";
 import { join } from "path";
 
@@ -46,12 +47,37 @@ export async function GET(
       }, { status: 400 });
     }
 
-    // Use the contract address to find the logo file in Supabase storage
+    // Use the contract address to find the logo file
     const contractAddress = tokenMetadata.address;
     const fileExtensions = [".png", ".jpg", ".jpeg", ".webp"];
     let fileBuffer: Buffer | null = null;
     let contentType = "image/png";
     let foundFilename = "";
+
+    // Create Redis cache key
+    const redisKey = `logo:${chainLower}:${contractAddress.toLowerCase()}`;
+
+    // Try to get from Redis cache first
+    try {
+      const cachedData = await redis.get(redisKey);
+      if (cachedData && typeof cachedData === 'object' && 'buffer' in cachedData && 'contentType' in cachedData) {
+        console.log(`Found logo in Redis cache: ${redisKey}`);
+        const cached = cachedData as { buffer: string; contentType: string };
+        const buffer = Buffer.from(cached.buffer, 'base64');
+        
+        return new NextResponse(buffer as unknown as BodyInit, {
+          headers: {
+            "Content-Type": cached.contentType,
+            "Cache-Control": "public, max-age=86400",
+            "Content-Length": buffer.length.toString(),
+            "X-Cache": "HIT",
+          },
+        });
+      }
+    } catch (redisError) {
+      console.error('Redis get error:', redisError);
+      // Continue without cache
+    }
 
     // Check for file with any of the supported extensions using contract address
     // Try both original case and lowercase versions
@@ -128,12 +154,26 @@ export async function GET(
 
     console.log(`Found logo: ${foundFilename} (${fileBuffer.length} bytes)`);
 
+    // Store in Redis cache for future requests (TTL: 7 days = 604800 seconds)
+    try {
+      const base64Buffer = fileBuffer.toString('base64');
+      await redis.setex(redisKey, 604800, {
+        buffer: base64Buffer,
+        contentType: contentType,
+      });
+      console.log(`Stored logo in Redis cache: ${redisKey}`);
+    } catch (redisError) {
+      console.error('Redis set error:', redisError);
+      // Continue without caching
+    }
+
     // Return the image as a response
     return new NextResponse(fileBuffer as unknown as BodyInit, {
       headers: {
         "Content-Type": contentType,
         "Cache-Control": "public, max-age=86400", // Cache for 24 hours
         "Content-Length": fileBuffer.length.toString(),
+        "X-Cache": "MISS",
       },
     });
 

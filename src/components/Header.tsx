@@ -79,7 +79,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     anndy: "bsc",
     light: "bsc",
     zonic: "bsc",
-    
+
 };
 
 // Full name to symbol mapping for suggestions
@@ -137,7 +137,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "Baby Priceless": "bp",
     "LeadAI Token": "lai",
     "BABY DEW": "babydew",
-    "SATERIA": "sat",    
+    "SATERIA": "sat",
     "ORBITAL": "orb",
     "CaptainBNB": "captainbnb",
     "首席模因官": "anndy",
@@ -267,7 +267,7 @@ export default function Header() {
     }, [isSearchOpen, sortMetric]);
 
     return (
-        <header className="sticky top-4 z-50 mx-4 px-4 py-2 rounded-md bg-white text-neutral-900">
+        <header className="sticky top-0 z-50 px-4 py-2 bg-white text-neutral-900">
             <nav className="flex flex-row justify-between items-center">
                 <Link href="/" className="font-bold flex flex-row items-center">
                     <Image
@@ -297,31 +297,31 @@ export default function Header() {
                             className="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 px-3 py-2 rounded-lg transition duration-200"
                             aria-label="Select Chain"
                         >
-                            <svg 
-                                className="h-5 w-5" 
-                                fill="none" 
-                                stroke="currentColor" 
+                            <svg
+                                className="h-5 w-5"
+                                fill="none"
+                                stroke="currentColor"
                                 viewBox="0 0 24 24"
                             >
-                                <path 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round" 
-                                    strokeWidth="2" 
-                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" 
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
                                 />
                             </svg>
                             <span className="hidden sm:inline text-sm font-medium">Chains</span>
-                            <svg 
+                            <svg
                                 className={`h-4 w-4 transition-transform duration-200 ${isChainDropdownOpen ? 'rotate-180' : ''}`}
-                                fill="none" 
-                                stroke="currentColor" 
+                                fill="none"
+                                stroke="currentColor"
                                 viewBox="0 0 24 24"
                             >
-                                <path 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round" 
-                                    strokeWidth="2" 
-                                    d="M19 9l-7 7-7-7" 
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M19 9l-7 7-7-7"
                                 />
                             </svg>
                         </button>
@@ -329,12 +329,12 @@ export default function Header() {
                         {/* Dropdown Menu */}
                         {isChainDropdownOpen && (
                             <>
-                                <div 
-                                    className="fixed inset-0 z-10" 
+                                <div
+                                    className="fixed inset-0 z-10"
                                     onClick={() => setIsChainDropdownOpen(false)}
                                 />
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-20">
-                                    <Link 
+                                    <Link
                                         href="/bsc"
                                         className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
                                         onClick={() => setIsChainDropdownOpen(false)}
@@ -347,7 +347,7 @@ export default function Header() {
                                         />
                                         <span className="text-sm font-medium">BSC Chain</span>
                                     </Link>
-                                    <Link 
+                                    <Link
                                         href="/rwa"
                                         className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
                                         onClick={() => setIsChainDropdownOpen(false)}
@@ -360,36 +360,24 @@ export default function Header() {
                                         />
                                         <span className="text-sm font-medium">RWA Chain</span>
                                     </Link>
-                                    <Link 
-                                        href="/sol"
-                                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
-                                        onClick={() => setIsChainDropdownOpen(false)}
-                                    >
-                                        <Image
-                                            src="/sol-logo.png"
-                                            alt="Solana"
-                                            width={24}
-                                            height={24}
-                                        />
-                                        <span className="text-sm font-medium">Solana Chain</span>
-                                    </Link>
+                                    
                                     <div className="border-t border-neutral-200 my-2"></div>
-                                    <Link 
+                                    <Link
                                         href="/"
                                         className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
                                         onClick={() => setIsChainDropdownOpen(false)}
                                     >
-                                        <svg 
-                                            className="h-5 w-5 text-neutral-600" 
-                                            fill="none" 
-                                            stroke="currentColor" 
+                                        <svg
+                                            className="h-5 w-5 text-neutral-600"
+                                            fill="none"
+                                            stroke="currentColor"
                                             viewBox="0 0 24 24"
                                         >
-                                            <path 
-                                                strokeLinecap="round" 
-                                                strokeLinejoin="round" 
-                                                strokeWidth="2" 
-                                                d="M4 6h16M4 12h16M4 18h16" 
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M4 6h16M4 12h16M4 18h16"
                                             />
                                         </svg>
                                         <span className="text-sm font-medium">All Chains</span>

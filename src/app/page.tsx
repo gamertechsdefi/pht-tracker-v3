@@ -39,15 +39,42 @@ function formatMarketCap(marketCap: number | string): string {
 }
 
 function formatPrice(price: number | string): { display: string; isExponential: boolean; zeros?: number; rest?: string } {
-  const priceStr = String(price);
+  // Handle N/A or invalid values
+  if (price === 'N/A' || price === null || price === undefined || price === '') {
+    return {
+      display: 'N/A',
+      isExponential: false,
+    };
+  }
 
+  // Convert to number if it's a string
+  let priceNum: number;
+  if (typeof price === 'string') {
+    // Remove any non-numeric characters except decimal point and minus sign
+    const cleanedPrice = price.replace(/[^0-9.-]/g, '');
+    priceNum = parseFloat(cleanedPrice);
+  } else {
+    priceNum = price;
+  }
+
+  // Check if conversion failed
+  if (isNaN(priceNum)) {
+    return {
+      display: 'N/A',
+      isExponential: false,
+    };
+  }
+
+  const priceStr = priceNum.toString();
+
+  // Check for very small numbers with many leading zeros
   if (priceStr.includes('.')) {
     const decimalPart = priceStr.split('.')[1];
-    if (decimalPart.startsWith('00000')) {
+    if (decimalPart && decimalPart.startsWith('00000')) {
       const leadingZeros = decimalPart.match(/^0+/)?.[0].length || 0;
-      const restOfNumber = decimalPart.substring(leadingZeros);
+      const restOfNumber = decimalPart.substring(leadingZeros).substring(0, 6); // Limit to 6 digits
       return {
-        display: `0.`,
+        display: '$0.',
         isExponential: true,
         zeros: leadingZeros,
         rest: restOfNumber,
@@ -55,8 +82,18 @@ function formatPrice(price: number | string): { display: string; isExponential: 
     }
   }
 
+  // For regular numbers, format with appropriate decimal places
+  let formattedPrice: string;
+  if (priceNum >= 1) {
+    formattedPrice = priceNum.toFixed(2);
+  } else if (priceNum >= 0.01) {
+    formattedPrice = priceNum.toFixed(4);
+  } else {
+    formattedPrice = priceNum.toFixed(8);
+  }
+
   return {
-    display: priceStr,
+    display: '$' + formattedPrice,
     isExponential: false,
   };
 }
@@ -91,13 +128,13 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="container mx-auto">
+    <div className="">
       <Header />
-      <div className="px-4 pt-8">
-        <div className="shadow rounded-lg overflow-hidden">
+      <div className=" pt-8">
+        <div className="shadow overflow-hidden">
           {/* Mobile: Horizontal scroll wrapper */}
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[400px] bg-neutral-900">
+            <table className="w-full min-w-[400px]">
               <thead>
                 <tr className="bg-orange-500">
                   <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left sticky left-0 bg-orange-500 z-20 min-w-[120px]">
@@ -114,15 +151,15 @@ export default function Home() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={3} className="bg-neutral-700 text-center py-10 text-white">
+                    <td colSpan={3} className="bg-[##440808] text-center py-10 text-white">
                       Loading tokens...
                     </td>
                   </tr>
                 ) : (
                   tokens.map((token: Token) => (
-                    <tr key={token.address} className="border-b border-neutral-800 hover:bg-neutral-800 transition-colors">
+                    <tr key={token.address} className="border-b border-orange-300 hover:bg-orange-400 transition-colors">
                       {/* Token column - sticky on mobile */}
-                      <td className="px-5 py-4 text-sm sticky left-0 bg-neutral-900 z-10 min-w-[120px]">
+                      <td className="px-5 py-4 text-sm sticky left-0 bg-[#440808] z-10 min-w-[120px]">
                         <Link href={`/${token.chain}/${token.address}`} className="flex items-center hover:opacity-80">
                           <img
                             src={`/images/${token.chain}/token-logos/${token.address.toLowerCase()}.png`}
@@ -157,7 +194,7 @@ export default function Home() {
                                 }}
                               />
                             </div>
-                            <span className="text-gray-400 text-xs whitespace-nowrap">
+                            <span className="text-neutral-200 text-xs whitespace-nowrap">
                               {token.name}
                             </span>
                           </div>
@@ -169,6 +206,9 @@ export default function Home() {
                         <span className="text-white whitespace-nowrap">
                           {(() => {
                             const { display, isExponential, zeros, rest } = formatPrice(token.price);
+                            if (display === 'N/A') {
+                              return <span className="text-neutral-400">N/A</span>;
+                            }
                             if (!isExponential) return display;
                             return (
                               <>

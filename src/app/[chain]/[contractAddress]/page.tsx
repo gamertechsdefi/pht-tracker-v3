@@ -13,6 +13,7 @@ import Image from "next/image";
 import CurrencyConverter from "@/components/Converter";
 import PriceActionChart from "@/components/PriceActionChart";
 import { getTokenByAddress, isValidContractAddress, TokenMetadata } from "@/lib/tokenRegistry";
+import { useTrackActiveToken } from "@/hooks/useTrackActiveToken";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -54,10 +55,13 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const [tokenMetadata, setTokenMetadata] = useState<TokenMetadata | null>(null);
 
     const [tokenData, setTokenData] = useState<TokenData | null>(null);
-    const [socialLinks, setSocialLinks] = useState<{ website: string; twitter: string; telegram: string; bscscan: string } | null>(null);
+    const [socialLinks, setSocialLinks] = useState<{ website: string; twitter: string; telegram: string; scan: string } | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>("info");
+
+    // Track this token as actively viewed for priority cache refresh
+    useTrackActiveToken(contractAddress || undefined, chain || undefined);
 
     const cryptocompareApiKey = process.env.CRYPTO_COMPARE_API_KEY;
     console.log(cryptocompareApiKey);
@@ -370,7 +374,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                         <FaTelegramPlane className="h-6 w-6" />
                                                     </a>
-                                                    <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                    <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                         <Image src="/bscscan.png" alt="BscScan Logo" width={10} height={10} className="h-6 w-6" />
                                                     </a>
                                                 </div>
@@ -462,6 +466,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 tokenSymbol={tokenMetadata.symbol.toUpperCase()}
                                                 tokenAddress={tokenData.contract}
                                                 tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
+                                                chain={chain}
                                             />
                                         )}
                                     </section>
@@ -550,7 +555,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                         <FaTelegramPlane className="h-6 w-6" />
                                                     </a>
-                                                    <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                    <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                         <Image src="/bscscan.png" alt="BscScan Logo" width={10} height={10} className="h-6 w-6" />
                                                     </a>
                                                 </div>
@@ -642,6 +647,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 tokenSymbol={tokenMetadata.symbol.toUpperCase()}
                                                 tokenAddress={tokenData.contract}
                                                 tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
+                                                chain={chain}
                                             />
                                         )}
 
