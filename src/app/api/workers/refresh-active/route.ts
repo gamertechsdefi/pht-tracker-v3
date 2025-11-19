@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { redis } from '@/lib/redis';
-import { getTokenByAddress } from '@/lib/tokenRegistry';
+// import { getTokenByAddress } from '@/lib/tokenRegistry';
 
 const DEXSCREENER_API_URL = "https://api.dexscreener.com/latest/dex/tokens";
 const ASSETCHAIN_LIQUIDITY_API = "https://liquidity-pool-api.assetchain.org/tokens";
