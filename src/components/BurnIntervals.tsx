@@ -98,7 +98,7 @@ export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnInte
 
         // Fetch burn data and token price concurrently
         const [burnResponse, priceResponse] = await Promise.all([
-          fetch(`/api/bsc/burns-interval/${encodeURIComponent(contractAddress)}`).then((res) => {
+          fetch(`/api/bsc/total-burnt/${encodeURIComponent(contractAddress)}`).then((res) => {
             if (!res.ok) throw new Error("Failed to fetch burn intervals");
             return res.json();
           }),
