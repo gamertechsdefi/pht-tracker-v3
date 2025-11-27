@@ -8,12 +8,14 @@ interface RouteParams {
  * Example external URL:
  * https://liquidity-pool-api.assetchain.org/tokens/<address>/price-chart?selector=D
  */
-export async function GET(
-	request: NextRequest,
-	context: { params: RouteParams }
-): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
 	try {
-		const { contractAddress } = context.params;
+		// extract contractAddress from pathname since typing the second `context` arg
+		// causes a Next.js route type error in this project
+		const url = new URL(request.url);
+		// pathname like /api/rwa/price-data/<contractAddress>
+		const parts = url.pathname.split('/').filter(Boolean);
+		const contractAddress = parts[parts.length - 1] || '';
 
 		if (!contractAddress) {
 			return NextResponse.json({ error: 'Missing contractAddress parameter' }, { status: 400 });
@@ -25,8 +27,7 @@ export async function GET(
 			return NextResponse.json({ error: 'Invalid contract address' }, { status: 400 });
 		}
 
-		const url = new URL(request.url);
-		const selector = url.searchParams.get('selector') ?? 'D';
+	const selector = url.searchParams.get('selector') ?? 'D';
 
 		const externalUrl = `https://liquidity-pool-api.assetchain.org/tokens/${contractAddress}/price-chart?selector=${encodeURIComponent(
 			selector
