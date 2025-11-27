@@ -39,7 +39,7 @@ const TIMEFRAMES = [
   { label: "90D", days: 90 },
 ] as const;
 
-type DataSource = "coingecko" | "cryptocompare" | null;
+type DataSource = "coingecko" | "cryptocompare" | "rwa" | null;
 
 function getPlatformId(chain: SupportedChain): string {
   return chain === "bsc" ? "binance-smart-chain" : "solana";
@@ -88,6 +88,101 @@ export default function PriceActionChart({
 
   // Fetch data with fallback logic, retries, and abort handling
   useEffect(() => {
+    // Fetch from internal RWA price-data route (proxies to external AssetChain API)
+    // Map selectedTimeframe -> selector: D=24h, W=weekly, Y=90d
+    async function fetchFromRWA(signal: AbortSignal): Promise<{ prices: number[]; labels: string[] }> {
+      const selector = selectedTimeframe <= 1 ? 'D' : selectedTimeframe <= 7 ? 'W' : 'Y';
+      const url = `/api/rwa/price-data/${encodeURIComponent(contractAddress)}?selector=${encodeURIComponent(selector)}`;
+      console.log('Fetching from RWA internal API:', url);
+
+      const resp = await fetch(url, { signal });
+      if (!resp.ok) {
+        throw new Error(`RWA price API failed: ${resp.status}`);
+      }
+
+      const json = await resp.json();
+
+      // Helper to coerce different time formats into milliseconds since epoch
+      function toMs(value: any): number | null {
+        if (value == null) return null;
+        // number already
+        if (typeof value === 'number' && !Number.isNaN(value)) {
+          // heuristics: > 1e12 -> ms, > 1e9 -> seconds
+          if (value > 1e12) return value;
+          if (value > 1e9) return value * 1000;
+          // small numbers unlikely, return as-is
+          return value;
+        }
+        // numeric string
+        if (typeof value === 'string') {
+          const trimmed = value.trim();
+          if (/^\d+$/.test(trimmed)) {
+            const n = Number(trimmed);
+            if (trimmed.length >= 13) return n;
+            if (trimmed.length === 10) return n * 1000;
+            if (n > 1e12) return n;
+            if (n > 1e9) return n * 1000;
+            return n;
+          }
+          // try parsing ISO date string
+          const parsed = Date.parse(trimmed);
+          if (!Number.isNaN(parsed)) return parsed;
+        }
+        return null;
+      }
+
+      // Try to normalize several common shapes
+      // 1) { prices: [ [timestamp_ms, price], ... ] }
+      if (Array.isArray(json.prices) && json.prices.length > 0 && Array.isArray(json.prices[0])) {
+        const prices: number[] = [];
+        const labels: string[] = [];
+        json.prices.forEach((p: any) => {
+          const ms = toMs(p[0]);
+          if (ms == null) return;
+          const price = Number(p[1]);
+          if (Number.isNaN(price)) return;
+          prices.push(price);
+          const date = new Date(ms);
+          labels.push(selectedTimeframe <= 1 ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : date.toLocaleDateString([], { month: 'short', day: 'numeric' }));
+        });
+        return { prices, labels };
+      }
+
+      // 2) { data: [{ time, close }, ...] }
+      if (Array.isArray(json.data) && json.data.length > 0 && (json.data[0].time || json.data[0].timestamp) && (json.data[0].close || json.data[0].price)) {
+        const prices: number[] = [];
+        const labels: string[] = [];
+        json.data.forEach((d: any) => {
+          const ms = toMs(d.time ?? d.timestamp);
+          if (ms == null) return;
+          const price = Number(d.close ?? d.price ?? 0);
+          if (Number.isNaN(price)) return;
+          prices.push(price);
+          const date = new Date(ms);
+          labels.push(selectedTimeframe <= 1 ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : date.toLocaleDateString([], { month: 'short', day: 'numeric' }));
+        });
+        return { prices, labels };
+      }
+
+      // 3) If the API returns an array at top-level of points { timestamp, price }
+      if (Array.isArray(json) && json.length > 0 && (json[0].timestamp || json[0].time) && (json[0].price || json[0].close)) {
+        const prices: number[] = [];
+        const labels: string[] = [];
+        json.forEach((d: any) => {
+          const ms = toMs(d.timestamp ?? d.time);
+          if (ms == null) return;
+          const price = Number(d.price ?? d.close ?? 0);
+          if (Number.isNaN(price)) return;
+          prices.push(price);
+          const date = new Date(ms);
+          labels.push(selectedTimeframe <= 1 ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : date.toLocaleDateString([], { month: 'short', day: 'numeric' }));
+        });
+        return { prices, labels };
+      }
+
+      // Otherwise, can't parse
+      throw new Error('Unrecognized RWA price data format');
+    }
     // Fetch from CoinGecko
     async function fetchFromCoinGecko(signal: AbortSignal): Promise<{ prices: number[]; labels: string[] }> {
       console.log('Fetching from CoinGecko:', coingeckoUrl);
@@ -220,6 +315,21 @@ export default function PriceActionChart({
           setData({ prices: cached.prices, labels: cached.labels });
         }
         
+        // If this is an RWA token, use internal RWA price-data route first
+        if (chain === 'rwa') {
+          try {
+            const rwaData = await fetchFromRWA(signal);
+            console.log('RWA data loaded:', rwaData.prices.length, 'points');
+            setData(rwaData);
+            setDataSource('rwa');
+            cacheRef.current.set(key, { ...rwaData, ts: Date.now() });
+            return;
+          } catch (rwaErr) {
+            console.warn('RWA data failed, falling back to other providers:', rwaErr);
+            // fallthrough to other providers
+          }
+        }
+
         // Try CoinGecko first
         try {
           const coinGeckoData = await fetchFromCoinGecko(signal);
@@ -230,12 +340,12 @@ export default function PriceActionChart({
           return;
         } catch (cgError) {
           console.warn('CoinGecko failed, trying CryptoCompare:', cgError);
-          
+
           // Fallback to CryptoCompare if API key is provided
           if (!cryptocompareApiKey) {
             throw new Error('CoinGecko failed and no CryptoCompare API key provided. Get a free key at https://www.cryptocompare.com/cryptopian/api-keys');
           }
-          
+
           const cryptoCompareData = await fetchFromCryptoCompare(signal);
           console.log('CryptoCompare data loaded:', cryptoCompareData.prices.length, 'points');
           setData(cryptoCompareData);
@@ -370,7 +480,7 @@ export default function PriceActionChart({
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Price Action</h3>
         <span className="text-xs text-gray-400">
-          Source: {dataSource === "coingecko" ? "CoinGecko" : dataSource === "cryptocompare" ? "CryptoCompare" : "..."}
+          Source: {dataSource === "coingecko" ? "CoinGecko" : dataSource === "cryptocompare" ? "CryptoCompare" : dataSource === 'rwa' ? 'AssetChain (RWA)' : "..."}
         </span>
       </div>
 
