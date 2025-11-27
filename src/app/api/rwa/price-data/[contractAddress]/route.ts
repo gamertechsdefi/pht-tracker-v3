@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-interface RouteParams {
-	contractAddress: string;
-}
+// interface RouteParams {
+// 	contractAddress: string;
+// }
 
 /** Simple on-request proxy to the external price-chart API used for RWA tokens.
  * Example external URL:
