@@ -75,7 +75,7 @@ export default function PriceActionChart({
   const isChartReady = true;
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<number>(1);
-  const [dataSource, setDataSource] = useState<DataSource>(null);
+  // const [dataSource, setDataSource] = useState<DataSource>(null);
 
   // Get CryptoCompare API key from environment variable
   const cryptocompareApiKey = process.env.CRYPTOCOMPARE_API_KEY || "a2908b51095ddf69552f5dd2caabe3f9a12d2507f8ed32987008c936c1caff61";
@@ -307,7 +307,7 @@ export default function PriceActionChart({
       try {
         setLoading(true);
         setError(null);
-        setDataSource(null);
+        // setDataSource(null);
         const key = `${chain}:${contractAddress}:${selectedTimeframe}`;
         // Serve stale cache immediately if present
         const cached = cacheRef.current.get(key);
@@ -321,7 +321,7 @@ export default function PriceActionChart({
             const rwaData = await fetchFromRWA(signal);
             console.log('RWA data loaded:', rwaData.prices.length, 'points');
             setData(rwaData);
-            setDataSource('rwa');
+            // setDataSource('rwa');
             cacheRef.current.set(key, { ...rwaData, ts: Date.now() });
             return;
           } catch (rwaErr) {
@@ -335,7 +335,7 @@ export default function PriceActionChart({
           const coinGeckoData = await fetchFromCoinGecko(signal);
           console.log('CoinGecko data loaded:', coinGeckoData.prices.length, 'points');
           setData(coinGeckoData);
-          setDataSource("coingecko");
+          // setDataSource("coingecko");
           cacheRef.current.set(key, { ...coinGeckoData, ts: Date.now() });
           return;
         } catch (cgError) {
@@ -349,7 +349,7 @@ export default function PriceActionChart({
           const cryptoCompareData = await fetchFromCryptoCompare(signal);
           console.log('CryptoCompare data loaded:', cryptoCompareData.prices.length, 'points');
           setData(cryptoCompareData);
-          setDataSource("cryptocompare");
+          // setDataSource("cryptocompare");
           cacheRef.current.set(key, { ...cryptoCompareData, ts: Date.now() });
         }
       } catch (e) {
