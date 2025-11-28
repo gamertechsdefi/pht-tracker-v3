@@ -39,7 +39,7 @@ const TIMEFRAMES = [
   { label: "90D", days: 90 },
 ] as const;
 
-type DataSource = "coingecko" | "cryptocompare" | "rwa" | null;
+// type DataSource = "coingecko" | "cryptocompare" | "rwa" | null;
 
 function getPlatformId(chain: SupportedChain): string {
   return chain === "bsc" ? "binance-smart-chain" : "solana";
