@@ -267,7 +267,7 @@ export default function Header() {
     }, [isSearchOpen, sortMetric]);
 
     return (
-        <header className="sticky top-0 z-50 px-4 py-2 bg-white text-neutral-900">
+        <header className="sticky top-0 z-50 px-8 md:px-16 py-2 bg-white text-neutral-900">
             <nav className="flex flex-row justify-between items-center">
                 <Link href="/" className="font-bold flex flex-row items-center">
                     <Image

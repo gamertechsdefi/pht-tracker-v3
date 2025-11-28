@@ -479,9 +479,9 @@ export default function PriceActionChart({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Price Action</h3>
-        <span className="text-xs text-gray-400">
+        {/* <span className="text-xs text-gray-400">
           Source: {dataSource === "coingecko" ? "CoinGecko" : dataSource === "cryptocompare" ? "CryptoCompare" : dataSource === 'rwa' ? 'AssetChain (RWA)' : "..."}
-        </span>
+        </span> */}
       </div>
 
       {/* Timeframe selector */}
