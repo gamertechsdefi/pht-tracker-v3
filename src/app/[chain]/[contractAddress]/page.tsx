@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import DataCard from "@/components/DataCard";
 import BurnsDisplay from "@/components/BurnHistory";
 import BurnIntervals from "@/components/BurnIntervals";
-import { FaCopy, FaGlobe, FaTelegramPlane } from "react-icons/fa";
+import { FaCopy, FaFire, FaGlobe, FaTelegramPlane } from "react-icons/fa";
 import { SiX } from "react-icons/si";
 import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
@@ -14,6 +14,7 @@ import CurrencyConverter from "@/components/Converter";
 import PriceActionChart from "@/components/PriceActionChart";
 import { getTokenByAddress, isValidContractAddress, TokenMetadata } from "@/lib/tokenRegistry";
 import { useTrackActiveToken } from "@/hooks/useTrackActiveToken";
+import { useEmojiReactions } from "@/hooks/useEmojiReactions";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -59,6 +60,13 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>("info");
+    
+    // Emoji reactions synced with Supabase
+    const {
+        counts: emojiCounts,
+        handleEmojiClick: submitEmojiReaction,
+        resetCounts: resetEmojiCounts,
+    } = useEmojiReactions(contractAddress);
 
     // Track this token as actively viewed for priority cache refresh
     useTrackActiveToken(contractAddress || undefined, chain || undefined);
@@ -296,7 +304,6 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     // Check if token has burns enabled
     const showBurns = tokenMetadata?.isBurn;
     
-
     // Dev logging to verify burn visibility
     useEffect(() => {
         if (process.env.NODE_ENV === 'development') {
@@ -500,6 +507,32 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 />
                                             </div>
                                         </div>
+
+                                         <div className="flex gap-2 md:gap-3 items-center justify-center mb-4 flex-wrap">
+                                            <div onClick={() => submitEmojiReaction(1)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🔥</div>
+                                                <h1 className="font-semibold">{emojiCounts[1]}</h1>
+                                            </div>
+                                            <div onClick={() => submitEmojiReaction(2)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚀</div>
+                                                <h1 className="font-semibold">{emojiCounts[2]}</h1>
+                                            </div>
+                                            <div onClick={() => submitEmojiReaction(3)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">❤️‍🔥</div>
+                                                <h1 className="font-semibold">{emojiCounts[3]}</h1>
+                                            </div>
+                                            <div onClick={() => submitEmojiReaction(4)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">💩</div>
+                                                <h1 className="font-semibold">{emojiCounts[4]}</h1>
+                                            </div>
+                                            <div onClick={() => submitEmojiReaction(5)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚩</div>
+                                                <h1 className="font-semibold">{emojiCounts[5]}</h1>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
+                                            Reset All
+                                        </button>
                                     </section>
                                 </div>
 
@@ -688,7 +721,35 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             />
                                         )}
                                     </div>
+                                            {/* Emoji Section - Desktop */}
+                                <div className="flex gap-4 md:gap-8 items-center justify-center mb-4 flex-wrap">
+                                    <div onClick={() => submitEmojiReaction(1)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🔥</div>
+                                        <h1 className="font-semibold">{emojiCounts[1]}</h1>
+                                    </div>
+                                    <div onClick={() => submitEmojiReaction(2)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚀</div>
+                                        <h1 className="font-semibold">{emojiCounts[2]}</h1>
+                                    </div>
+                                    <div onClick={() => submitEmojiReaction(3)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">❤️‍🔥</div>
+                                        <h1 className="font-semibold">{emojiCounts[3]}</h1>
+                                    </div>
+                                    <div onClick={() => submitEmojiReaction(4)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">💩</div>
+                                        <h1 className="font-semibold">{emojiCounts[4]}</h1>
+                                    </div>
+                                    <div onClick={() => submitEmojiReaction(5)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚩</div>
+                                        <h1 className="font-semibold">{emojiCounts[5]}</h1>
+                                    </div>
+                                </div>
+                                <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
+                                    Reset All
+                                </button>
                                 </section>
+
+                        
 
                                 {/* Bottom Section: Burns (if enabled) */}
                                 {showBurns && (
