@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import DataCard from "@/components/DataCard";
 import BurnsDisplay from "@/components/BurnHistory";
 import BurnIntervals from "@/components/BurnIntervals";
-import { FaCopy, FaFire, FaGlobe, FaTelegramPlane } from "react-icons/fa";
+import { FaCopy, FaGlobe, FaTelegramPlane } from "react-icons/fa";
 import { SiX } from "react-icons/si";
 import styles from '../styles.module.css';
 import Footer from "@/components/Footer";
