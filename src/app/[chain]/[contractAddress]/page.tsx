@@ -65,7 +65,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const {
         counts: emojiCounts,
         handleEmojiClick: submitEmojiReaction,
-        resetCounts: resetEmojiCounts,
+        // resetCounts: resetEmojiCounts,
         hasReactedToday: hasReactedToday,
     } = useEmojiReactions(contractAddress);
 
