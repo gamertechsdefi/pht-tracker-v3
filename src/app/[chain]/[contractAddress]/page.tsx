@@ -13,6 +13,8 @@ import Image from "next/image";
 import CurrencyConverter from "@/components/Converter";
 import PriceActionChart from "@/components/PriceActionChart";
 import { getTokenByAddress, isValidContractAddress, TokenMetadata } from "@/lib/tokenRegistry";
+import { useTrackActiveToken } from "@/hooks/useTrackActiveToken";
+import { useEmojiReactions } from "@/hooks/useEmojiReactions";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -54,10 +56,20 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const [tokenMetadata, setTokenMetadata] = useState<TokenMetadata | null>(null);
 
     const [tokenData, setTokenData] = useState<TokenData | null>(null);
-    const [socialLinks, setSocialLinks] = useState<{ website: string; twitter: string; telegram: string; bscscan: string } | null>(null);
+    const [socialLinks, setSocialLinks] = useState<{ website: string; twitter: string; telegram: string; scan: string } | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>("info");
+    
+    // Emoji reactions synced with Supabase
+    const {
+        counts: emojiCounts,
+        handleEmojiClick: submitEmojiReaction,
+        resetCounts: resetEmojiCounts,
+    } = useEmojiReactions(contractAddress);
+
+    // Track this token as actively viewed for priority cache refresh
+    useTrackActiveToken(contractAddress || undefined, chain || undefined);
 
     const cryptocompareApiKey = process.env.CRYPTO_COMPARE_API_KEY;
     console.log(cryptocompareApiKey);
@@ -82,7 +94,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                 return;
             }
 
-            const chainLower = chain.toLowerCase() as 'bsc' | 'sol';
+            const chainLower = chain.toLowerCase() as 'bsc' | 'sol' | 'rwa';
             
             // Validate contract address format
             if (!isValidContractAddress(contractAddress, chainLower)) {
@@ -292,7 +304,6 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     // Check if token has burns enabled
     const showBurns = tokenMetadata?.isBurn;
     
-
     // Dev logging to verify burn visibility
     useEffect(() => {
         if (process.env.NODE_ENV === 'development') {
@@ -370,7 +381,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                         <FaTelegramPlane className="h-6 w-6" />
                                                     </a>
-                                                    <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                    <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                         <Image src="/bscscan.png" alt="BscScan Logo" width={10} height={10} className="h-6 w-6" />
                                                     </a>
                                                 </div>
@@ -462,6 +473,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 tokenSymbol={tokenMetadata.symbol.toUpperCase()}
                                                 tokenAddress={tokenData.contract}
                                                 tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
+                                                chain={chain}
                                             />
                                         )}
                                     </section>
@@ -495,6 +507,32 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 />
                                             </div>
                                         </div>
+
+                                         <div className="flex gap-2 md:gap-3 items-center justify-center mb-4 flex-wrap">
+                                            <div onClick={() => submitEmojiReaction(1)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🔥</div>
+                                                <h1 className="font-semibold">{emojiCounts[1]}</h1>
+                                            </div>
+                                            <div onClick={() => submitEmojiReaction(2)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚀</div>
+                                                <h1 className="font-semibold">{emojiCounts[2]}</h1>
+                                            </div>
+                                            <div onClick={() => submitEmojiReaction(3)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">❤️‍🔥</div>
+                                                <h1 className="font-semibold">{emojiCounts[3]}</h1>
+                                            </div>
+                                            <div onClick={() => submitEmojiReaction(4)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">💩</div>
+                                                <h1 className="font-semibold">{emojiCounts[4]}</h1>
+                                            </div>
+                                            <div onClick={() => submitEmojiReaction(5)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                                <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚩</div>
+                                                <h1 className="font-semibold">{emojiCounts[5]}</h1>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
+                                            Reset All
+                                        </button>
                                     </section>
                                 </div>
 
@@ -514,7 +552,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     <div className="mb-16">
                                         {chain && contractAddress && (
                                             <PriceActionChart
-                                                chain={chain.toLowerCase() as 'bsc' | 'sol'}
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
                                                 contractAddress={contractAddress}
                                             />
                                         )}
@@ -550,7 +588,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                         <FaTelegramPlane className="h-6 w-6" />
                                                     </a>
-                                                    <a href={socialLinks.bscscan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                                                    <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                                                         <Image src="/bscscan.png" alt="BscScan Logo" width={10} height={10} className="h-6 w-6" />
                                                     </a>
                                                 </div>
@@ -642,6 +680,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 tokenSymbol={tokenMetadata.symbol.toUpperCase()}
                                                 tokenAddress={tokenData.contract}
                                                 tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
+                                                chain={chain}
                                             />
                                         )}
 
@@ -677,12 +716,40 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     <div>
                                         {chain && contractAddress && (
                                             <PriceActionChart
-                                                chain={chain.toLowerCase() as 'bsc' | 'sol'}
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
                                                 contractAddress={contractAddress}
                                             />
                                         )}
                                     </div>
+                                            {/* Emoji Section - Desktop */}
+                                <div className="flex gap-4 md:gap-8 items-center justify-center mb-4 flex-wrap">
+                                    <div onClick={() => submitEmojiReaction(1)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🔥</div>
+                                        <h1 className="font-semibold">{emojiCounts[1]}</h1>
+                                    </div>
+                                    <div onClick={() => submitEmojiReaction(2)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚀</div>
+                                        <h1 className="font-semibold">{emojiCounts[2]}</h1>
+                                    </div>
+                                    <div onClick={() => submitEmojiReaction(3)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">❤️‍🔥</div>
+                                        <h1 className="font-semibold">{emojiCounts[3]}</h1>
+                                    </div>
+                                    <div onClick={() => submitEmojiReaction(4)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">💩</div>
+                                        <h1 className="font-semibold">{emojiCounts[4]}</h1>
+                                    </div>
+                                    <div onClick={() => submitEmojiReaction(5)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚩</div>
+                                        <h1 className="font-semibold">{emojiCounts[5]}</h1>
+                                    </div>
+                                </div>
+                                <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
+                                    Reset All
+                                </button>
                                 </section>
+
+                        
 
                                 {/* Bottom Section: Burns (if enabled) */}
                                 {showBurns && (

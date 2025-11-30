@@ -43,8 +43,8 @@ type FormattedTransaction = {
 };
 
 // Environment variables
-const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY || "1E2JNG6XDN9SB1HXKHVJS6U1ZVR8GR1GFC";
-const BSCSCAN_API_URL = "https://api.etherscan.io/v2/api?chainid=56";
+const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
+const BSCSCAN_API_URL = "https://scan.assetchain.org/api/v2/stats";
 const DEAD_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 
 /**

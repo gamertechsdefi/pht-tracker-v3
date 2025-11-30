@@ -79,7 +79,7 @@ const TOKEN_LIST: { [key: string]: string } = {
     anndy: "bsc",
     light: "bsc",
     zonic: "bsc",
-    
+
 };
 
 // Full name to symbol mapping for suggestions
@@ -137,7 +137,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
     "Baby Priceless": "bp",
     "LeadAI Token": "lai",
     "BABY DEW": "babydew",
-    "SATERIA": "sat",    
+    "SATERIA": "sat",
     "ORBITAL": "orb",
     "CaptainBNB": "captainbnb",
     "首席模因官": "anndy",
@@ -149,6 +149,7 @@ export default function Header() {
     const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false);
     const [search, setSearch] = useState<string>("");
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
     const [trendingTokens, setTrendingTokens] = useState<Token[]>([]);
@@ -266,7 +267,7 @@ export default function Header() {
     }, [isSearchOpen, sortMetric]);
 
     return (
-        <header className="sticky top-4 z-50 mx-4 px-4 py-2 rounded-md bg-white text-neutral-900">
+        <header className="sticky top-0 z-50 px-4 md:px-16 py-2 bg-white text-neutral-900">
             <nav className="flex flex-row justify-between items-center">
                 <Link href="/" className="font-bold flex flex-row items-center">
                     <Image
@@ -286,49 +287,150 @@ export default function Header() {
                     <Link href="/price2mc" className="hover:text-neutral-700 transition-colors duration-200">Price2MC</Link>
                     <Link href="https://www.phoenixtoken.community" className="hover:text-neutral-700 transition-colors duration-200">Token</Link>
                 </div>
-                
-                <button
-                    onClick={() => setIsSearchOpen(true)}
-                    className="flex items-center bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition duration-200"
-                    aria-label="Search Tokens"
-                >
-                    <svg
-                        className="h-5 w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                    </svg>
-                </button>
 
-                {/* Mobile Menu Button */}
-                <button
-                    className="md:hidden flex items-center p-2 border border-neutral-300 rounded text-neutral-900"
-                    onClick={toggleMenu}
-                    aria-label="Toggle menu"
-                >
-                    <svg
-                        className="h-5 w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
+                {/* Right side buttons */}
+                <div className="flex items-center gap-2">
+                    {/* Chain Selector Dropdown */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsChainDropdownOpen(!isChainDropdownOpen)}
+                            className="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 px-3 py-2 rounded-lg transition duration-200"
+                            aria-label="Select Chain"
+                        >
+                            <svg
+                                className="h-5 w-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                                />
+                            </svg>
+                            <span className="hidden sm:inline text-sm font-medium">Chains</span>
+                            <svg
+                                className={`h-4 w-4 transition-transform duration-200 ${isChainDropdownOpen ? 'rotate-180' : ''}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {isChainDropdownOpen && (
+                            <>
+                                <div
+                                    className="fixed inset-0 z-10"
+                                    onClick={() => setIsChainDropdownOpen(false)}
+                                />
+                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-20">
+                                    <Link
+                                        href="/bsc"
+                                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
+                                        onClick={() => setIsChainDropdownOpen(false)}
+                                    >
+                                        <Image
+                                            src="/bsc-logo.png"
+                                            alt="BSC"
+                                            width={24}
+                                            height={24}
+                                        />
+                                        <span className="text-sm font-medium">BSC Chain</span>
+                                    </Link>
+                                    <Link
+                                        href="/rwa"
+                                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
+                                        onClick={() => setIsChainDropdownOpen(false)}
+                                    >
+                                        <Image
+                                            src="/rwa-logo.png"
+                                            alt="RWA"
+                                            width={24}
+                                            height={24}
+                                        />
+                                        <span className="text-sm font-medium">RWA Chain</span>
+                                    </Link>
+                                    
+                                    <div className="border-t border-neutral-200 my-2"></div>
+                                    <Link
+                                        href="/"
+                                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
+                                        onClick={() => setIsChainDropdownOpen(false)}
+                                    >
+                                        <svg
+                                            className="h-5 w-5 text-neutral-600"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M4 6h16M4 12h16M4 18h16"
+                                            />
+                                        </svg>
+                                        <span className="text-sm font-medium">All Chains</span>
+                                    </Link>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Search Button */}
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="flex items-center bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition duration-200"
+                        aria-label="Search Tokens"
                     >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M4 6h16M4 12h16M4 18h16"
-                        />
-                    </svg>
-                </button>
+                        <svg
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                        </svg>
+                    </button>
+
+                    {/* Mobile Menu Button */}
+                    <button
+                        className="md:hidden flex items-center p-2 border border-neutral-300 rounded text-neutral-900"
+                        onClick={toggleMenu}
+                        aria-label="Toggle menu"
+                    >
+                        <svg
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
+                        </svg>
+                    </button>
+                </div>
             </nav>
 
             {/* Mobile Menu */}

@@ -1,20 +1,82 @@
-// Comprehensive token metadata interface
+// Database-powered token registry using Supabase
+// import { createClient } from '@supabase/supabase-js';
+
+// Types
 export interface SocialLinks {
-  website: string;
-  twitter: string;
-  telegram: string;
-  bscscan: string;
+  website?: string;
+  twitter?: string;
+  telegram?: string;
+  bscscan?: string;
 }
 
 export interface TokenMetadata {
   address: string;
   symbol: string;
   name: string;
-  chain: 'bsc' | 'sol';
+  chain: 'bsc' | 'sol' | 'rwa';
   decimals?: number;
   socials?: SocialLinks;
   isBurn?: boolean;
 }
+
+// Database token type (matches Supabase table structure)
+// interface DbToken {
+//   id: number;
+//   address: string;
+//   symbol: string;
+//   name: string;
+//   chain: string;
+//   decimals?: number;
+//   is_burn?: boolean;
+//   website?: string;
+//   twitter?: string;
+//   telegram?: string;
+//   bscscan?: string;
+//   created_at: string;
+//   updated_at: string;
+// }
+
+// Initialize Supabase client
+// const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+// const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+// if (!supabaseUrl || !supabaseKey) {
+//   console.warn('Missing Supabase environment variables, falling back to empty registry');
+// }
+
+// const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+
+// In-memory cache to reduce database queries
+// interface TokenCache {
+//   data: Map<string, TokenMetadata>;
+//   lastFetch: number;
+//   ttl: number; // Time to live in milliseconds
+// }
+
+// const tokenCache: TokenCache = {
+//   data: new Map(),
+//   lastFetch: 0,
+//   ttl: 5 * 60 * 1000, // 5 minutes
+// };
+
+// Helper function to convert database token to TokenMetadata
+// function dbTokenToMetadata(dbToken: DbToken): TokenMetadata {
+//   const socials: SocialLinks = {};
+//   if (dbToken.website) socials.website = dbToken.website;
+//   if (dbToken.twitter) socials.twitter = dbToken.twitter;
+//   if (dbToken.telegram) socials.telegram = dbToken.telegram;
+//   if (dbToken.bscscan) socials.bscscan = dbToken.bscscan;
+
+//   return {
+//     address: dbToken.address,
+//     symbol: dbToken.symbol,
+//     name: dbToken.name,
+//     chain: dbToken.chain as 'bsc' | 'sol',
+//     decimals: dbToken.decimals || 18,
+//     socials: Object.keys(socials).length > 0 ? socials : undefined,
+//     isBurn: dbToken.is_burn || false,
+//   };
+// }
 
 // Centralized token registry - single source of truth
 export const TOKEN_REGISTRY: TokenMetadata[] = [
@@ -90,12 +152,14 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0xDc11726C4efa126CFe9614408CD310B22fe74444", symbol: "anndy", name: "首席模因官", chain: "bsc", isBurn: true },
   { address: "0x794BF989b667E718FD4053029397CF8BF8CaC4ca", symbol: "light", name: "Luminous Token", chain: "bsc", isBurn: true },
   { address: "0xC284A77838D09784C79061BA57B7203F8CBF76d9", symbol: "zonic", name: "Zion Token", chain: "bsc", isBurn: true },
-  
-  // Solana Tokens (placeholder addresses - replace with actual Solana addresses)
-  { address: "scat_solana_address_placeholder", symbol: "scat", name: "Solana Cat Token", chain: "sol", isBurn: true },
-  { address: "petros_solana_address_placeholder", symbol: "petros", name: "Petros Token", chain: "sol", isBurn: true },
-  { address: "nuke_solana_address_placeholder", symbol: "nuke", name: "Nuke Token", chain: "sol", isBurn: true },
-  { address: "venus_solana_address_placeholder", symbol: "venus", name: "Two Face Cat", chain: "sol", isBurn: true },
+
+  {address: "0xf20f989CAf263C513f9183B4Fed88F14Fc04c8dB", symbol: "shalom", name: "Shalom", chain: "rwa", isBurn: false },
+  { address: "0x782ea82124B474f1f968262ec24FCdED39689dd5", symbol: "rvm", name: "Real World Meme", chain: "rwa", isBurn: false},
+  {address: "0x02afe9989D86a0357fbb238579FE035dc17BcAB0", symbol: "xRWA", name: "Xend Finance RWA", chain: "rwa", isBurn: false},
+  {address: "0xEc6943BB984AED25eC96986898721a7f8aB6212E", symbol: "", name: "WiCrypt Network", chain:"rwa", isBurn: false},
+  { address: "0x7923C0f6FA3d1BA6EAFCAedAaD93e737Fd22FC4F", symbol: "cNGN", name: "cNGN", chain: "rwa", isBurn: false},
+  {address: "0xbe231A8492487aAe6096278A97050FAe6B9d5BEc", symbol: "weth", name: "Wrapped Ether", chain: "rwa", isBurn: false},
+
 ];
 
 // Utility functions for token lookups
@@ -105,7 +169,7 @@ export function getTokenByAddress(address: string): TokenMetadata | undefined {
   );
 }
 
-export function getTokenBySymbol(symbol: string, chain?: 'bsc' | 'sol'): TokenMetadata | undefined {
+export function getTokenBySymbol(symbol: string, chain?: 'bsc' | 'sol' | 'rwa'): TokenMetadata | undefined {
   const tokens = TOKEN_REGISTRY.filter(token =>
     token.symbol.toLowerCase() === symbol.toLowerCase() &&
     (chain ? token.chain === chain : true)
@@ -125,17 +189,21 @@ export function getTokensBySymbol(symbol: string): TokenMetadata[] {
   );
 }
 
-export function getTokensByChain(chain: 'bsc' | 'sol'): TokenMetadata[] {
+export function getTokensByChain(chain: 'bsc' | 'sol'| 'rwa'): TokenMetadata[] {
   return TOKEN_REGISTRY.filter(token => token.chain === chain);
 }
 
-export function isValidContractAddress(address: string, chain: 'bsc' | 'sol'): boolean {
+export function isValidContractAddress(address: string, chain: 'bsc' | 'sol' | 'rwa'): boolean {
   if (chain === 'bsc') {
     // EVM address validation: 42 characters, starts with 0x, followed by 40 hex characters
     return /^0x[a-fA-F0-9]{40}$/.test(address);
   } else if (chain === 'sol') {
     // Solana address validation: 32-44 characters, base58 encoded
     return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+  }
+  else if (chain === 'rwa') {
+    
+    return /^0x[a-fA-F0-9]{40}$/.test(address);
   }
   return false;
 }
