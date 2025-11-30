@@ -66,6 +66,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
         counts: emojiCounts,
         handleEmojiClick: submitEmojiReaction,
         resetCounts: resetEmojiCounts,
+        hasReactedToday: hasReactedToday,
     } = useEmojiReactions(contractAddress);
 
     // Track this token as actively viewed for priority cache refresh
@@ -509,30 +510,75 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         </div>
 
                                          <div className="flex gap-2 md:gap-3 items-center justify-center mb-4 flex-wrap">
-                                            <div onClick={() => submitEmojiReaction(1)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                            <div 
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(1)} 
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                                    hasReactedToday 
+                                                        ? 'opacity-50 cursor-not-allowed' 
+                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                                title={hasReactedToday ? 'You have already reacted today' : ''}
+                                            >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🔥</div>
                                                 <h1 className="font-semibold">{emojiCounts[1]}</h1>
                                             </div>
-                                            <div onClick={() => submitEmojiReaction(2)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                            <div 
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(2)} 
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                                    hasReactedToday 
+                                                        ? 'opacity-50 cursor-not-allowed' 
+                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                                title={hasReactedToday ? 'You have already reacted today' : ''}
+                                            >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚀</div>
                                                 <h1 className="font-semibold">{emojiCounts[2]}</h1>
                                             </div>
-                                            <div onClick={() => submitEmojiReaction(3)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                            <div 
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(3)} 
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                                    hasReactedToday 
+                                                        ? 'opacity-50 cursor-not-allowed' 
+                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                                title={hasReactedToday ? 'You have already reacted today' : ''}
+                                            >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">❤️‍🔥</div>
                                                 <h1 className="font-semibold">{emojiCounts[3]}</h1>
                                             </div>
-                                            <div onClick={() => submitEmojiReaction(4)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                            <div 
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(4)} 
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                                    hasReactedToday 
+                                                        ? 'opacity-50 cursor-not-allowed' 
+                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                                title={hasReactedToday ? 'You have already reacted today' : ''}
+                                            >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">💩</div>
                                                 <h1 className="font-semibold">{emojiCounts[4]}</h1>
                                             </div>
-                                            <div onClick={() => submitEmojiReaction(5)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                            <div 
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(5)} 
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                                    hasReactedToday 
+                                                        ? 'opacity-50 cursor-not-allowed' 
+                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                                title={hasReactedToday ? 'You have already reacted today' : ''}
+                                            >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚩</div>
                                                 <h1 className="font-semibold">{emojiCounts[5]}</h1>
                                             </div>
                                         </div>
-                                        <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
+                                        {hasReactedToday && (
+                                            <p className="text-center text-sm text-gray-400 mb-4">
+                                                You have already reacted today. Come back tomorrow to react again!
+                                            </p>
+                                        )}
+                                        {/* <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
                                             Reset All
-                                        </button>
+                                        </button> */}
                                     </section>
                                 </div>
 
@@ -723,30 +769,75 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     </div>
                                             {/* Emoji Section - Desktop */}
                                 <div className="flex gap-4 md:gap-8 items-center justify-center mb-4 flex-wrap">
-                                    <div onClick={() => submitEmojiReaction(1)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                    <div 
+                                        onClick={() => !hasReactedToday && submitEmojiReaction(1)} 
+                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                            hasReactedToday 
+                                                ? 'opacity-50 cursor-not-allowed' 
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                        }`}
+                                        title={hasReactedToday ? 'You have already reacted today' : ''}
+                                    >
                                         <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🔥</div>
                                         <h1 className="font-semibold">{emojiCounts[1]}</h1>
                                     </div>
-                                    <div onClick={() => submitEmojiReaction(2)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                    <div 
+                                        onClick={() => !hasReactedToday && submitEmojiReaction(2)} 
+                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                            hasReactedToday 
+                                                ? 'opacity-50 cursor-not-allowed' 
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                        }`}
+                                        title={hasReactedToday ? 'You have already reacted today' : ''}
+                                    >
                                         <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚀</div>
                                         <h1 className="font-semibold">{emojiCounts[2]}</h1>
                                     </div>
-                                    <div onClick={() => submitEmojiReaction(3)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                    <div 
+                                        onClick={() => !hasReactedToday && submitEmojiReaction(3)} 
+                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                            hasReactedToday 
+                                                ? 'opacity-50 cursor-not-allowed' 
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                        }`}
+                                        title={hasReactedToday ? 'You have already reacted today' : ''}
+                                    >
                                         <div className="text-3xl md:text-4xl flex items-center justify-center h-full">❤️‍🔥</div>
                                         <h1 className="font-semibold">{emojiCounts[3]}</h1>
                                     </div>
-                                    <div onClick={() => submitEmojiReaction(4)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                    <div 
+                                        onClick={() => !hasReactedToday && submitEmojiReaction(4)} 
+                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                            hasReactedToday 
+                                                ? 'opacity-50 cursor-not-allowed' 
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                        }`}
+                                        title={hasReactedToday ? 'You have already reacted today' : ''}
+                                    >
                                         <div className="text-3xl md:text-4xl flex items-center justify-center h-full">💩</div>
                                         <h1 className="font-semibold">{emojiCounts[4]}</h1>
                                     </div>
-                                    <div onClick={() => submitEmojiReaction(5)} className="border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg hover:bg-orange-500 hover:bg-opacity-10 transition-all duration-200 transform hover:scale-110 cursor-pointer">
+                                    <div 
+                                        onClick={() => !hasReactedToday && submitEmojiReaction(5)} 
+                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
+                                            hasReactedToday 
+                                                ? 'opacity-50 cursor-not-allowed' 
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                        }`}
+                                        title={hasReactedToday ? 'You have already reacted today' : ''}
+                                    >
                                         <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚩</div>
                                         <h1 className="font-semibold">{emojiCounts[5]}</h1>
                                     </div>
                                 </div>
-                                <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
+                                {hasReactedToday && (
+                                    <p className="text-center text-sm text-gray-400 mb-4">
+                                        You have already reacted today. Come back tomorrow to react again!
+                                    </p>
+                                )}
+                                {/* <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
                                     Reset All
-                                </button>
+                                </button> */}
                                 </section>
 
                         
