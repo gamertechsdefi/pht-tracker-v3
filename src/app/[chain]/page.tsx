@@ -12,6 +12,7 @@ interface Token {
   price: string | number;
   marketCap: string | number;
   volume: string | number;
+  liquidity: string | number;
   change24h: string | number;
 }
 
@@ -45,16 +46,67 @@ function formatMarketCap(marketCap: number | string): string {
   return marketCap.toString();
 }
 
-function formatPrice(price: number | string): { display: string; isExponential: boolean; zeros?: number; rest?: string } {
-  const priceStr = String(price);
+function formatCompactNumber(value: number | string): string {
+  if (typeof value === 'string') {
+    value = parseFloat(value.replace(/[^0-9.-]+/g, ''));
+  }
 
+  if (isNaN(value) || value === 0) {
+    return 'N/A';
+  }
+
+  if (value >= 1e12) {
+    return (value / 1e12).toFixed(2) + 'T';
+  }
+  if (value >= 1e9) {
+    return (value / 1e9).toFixed(2) + 'B';
+  }
+  if (value >= 1e6) {
+    return (value / 1e6).toFixed(2) + 'M';
+  }
+  if (value >= 1e3) {
+    return (value / 1e3).toFixed(2) + 'K';
+  }
+  return value.toFixed(2);
+}
+
+function formatPrice(price: number | string): { display: string; isExponential: boolean; zeros?: number; rest?: string } {
+  // Handle N/A or invalid values
+  if (price === 'N/A' || price === null || price === undefined || price === '') {
+    return {
+      display: 'N/A',
+      isExponential: false,
+    };
+  }
+
+  // Convert to number if it's a string
+  let priceNum: number;
+  if (typeof price === 'string') {
+    // Remove any non-numeric characters except decimal point and minus sign
+    const cleanedPrice = price.replace(/[^0-9.-]/g, '');
+    priceNum = parseFloat(cleanedPrice);
+  } else {
+    priceNum = price;
+  }
+
+  // Check if conversion failed
+  if (isNaN(priceNum)) {
+    return {
+      display: 'N/A',
+      isExponential: false,
+    };
+  }
+
+  const priceStr = priceNum.toString();
+
+  // Check for very small numbers with many leading zeros
   if (priceStr.includes('.')) {
     const decimalPart = priceStr.split('.')[1];
-    if (decimalPart.startsWith('00000')) {
+    if (decimalPart && decimalPart.startsWith('00000')) {
       const leadingZeros = decimalPart.match(/^0+/)?.[0].length || 0;
-      const restOfNumber = decimalPart.substring(leadingZeros);
+      const restOfNumber = decimalPart.substring(leadingZeros).substring(0, 6); // Limit to 6 digits
       return {
-        display: `0.`,
+        display: '$0.',
         isExponential: true,
         zeros: leadingZeros,
         rest: restOfNumber,
@@ -62,8 +114,18 @@ function formatPrice(price: number | string): { display: string; isExponential: 
     }
   }
 
+  // For regular numbers, format with appropriate decimal places
+  let formattedPrice: string;
+  if (priceNum >= 1) {
+    formattedPrice = priceNum.toFixed(2);
+  } else if (priceNum >= 0.01) {
+    formattedPrice = priceNum.toFixed(4);
+  } else {
+    formattedPrice = priceNum.toFixed(8);
+  }
+
   return {
-    display: priceStr,
+    display: '$' + formattedPrice,
     isExponential: false,
   };
 }
@@ -112,11 +174,132 @@ export default function ChainPage({ params }: PageProps) {
     <div className="container mx-auto">
       <Header />
       <div className="px-4 pt-8">
+        {/* Mobile: Card Layout */}
+        <div className="md:hidden flex flex-col gap-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div
+                  className="animate-spin inline-block w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full"
+                  role="status"
+                >
+                  <span className="sr-only">Loading...</span>
+                </div>
+                <p className="text-white mt-4">Loading {chain.toUpperCase()} tokens...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-10 text-red-400">
+              {error}
+            </div>
+          ) : (
+            tokens.map((token: Token) => {
+              const { display, isExponential, zeros, rest } = formatPrice(token.price);
+              const priceDisplay = display === 'N/A' ? (
+                <span className="text-neutral-400">N/A</span>
+              ) : isExponential ? (
+                <>
+                  {display}0<sub>{zeros}</sub>{rest}
+                </>
+              ) : (
+                display
+              );
 
-        <div className="shadow rounded-lg overflow-hidden">
-          {/* Mobile: Horizontal scroll wrapper */}
+              return (
+                <Link
+                  key={token.address}
+                  href={`/${token.chain}/${token.address}`}
+                  className="rounded-lg p-4 border border-orange-500/30 hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20"
+                >
+                  {/* Card Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    {/* Left: Token Icon and Info */}
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {/* Token Icon with Chain Badge */}
+                      <div className="relative flex-shrink-0">
+                        <img
+                          src={`/images/${token.chain}/token-logos/${token.address.toLowerCase()}.png`}
+                          alt={token.symbol}
+                          width={48}
+                          height={48}
+                          className="rounded-full"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            if (!target.src.includes('/api/')) {
+                              target.src = `/api/${token.chain}/logo/${token.address}`;
+                            } else {
+                              target.src = '/logo.png';
+                            }
+                          }}
+                        />
+                        {/* Chain Logo Overlay */}
+                        <img
+                          src={`/${token.chain}-logo.png`}
+                          alt={token.chain}
+                          width={20}
+                          height={20}
+                          className="absolute -bottom-1 -right-1 rounded-sm border-2 border-black"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                      
+                      {/* Token Symbol and Name */}
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span className="text-white font-bold text-lg whitespace-nowrap truncate">
+                          {token.symbol.toUpperCase()}
+                        </span>
+                        <span className="text-neutral-200 text-xs whitespace-nowrap truncate">
+                          {token.name}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right: Price */}
+                    <div className="text-right flex-shrink-0 ml-2">
+                      <span className="text-white font-semibold text-xl whitespace-nowrap">
+                        {priceDisplay}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Metrics Row */}
+                  <div className="flex gap-2">
+                    {/* Volume */}
+                    <div className="flex-1 border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                      <div className="text-orange-500 text-xs font-medium">VOL</div>
+                      <div className="text-white text-sm font-semibold">
+                        ${formatCompactNumber(token.volume)}
+                      </div>
+                    </div>
+
+                    {/* Liquidity */}
+                    <div className="flex-1 border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                      <div className="text-orange-500 text-xs font-medium">LIQ.</div>
+                      <div className="text-white text-sm font-semibold">
+                        ${formatCompactNumber(token.liquidity)}
+                      </div>
+                    </div>
+
+                    {/* Market Cap */}
+                    <div className="flex-1 border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                      <div className="text-orange-500 text-xs font-medium">MCAP</div>
+                      <div className="text-white text-sm font-semibold">
+                        ${formatCompactNumber(token.marketCap)}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop: Table Layout */}
+        <div className="hidden md:block shadow rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px] bg-neutral-900">
+            <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="bg-orange-500">
                   <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left sticky left-0 bg-orange-500 z-20 min-w-[150px]">
@@ -129,7 +312,10 @@ export default function ChainPage({ params }: PageProps) {
                     Market Cap
                   </th>
                   <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[120px]">
-                    24h Volume
+                    Liquidity
+                  </th>
+                  <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[120px]">
+                    24H Volume
                   </th>
                 
                 </tr>
@@ -137,39 +323,53 @@ export default function ChainPage({ params }: PageProps) {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="bg-neutral-700 text-center py-10 text-white">
+                    <td colSpan={6} className="text-center py-10 text-white">
                       Loading {chain.toUpperCase()} tokens...
                     </td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={5} className="bg-neutral-700 text-center py-10 text-red-400">
+                    <td colSpan={6} className="text-center py-10 text-red-400">
                       {error}
                     </td>
                   </tr>
                 ) : (
                   tokens.map((token: Token) => (
-                    <tr key={token.address} className="border-b border-neutral-800 hover:bg-neutral-800 transition-colors">
+                    <tr key={token.address} className="border-b border-orange-500 hover:bg-orange-600 transition-colors">
                       {/* Token column - sticky on mobile */}
-                      <td className="px-5 py-4 text-sm sticky left-0 bg-neutral-900 z-10 min-w-[150px]">
+                      <td className="px-5 py-4 text-sm sticky left-0 z-10 min-w-[150px]">
                         <Link href={`/${token.chain}/${token.address}`} className="flex items-center hover:opacity-80">
-                          <img
-                            src={`/images/${token.chain}/token-logos/${token.address.toLowerCase()}.png`}
-                            alt={token.symbol}
-                            width={32}
-                            height={32}
-                            className="mr-3 flex-shrink-0 rounded-full"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              // Try API endpoint as fallback
-                              if (!target.src.includes('/api/')) {
-                                target.src = `/api/${token.chain}/logo/${token.address}`;
-                              } else {
-                                // Final fallback to default logo
-                                target.src = '/logo.png';
-                              }
-                            }}
-                          />
+                          {/* Token Icon with Chain Badge */}
+                          <div className="relative flex-shrink-0 mr-3">
+                            <img
+                              src={`/images/${token.chain}/token-logos/${token.address.toLowerCase()}.png`}
+                              alt={token.symbol}
+                              width={32}
+                              height={32}
+                              className="rounded-full"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                // Try API endpoint as fallback
+                                if (!target.src.includes('/api/')) {
+                                  target.src = `/api/${token.chain}/logo/${token.address}`;
+                                } else {
+                                  // Final fallback to default logo
+                                  target.src = '/logo.png';
+                                }
+                              }}
+                            />
+                            {/* Chain Logo Overlay */}
+                            <img
+                              src={`/${token.chain}-logo.png`}
+                              alt={token.chain}
+                              width={16}
+                              height={16}
+                              className="absolute -bottom-1 -right-1 rounded-sm border-2 border-black"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
                           <div className="flex flex-col">
                             <span className="text-white whitespace-nowrap font-medium text-base">
                               {token.symbol.toUpperCase()}
@@ -186,12 +386,10 @@ export default function ChainPage({ params }: PageProps) {
                         <span className="text-white whitespace-nowrap">
                           {token.price === 'N/A' ? 'N/A' : (() => {
                             const { display, isExponential, zeros, rest } = formatPrice(token.price);
-                            if (!isExponential) return `$${display}`;
+                            if (!isExponential) return display;
                             return (
                               <>
-                                ${display}0
-                                <sub>{zeros}</sub>
-                                {rest}
+                                {display}0<sub>{zeros}</sub>{rest}
                               </>
                             );
                           })()}
@@ -202,6 +400,13 @@ export default function ChainPage({ params }: PageProps) {
                       <td className="px-5 py-4 text-sm min-w-[120px]">
                         <span className="text-white whitespace-nowrap">
                           ${formatMarketCap(token.marketCap)}
+                        </span>
+                      </td>
+
+                      {/* Liquidity column */}
+                      <td className="px-5 py-4 text-sm min-w-[120px]">
+                        <span className="text-white whitespace-nowrap">
+                          {token.liquidity === 'N/A' ? 'N/A' : `$${formatCompactNumber(token.liquidity)}`}
                         </span>
                       </td>
 
@@ -217,11 +422,6 @@ export default function ChainPage({ params }: PageProps) {
                 )}
               </tbody>
             </table>
-          </div>
-          
-          {/* Optional: Scroll indicator for mobile */}
-          <div className="md:hidden bg-neutral-800 px-4 py-2 text-xs text-neutral-400 text-center">
-            ← Swipe to see more columns →
           </div>
         </div>
 

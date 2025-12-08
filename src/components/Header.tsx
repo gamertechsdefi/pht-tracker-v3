@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 // Define interfaces for data structures
 interface Token {
@@ -147,6 +147,7 @@ const FULL_NAME_MAP: { [key: string]: string } = {
 
 export default function Header() {
     const router = useRouter();
+    const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false);
@@ -156,6 +157,30 @@ export default function Header() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [sortMetric, setSortMetric] = useState<"volume" | "priceChange">("volume");
+
+    // Determine active chain from pathname
+    const getActiveChain = (): string | null => {
+        const path = pathname?.toLowerCase() || '';
+        if (path.startsWith('/bsc')) return 'bsc';
+        if (path.startsWith('/rwa')) return 'rwa';
+        if (path.startsWith('/sol')) return 'sol';
+        return null; // Home page or other routes
+    };
+
+    const activeChain = getActiveChain();
+
+    // Get chain display info
+    const getChainInfo = (chain: string | null) => {
+        if (!chain) return { name: 'All Chains', logo: null };
+        const chainInfo: { [key: string]: { name: string; logo: string } } = {
+            bsc: { name: 'BSC Chain', logo: '/bsc-logo.png' },
+            rwa: { name: 'RWA Chain', logo: '/rwa-logo.png' },
+            sol: { name: 'Solana', logo: '/sol-logo.png' },
+        };
+        return chainInfo[chain] || { name: 'All Chains', logo: null };
+    };
+
+    const currentChainInfo = getChainInfo(activeChain);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -294,23 +319,39 @@ export default function Header() {
                     <div className="relative">
                         <button
                             onClick={() => setIsChainDropdownOpen(!isChainDropdownOpen)}
-                            className="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 px-3 py-2 rounded-lg transition duration-200"
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition duration-200 ${
+                                activeChain 
+                                    ? 'bg-orange-100 hover:bg-orange-200 text-orange-900 border border-orange-300' 
+                                    : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
+                            }`}
                             aria-label="Select Chain"
                         >
-                            <svg
-                                className="h-5 w-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                            {activeChain && currentChainInfo.logo ? (
+                                <Image
+                                    src={currentChainInfo.logo}
+                                    alt={activeChain}
+                                    width={20}
+                                    height={20}
+                                    className="rounded-sm"
                                 />
-                            </svg>
-                            <span className="hidden sm:inline text-sm font-medium">Chains</span>
+                            ) : (
+                                <svg
+                                    className="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                                    />
+                                </svg>
+                            )}
+                            <span className="hidden sm:inline text-sm font-medium">
+                                {activeChain ? currentChainInfo.name : 'Chains'}
+                            </span>
                             <svg
                                 className={`h-4 w-4 transition-transform duration-200 ${isChainDropdownOpen ? 'rotate-180' : ''}`}
                                 fill="none"
@@ -336,7 +377,11 @@ export default function Header() {
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-20">
                                     <Link
                                         href="/bsc"
-                                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
+                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${
+                                            activeChain === 'bsc'
+                                                ? 'bg-orange-100 text-orange-900 font-semibold'
+                                                : 'hover:bg-neutral-100'
+                                        }`}
                                         onClick={() => setIsChainDropdownOpen(false)}
                                     >
                                         <Image
@@ -346,10 +391,27 @@ export default function Header() {
                                             height={24}
                                         />
                                         <span className="text-sm font-medium">BSC Chain</span>
+                                        {activeChain === 'bsc' && (
+                                            <svg
+                                                className="h-4 w-4 ml-auto text-orange-600"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        )}
                                     </Link>
                                     <Link
                                         href="/rwa"
-                                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
+                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${
+                                            activeChain === 'rwa'
+                                                ? 'bg-orange-100 text-orange-900 font-semibold'
+                                                : 'hover:bg-neutral-100'
+                                        }`}
                                         onClick={() => setIsChainDropdownOpen(false)}
                                     >
                                         <Image
@@ -359,12 +421,29 @@ export default function Header() {
                                             height={24}
                                         />
                                         <span className="text-sm font-medium">RWA Chain</span>
+                                        {activeChain === 'rwa' && (
+                                            <svg
+                                                className="h-4 w-4 ml-auto text-orange-600"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        )}
                                     </Link>
                                     
                                     <div className="border-t border-neutral-200 my-2"></div>
                                     <Link
                                         href="/"
-                                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors duration-200"
+                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${
+                                            !activeChain
+                                                ? 'bg-orange-100 text-orange-900 font-semibold'
+                                                : 'hover:bg-neutral-100'
+                                        }`}
                                         onClick={() => setIsChainDropdownOpen(false)}
                                     >
                                         <svg
@@ -381,6 +460,19 @@ export default function Header() {
                                             />
                                         </svg>
                                         <span className="text-sm font-medium">All Chains</span>
+                                        {!activeChain && (
+                                            <svg
+                                                className="h-4 w-4 ml-auto text-orange-600"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        )}
                                     </Link>
                                 </div>
                             </>
