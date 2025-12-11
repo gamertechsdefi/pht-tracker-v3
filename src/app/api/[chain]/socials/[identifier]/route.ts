@@ -368,7 +368,7 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     website: "https://thechozencultivator.com",
     twitter: "https://x.com/bc400_bnb",
     telegram: "https://t.me/bc400_bnb",
-    scan: "https://scan.com/token/0x61Fc93c7C070B32B1b1479B86056d8Ec1D7125BD",
+    scan: "https://bscscan.com/token/0x61Fc93c7C070B32B1b1479B86056d8Ec1D7125BD",
   }
 
 };
