@@ -364,7 +364,7 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     telegram: "#",
     scan: "https://scan.assetchain.org/token/0xf20f989CAf263C513f9183B4Fed88F14Fc04c8dB",
   },
-  "bc4000": {
+  "bc400": {
     website: "https://thechozencultivator.com",
     twitter: "https://x.com/bc400_bnb",
     telegram: "https://t.me/bc400_bnb",
