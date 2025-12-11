@@ -358,7 +358,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 {/* Info Tab */}
                                 <div className={activeTab === "info" ? "" : "hidden"}>
                                     <section className="">
-                                        <div className="flex flex-row bg-black rounded-lg p-4 mb-2 justify-between md:items-end w-full">
+                                        <div className="flex flex-col bg-black rounded-lg p-4 mb-2 justify-between md:items-end w-full">
                                             <div className="flex flex-row items-center gap-2 flex-1 min-w-0">
                                                 <img
                                                     src={`/api/${chain}/logo/${contractAddress}`}
@@ -372,19 +372,19 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 <h1 className="text-lg md:text-2xl font-bold break-words">{tokenMetadata.name}</h1>
                                             </div>
                                             {socialLinks && (
-                                                <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
-                                                    <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <FaGlobe className="h-6 w-6" />
+                                                <div className="flex flex-row gap-4 mt-4 items-center justify-between px-4 bg-neutral-800 p-4 rounded-lg">
+                                                    <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" >
+                                                        <p className="text-sm">Website</p>
                                                     </a>
-                                                    <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <SiX className="h-6 w-6" />
+                                                    <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" >
+                                                        <p className="text-sm">X(Twitter)</p>
                                                     </a>
-                                                    <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <FaTelegramPlane className="h-6 w-6" />
+                                                    <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" >
+                                                        <p className="text-sm">Telegram</p>
                                                     </a>
-                                                    <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <Image src="/bscscan.png" alt="BscScan Logo" width={10} height={10} className="h-6 w-6" />
-                                                    </a>
+                                                    <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" >
+                                                        <p className="text-sm">Explorer</p>
+                                                         </a>
                                                 </div>
                                             )}
                                         </div>
@@ -612,7 +612,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 <section className="md:grid md:grid-cols-2 md:gap-8 mb-16">
                                     {/* Left Side: Token Information */}
                                     <div>
-                                        <div className="flex flex-row items-center gap-2 bg-black rounded-md p-4 mb-4">
+                                        <div className="flex flex-col gap-2 bg-black rounded-md p-4 mb-4">
+                                            <div className="flex flex-row items-center gap-2">
                                             <img
                                                 src={`/api/${chain}/logo/${contractAddress}`}
                                                 alt={`${tokenMetadata.symbol.toUpperCase()} Logo`}
@@ -623,21 +624,22 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 }}
                                             />
                                             <h1 className="text-2xl font-bold break-words">{tokenMetadata.name}</h1>
+                                            </div>
                                             {socialLinks && (
-                                                <div className="flex flex-row gap-4 mt-2 w-full">
-                                                    <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <FaGlobe className="h-6 w-6" />
+                                               <div className="flex flex-row gap-4 mt-4 items-center text-white justify-between px-4 bg-neutral-800 p-4 rounded-lg">
+                                               <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" >
+                                                   <p className="text-sm">Website</p>
+                                               </a>
+                                               <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" >
+                                                   <p className="text-sm">X(Twitter)</p>
+                                               </a>
+                                               <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" >
+                                                   <p className="text-sm">Telegram</p>
+                                               </a>
+                                               <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" >
+                                                   <p className="text-sm">Explorer</p>
                                                     </a>
-                                                    <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <SiX className="h-6 w-6" />
-                                                    </a>
-                                                    <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <FaTelegramPlane className="h-6 w-6" />
-                                                    </a>
-                                                    <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                                                        <Image src="/bscscan.png" alt="BscScan Logo" width={10} height={10} className="h-6 w-6" />
-                                                    </a>
-                                                </div>
+                                           </div>
                                             )}
                                         </div>
 
