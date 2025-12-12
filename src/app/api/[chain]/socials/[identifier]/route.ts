@@ -369,6 +369,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "https://x.com/bc400_bnb",
     telegram: "https://t.me/bc400_bnb",
     scan: "https://bscscan.com/token/0x61Fc93c7C070B32B1b1479B86056d8Ec1D7125BD",
+  },
+  "bullnance": {
+    website: "https://bullnance.fun/",
+    twitter: "https://x.com/_bullnancebsc",
+    telegram: "https://t.me/bullnanceBSC",
+    scan: "https://scan.com/token/0x591DF09AF60366298FE31C4590a9230585D34FBd",
   }
 
 };

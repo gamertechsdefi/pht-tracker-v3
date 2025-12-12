@@ -153,6 +153,7 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0x794BF989b667E718FD4053029397CF8BF8CaC4ca", symbol: "light", name: "Luminous Token", chain: "bsc", isBurn: true },
   { address: "0xC284A77838D09784C79061BA57B7203F8CBF76d9", symbol: "zonic", name: "Zion Token", chain: "bsc", isBurn: true },
   { address: "0x61Fc93c7C070B32B1b1479B86056d8Ec1D7125BD", symbol: "bc400", name: "BITCOIN CULTIVATOR 400", chain: "bsc", isBurn: false },
+  { address: "0x591DF09AF60366298FE31C4590a9230585D34FBd", symbol: "bullnance", name: "BULLNANCE", chain: "bsc", isBurn: false },
 
   {address: "0xf20f989CAf263C513f9183B4Fed88F14Fc04c8dB", symbol: "shalom", name: "Shalom", chain: "rwa", isBurn: false },
   { address: "0x782ea82124B474f1f968262ec24FCdED39689dd5", symbol: "rvm", name: "Real World Meme", chain: "rwa", isBurn: false},
