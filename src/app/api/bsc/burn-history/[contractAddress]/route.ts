@@ -1,38 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ethers } from 'ethers';
 import { getTokenByAddress, isValidContractAddress } from '@/lib/tokenRegistry';
 
+// Define proper types for API responses and data structures
 interface RouteParams {
-  contractAddress: string;
-}
-
-// Define proper types for BSCScan API responses
-type BscscanApiResponse = {
-    status: string;
-    message: string;
-    result: BscscanTransaction[] | string; // result can be a string when there's an error
-};
-
-type BscscanTransaction = {
-    blockNumber: string;
-    timeStamp: string;
-    hash: string;
-    nonce: string;
-    blockHash: string;
-    from: string;
     contractAddress: string;
-    to: string;
-    value: string;
-    tokenName: string;
-    tokenSymbol: string;
-    tokenDecimal: string;
-    transactionIndex: string;
-    gas: string;
-    gasPrice: string;
-    gasUsed: string;
-    cumulativeGasUsed: string;
-    input: string;
-    confirmations: string;
-};
+}
 
 type FormattedTransaction = {
     from: string;
@@ -42,10 +15,29 @@ type FormattedTransaction = {
     transactionHash: string;
 };
 
+interface BurnHistoryResponse {
+    token: string;
+    contractAddress: string;
+    burnAddresses: string[];
+    latestBurnTransactions: FormattedTransaction[];
+    lastUpdated: string;
+}
+
+interface ErrorResponse {
+    error: string;
+    message?: string;
+}
+
 // Environment variables
-const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY || "1E2JNG6XDN9SB1HXKHVJS6U1ZVR8GR1GFC";
-const BSCSCAN_API_URL = "https://api.etherscan.io/v2/api?chainid=56";
-const DEAD_ADDRESS = "0x000000000000000000000000000000000000dEaD";
+const RPC_ENDPOINT = process.env.RPC_ENDPOINT as string;
+
+// ERC20 ABI - minimal interface for token transfers
+const ERC20_ABI = [
+    "event Transfer(address indexed from, address indexed to, uint256 value)",
+    "function decimals() view returns (uint8)",
+    "function symbol() view returns (string)",
+    "function name() view returns (string)"
+];
 
 /**
  * Format a timestamp to a human-readable "time ago" string
@@ -79,220 +71,181 @@ function formatTimeAgo(timestamp: Date): string {
     return "just now";
 }
 
-export async function GET(
-  _req: NextRequest,
-  context: { params: Promise<RouteParams> }
-): Promise<NextResponse> {
-  try {
-    console.log('Starting burn history API call...');
-    
-    const params = await context.params;
-    const { contractAddress } = params;
-    console.log('Contract address:', contractAddress);
-
-    if (!contractAddress) {
-      console.log('Missing contract address');
-      return NextResponse.json({ error: 'Missing contract address' }, { status: 400 });
-    }
-
-    const addressLower = contractAddress.toLowerCase();
-    console.log('Normalized address:', addressLower);
-
-    // Validate contract address format
+/**
+ * Fetch burn transactions using ethers.js for multiple burn addresses
+ */
+async function fetchBurnTransactions(
+    provider: ethers.JsonRpcProvider,
+    tokenAddress: string,
+    burnAddresses: string[],
+    limit: number = 50
+): Promise<FormattedTransaction[]> {
     try {
-      if (!isValidContractAddress(addressLower, 'bsc')) {
-        console.log('Invalid contract address format');
-        return NextResponse.json({ error: 'Invalid contract address format' }, { status: 400 });
-      }
-    } catch (validationError) {
-      console.error('Error validating contract address:', validationError);
-      return NextResponse.json({ error: 'Error validating contract address' }, { status: 500 });
-    }
+        // Create contract instance
+        const contract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
 
-    // Verify token exists in registry
-    let tokenMetadata;
-    try {
-      tokenMetadata = getTokenByAddress(addressLower);
-      console.log('Token metadata:', tokenMetadata);
-    } catch (registryError) {
-      console.error('Error fetching token from registry:', registryError);
-      return NextResponse.json({ error: 'Error accessing token registry' }, { status: 500 });
-    }
+        // Get token decimals
+        const decimals = await contract.decimals();
 
-    if (!tokenMetadata) {
-      console.log('Token not found in registry');
-      return NextResponse.json({ error: 'Token not found in registry' }, { status: 404 });
-    }
-
-    // Verify it's a BSC token
-    if (tokenMetadata.chain !== 'bsc') {
-      console.log(`Token is on ${tokenMetadata.chain}, not BSC`);
-      return NextResponse.json({
-        error: `Token is on ${tokenMetadata.chain.toUpperCase()}, not BSC`
-      }, { status: 400 });
-    }
-
-    // Validate API key
-    if (!BSCSCAN_API_KEY) {
-      console.error("Missing BSCSCAN_API_KEY environment variable");
-      return NextResponse.json(
-        { error: "Server configuration error", message: "API key not configured" },
-        { status: 500 }
-      );
-    }
-
-    // Fetch burn transactions from BSCScan API
-    const url = `${BSCSCAN_API_URL}&module=account&action=tokentx&contractaddress=${contractAddress}&address=${DEAD_ADDRESS}&sort=desc&offset=50&page=1&apikey=${BSCSCAN_API_KEY}`;
-    console.log('Fetching from BSCScan URL:', url);
-
-    let response;
-    let data: BscscanApiResponse;
-    
-    try {
-      response = await fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'BurnTracker/1.0'
-        }
-      });
-
-      if (!response.ok) {
-        console.error(`BSCScan API HTTP error: ${response.status} ${response.statusText}`);
-        return NextResponse.json(
-          { error: "BSCScan API request failed", message: `HTTP ${response.status}` },
-          { status: 500 }
-        );
-      }
-
-      data = await response.json() as BscscanApiResponse;
-      console.log('BSCScan API response status:', data.status);
-      console.log('BSCScan API message:', data.message);
-      
-    } catch (fetchError) {
-      console.error("Error fetching from BSCScan:", fetchError);
-      return NextResponse.json(
-        { error: "Failed to fetch from BSCScan", message: (fetchError as Error).message },
-        { status: 500 }
-      );
-    }
-
-    // Handle BSCScan API errors or empty results
-    if (data.status !== "1") {
-      if (data.message === "No transactions found") {
-        console.log('No burn transactions found for this token');
-        // Return empty results instead of error
-        const burnData = {
-          contractAddress: contractAddress,
-          symbol: tokenMetadata.symbol,
-          name: tokenMetadata.name,
-          burnHistory: [],
-          totalBurnEvents: 0,
-          totalBurned: "0",
-          lastUpdated: new Date().toISOString()
-        };
-        return NextResponse.json(burnData);
-      }
-      
-      console.error("BSCScan API error:", data.message);
-      return NextResponse.json(
-        { error: "Failed to fetch burn transactions", message: data.message },
-        { status: 500 }
-      );
-    }
-
-    // Check if result is an array (successful response) or string (error)
-    if (!Array.isArray(data.result)) {
-      console.error("Unexpected BSCScan response format:", data.result);
-      return NextResponse.json(
-        { error: "Unexpected API response format", message: "Invalid response structure" },
-        { status: 500 }
-      );
-    }
-
-    console.log(`Found ${data.result.length} burn transactions`);
-
-    // Format the transactions with better error handling
-    const transactions: FormattedTransaction[] = [];
-    
-    for (const tx of data.result) {
-      try {
-        // Ensure values are properly converted with validation
-        const tokenDecimal = parseInt(tx.tokenDecimal) || 0;
-        const txValue = tx.value || "0";
-        const timeStamp = parseInt(tx.timeStamp) || 0;
-
-        // Handle potential conversion issues with safe parsing
-        let amount = 0;
-        try {
-          if (tokenDecimal > 0 && txValue !== "0") {
-            const divisor = Math.pow(10, tokenDecimal);
-            amount = parseFloat(txValue) / divisor;
+        // Get current block
+        const currentBlock = await provider.getBlockNumber();
+        
+        // Query Transfer events to burn addresses (last ~10000 blocks to optimize)
+        const fromBlock = Math.max(0, currentBlock - 10000);
+        
+        // Fetch events for all burn addresses
+        const allEvents: ethers.EventLog[] = [];
+        
+        for (const burnAddress of burnAddresses) {
+            const filter = contract.filters.Transfer(null, burnAddress);
+            const events = await contract.queryFilter(filter, fromBlock, currentBlock);
             
-            // Validate the result
-            if (!isFinite(amount) || isNaN(amount)) {
-              amount = 0;
-            }
-          }
-        } catch (amountError) {
-          console.warn('Error calculating amount for tx:', tx.hash, amountError);
-          amount = 0;
+            // Filter and add EventLog instances
+            const eventLogs = events.filter((event): event is ethers.EventLog => 
+                event instanceof ethers.EventLog
+            );
+            allEvents.push(...eventLogs);
         }
 
-        const txTimestamp = timeStamp > 0 ? new Date(timeStamp * 1000) : new Date();
+        // Sort by block number descending and limit results
+        const sortedEvents = allEvents
+            .sort((a, b) => b.blockNumber - a.blockNumber)
+            .slice(0, limit);
 
-        transactions.push({
-          from: tx.from || '',
-          to: tx.to || '',
-          amount: amount,
-          timestamp: formatTimeAgo(txTimestamp),
-          transactionHash: tx.hash || '',
+        // Format transactions
+        const transactions: FormattedTransaction[] = await Promise.all(
+            sortedEvents.map(async (event) => {
+                const block = await event.getBlock();
+                const timestamp = new Date(block.timestamp * 1000);
+                
+                // Parse the Transfer event args
+                const from = event.args[0] as string;
+                const to = event.args[1] as string;
+                const value = event.args[2] as bigint;
+
+                const amount = Number(ethers.formatUnits(value, decimals));
+
+                return {
+                    from,
+                    to,
+                    amount,
+                    timestamp: formatTimeAgo(timestamp),
+                    transactionHash: event.transactionHash,
+                };
+            })
+        );
+
+        return transactions;
+    } catch (error) {
+        console.error("Error fetching burn transactions:", error);
+        throw error;
+    }
+}
+
+/**
+ * Handler for GET requests to fetch token burn transactions
+ */
+export async function GET(
+    _request: NextRequest,
+    context: { params: Promise<RouteParams> }
+): Promise<NextResponse<BurnHistoryResponse | ErrorResponse>> {
+    try {
+        const params = await context.params;
+        const { contractAddress } = params;
+
+        if (!contractAddress) {
+            return NextResponse.json(
+                { error: "Missing contract address" },
+                { status: 400 }
+            );
+        }
+
+        const addressLower = contractAddress.toLowerCase();
+
+        // Validate contract address format
+        if (!isValidContractAddress(addressLower, 'bsc')) {
+            return NextResponse.json(
+                { error: "Invalid contract address format" },
+                { status: 400 }
+            );
+        }
+
+        // Verify token exists in registry
+        const tokenMetadata = getTokenByAddress(addressLower);
+        if (!tokenMetadata) {
+            return NextResponse.json(
+                { error: "Token not found in registry" },
+                { status: 404 }
+            );
+        }
+
+        // Verify it's a BSC token
+        if (tokenMetadata.chain !== 'bsc') {
+            return NextResponse.json(
+                { error: `Token is on ${tokenMetadata.chain.toUpperCase()}, not BSC` },
+                { status: 400 }
+            );
+        }
+
+        const tokenAddress = tokenMetadata.address;
+        
+        // Get burn addresses - support both common burn addresses
+        const burnAddresses = [
+            "0x000000000000000000000000000000000000dEaD", // Most common burn address
+            "0x0000000000000000000000000000000000000000"  // Zero address (also used for burns)
+        ];
+
+        // Validate RPC endpoint
+        if (!RPC_ENDPOINT) {
+            console.error("Missing RPC_ENDPOINT environment variable");
+            return NextResponse.json(
+                { error: "Server configuration error", message: "RPC endpoint not configured" },
+                { status: 500 }
+            );
+        }
+
+        console.log("Connecting to RPC:", RPC_ENDPOINT.replace(/api_key=[^&]+/, 'api_key=***'));
+
+        // Create provider - URL should include ?api_key= parameter
+        const provider = new ethers.JsonRpcProvider(RPC_ENDPOINT, 56, {
+            staticNetwork: ethers.Network.from(56),
         });
 
-      } catch (txError) {
-        console.warn('Error processing transaction:', tx.hash, txError);
-        // Continue processing other transactions
-      }
+        // Test the connection
+        try {
+            const blockNumber = await provider.getBlockNumber();
+            console.log("Connected successfully. Current block:", blockNumber);
+        } catch (error) {
+            console.error("Provider connection error:", error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            return NextResponse.json(
+                { error: "Failed to connect to RPC endpoint", message: errorMessage },
+                { status: 500 }
+            );
+        }
+
+        // Fetch burn transactions from all burn addresses
+        const transactions = await fetchBurnTransactions(
+            provider,
+            tokenAddress,
+            burnAddresses,
+            50
+        );
+
+        return NextResponse.json({
+            token: tokenMetadata.symbol.toUpperCase(),
+            contractAddress: contractAddress,
+            burnAddresses: burnAddresses,
+            latestBurnTransactions: transactions,
+            lastUpdated: new Date().toISOString(),
+        });
+    } catch (error) {
+        const typedError = error as Error;
+        console.error("API Error:", typedError);
+
+        return NextResponse.json(
+            { error: "Failed to fetch burn transactions", message: typedError.message },
+            { status: 500 }
+        );
     }
-
-    // Calculate total burned with safe math
-    const totalBurned = transactions.reduce((sum: number, burn: FormattedTransaction) => {
-      const amount = burn.amount || 0;
-      return sum + (isFinite(amount) ? amount : 0);
-    }, 0);
-
-    const burnData = {
-      contractAddress: contractAddress,
-      symbol: tokenMetadata.symbol,
-      name: tokenMetadata.name,
-      burnHistory: transactions,
-      totalBurnEvents: transactions.length,
-      totalBurned: totalBurned.toString(),
-      lastUpdated: new Date().toISOString()
-    };
-
-    console.log('Successfully processed burn data:', {
-      totalEvents: burnData.totalBurnEvents,
-      totalBurned: burnData.totalBurned
-    });
-
-    return NextResponse.json(burnData);
-
-  } catch (error) {
-    // Enhanced error logging
-    const typedError = error as Error;
-    console.error("Burn history API error:", {
-      message: typedError.message,
-      stack: typedError.stack,
-      name: typedError.name
-    });
-
-    return NextResponse.json(
-      { 
-        error: "Failed to fetch burn history", 
-        message: typedError.message,
-        ...(process.env.NODE_ENV === 'development' && { stack: typedError.stack })
-      },
-      { status: 500 }
-    );
-  }
 }
