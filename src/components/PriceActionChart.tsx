@@ -8,6 +8,7 @@ type SupportedChain = "bsc" | "sol" | "rwa";
 interface PriceActionChartProps {
   chain: SupportedChain;
   contractAddress: string;
+  tokenSymbol: string;
 }
 
 interface MarketChartResponse {
@@ -63,9 +64,10 @@ function getHistoLimit(days: number): number {
   return 90;
 }
 
-export default function PriceActionChart({ 
-  chain, 
-  contractAddress
+export default function PriceActionChart({
+  chain,
+  contractAddress,
+  tokenSymbol
 }: PriceActionChartProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const chartRef = useRef<any>(null);
@@ -235,14 +237,14 @@ export default function PriceActionChart({
       const symbol = getSymbolFromChain(chain);
       const endpoint = getHistoEndpoint(selectedTimeframe);
       const limit = getHistoLimit(selectedTimeframe);
-      
+
       // Build URL with API key if provided
       let url = `https://min-api.cryptocompare.com/data/v2/${endpoint}?fsym=${symbol}&tsym=USD&limit=${limit}`;
-      
+
       if (cryptocompareApiKey) {
         url += `&api_key=${cryptocompareApiKey}`;
       }
-      
+
       console.log('Fetching from CryptoCompare:', url.replace(cryptocompareApiKey || '', '***'));
       // Retry with backoff for 429/5xx
       const maxAttempts = 2;
@@ -266,25 +268,25 @@ export default function PriceActionChart({
       }
       if (!resp) throw new Error('CryptoCompare: no response');
       const json = (await resp.json()) as CryptoCompareResponse;
-      
+
       // Check for API error response
       if (json.Response === 'Error') {
         throw new Error(json.Message || 'CryptoCompare API error');
       }
-      
+
       if (!json.Data?.Data || json.Data.Data.length === 0) {
         throw new Error('No data from CryptoCompare');
       }
-      
+
       const prices: number[] = [];
       const labels: string[] = [];
-      
+
       json.Data.Data.forEach((dataPoint) => {
         prices.push(dataPoint.close);
-        
+
         const date = new Date(dataPoint.time * 1000); // Convert seconds to milliseconds
         let timeLabel: string;
-        
+
         if (selectedTimeframe <= 1) {
           timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         } else if (selectedTimeframe <= 7) {
@@ -292,10 +294,10 @@ export default function PriceActionChart({
         } else {
           timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
         }
-        
+
         labels.push(timeLabel);
       });
-      
+
       return { prices, labels };
     }
 
@@ -314,7 +316,7 @@ export default function PriceActionChart({
         if (cached && !cancelled) {
           setData({ prices: cached.prices, labels: cached.labels });
         }
-        
+
         // If this is an RWA token, use internal RWA price-data route first
         if (chain === 'rwa') {
           try {
@@ -359,7 +361,7 @@ export default function PriceActionChart({
         setLoading(false);
       }
     }
-    
+
     if (contractAddress) {
       loadData();
     }
@@ -377,7 +379,7 @@ export default function PriceActionChart({
     }
 
     console.log('Creating chart with', data.prices.length, 'data points');
-    
+
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) {
       console.log('No canvas context');
@@ -456,7 +458,7 @@ export default function PriceActionChart({
           },
         },
       });
-      
+
       console.log('Chart created successfully');
     } catch (chartError) {
       console.error('Chart creation failed:', chartError);
@@ -468,17 +470,17 @@ export default function PriceActionChart({
           chartRef.current.destroy();
           chartRef.current = null;
         }
-      } catch {}
+      } catch { }
     };
   }, [isChartReady, data]);
 
   return (
-    <div className="mt-4 bg-neutral-900 border border-neutral-700 rounded-md p-4">
+    <div className="mt-4 rounded-md p-4">
       {/* Chart.js is loaded dynamically in a useEffect */}
 
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Price Action</h3>
+        <h3 className="text-lg font-semibold"> {tokenSymbol} Price Action</h3>
         {/* <span className="text-xs text-gray-400">
           Source: {dataSource === "coingecko" ? "CoinGecko" : dataSource === "cryptocompare" ? "CryptoCompare" : dataSource === 'rwa' ? 'AssetChain (RWA)' : "..."}
         </span> */}
@@ -490,11 +492,10 @@ export default function PriceActionChart({
           <button
             key={timeframe.days}
             onClick={() => setSelectedTimeframe(timeframe.days)}
-            className={`px-3 py-1 text-xs rounded ${
-              selectedTimeframe === timeframe.days
+            className={`px-3 py-1 text-xs rounded ${selectedTimeframe === timeframe.days
                 ? "bg-orange-500 text-white"
-                : "bg-neutral-700 text-gray-300 hover:bg-neutral-600"
-            }`}
+                : "bg-neutral-200 text-black hover:bg-neutral-600"
+              }`}
           >
             {timeframe.label}
           </button>
@@ -503,14 +504,14 @@ export default function PriceActionChart({
 
       {/* Chart or status */}
       {loading ? (
-        <div className="text-center text-sm text-gray-400 py-8">Loading price data…</div>
+        <div className="text-center text-sm text-white py-8">Loading price data…</div>
       ) : error ? (
         <div className="text-center py-8">
           <div className="text-sm text-red-500 mb-2">{error}</div>
           {!cryptocompareApiKey && error.includes('CryptoCompare') && (
-            <a 
-              href="https://www.cryptocompare.com/cryptopian/api-keys" 
-              target="_blank" 
+            <a
+              href="https://www.cryptocompare.com/cryptopian/api-keys"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-blue-400 hover:underline"
             >

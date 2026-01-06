@@ -60,7 +60,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>("info");
-    
+
     // Emoji reactions synced with Supabase
     const {
         counts: emojiCounts,
@@ -87,19 +87,19 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
     useEffect(() => {
         async function fetchTokenData() {
-            
+
             if (!chain || !contractAddress) {
-                
+
                 setError("Invalid chain or contract address");
                 setLoading(false);
                 return;
             }
 
             const chainLower = chain.toLowerCase() as 'bsc' | 'sol' | 'rwa';
-            
+
             // Validate contract address format
             if (!isValidContractAddress(contractAddress, chainLower)) {
-                
+
                 router.push(`/error?type=invalid_address&identifier=${encodeURIComponent(contractAddress)}&chain=${chainLower}`);
                 return;
             }
@@ -107,14 +107,14 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
             // Get token metadata from registry
             const metadata = getTokenByAddress(contractAddress);
             if (!metadata) {
-                
+
                 router.push(`/error?type=token_not_found&identifier=${encodeURIComponent(contractAddress)}&chain=${chainLower}`);
                 return;
             }
 
             // Verify chain matches
             if (metadata.chain !== chainLower) {
-               
+
                 router.push(`/error?type=chain_mismatch&identifier=${encodeURIComponent(contractAddress)}&chain=${chainLower}`);
                 return;
             }
@@ -124,9 +124,9 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                 ...metadata,
                 isBurn: metadata.isBurn === true
             };
-            
+
             setTokenMetadata(enhancedMetadata);
-            
+
             try {
                 // Use the token symbol for API calls (for backward compatibility with existing APIs)
                 // const tokenSymbol = metadata.symbol;
@@ -139,7 +139,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     `/api/${chainLower}/socials/${contractAddress}`,
                     `/api/${chainLower}/ca/${contractAddress}`,
                 ];
-                
+
                 const responses = await Promise.all(
                     apiEndpoints.map((endpoint) =>
                         fetch(endpoint)
@@ -270,7 +270,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     function formatEvmAddress(address: string, shorten: boolean = true, chars: number = 5): string {
         // Normalize to lowercase and remove '0x' prefix if present
         const normalized = address.toLowerCase().replace(/^0x/i, '');
-        if (normalized.length < 40 ) {
+        if (normalized.length < 40) {
             throw new Error("Invalid EVM address. Must be 40 hexadecimal characters.");
         }
 
@@ -294,7 +294,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     async function copyAddress(address: string): Promise<void> {
         try {
             await navigator.clipboard.writeText(address);
-            
+
             alert('Address copied to clipboard!');
         } catch (error) {
             console.error('Failed to copy address:', error);
@@ -304,7 +304,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
     // Check if token has burns enabled
     const showBurns = tokenMetadata?.isBurn;
-    
+
     // Dev logging to verify burn visibility
     useEffect(() => {
         if (process.env.NODE_ENV === 'development') {
@@ -384,7 +384,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     </a>
                                                     <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" >
                                                         <p className="text-sm">Explorer</p>
-                                                         </a>
+                                                    </a>
                                                 </div>
                                             )}
                                         </div>
@@ -465,7 +465,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             <p className="text-md">Contract Address</p>
                                             <h1 className="text-lg md:text-xl font-bold text-orange-500 flex gap-2">
                                                 <span>{formatEvmAddress(tokenData.contract)}</span>
-                                                <button onClick={()=> copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
+                                                <button onClick={() => copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
                                             </h1>
                                         </div>
 
@@ -509,62 +509,57 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </div>
                                         </div>
 
-                                         <div className="flex gap-2 md:gap-3 items-center justify-center mb-4 flex-wrap">
-                                            <div 
-                                                onClick={() => !hasReactedToday && submitEmojiReaction(1)} 
-                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                                    hasReactedToday 
-                                                        ? 'opacity-50 cursor-not-allowed' 
+                                        <div className="flex gap-2 md:gap-3 items-center justify-center mb-4 flex-wrap">
+                                            <div
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(1)}
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                        ? 'opacity-50 cursor-not-allowed'
                                                         : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                                }`}
+                                                    }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🔥</div>
                                                 <h1 className="font-semibold">{emojiCounts[1]}</h1>
                                             </div>
-                                            <div 
-                                                onClick={() => !hasReactedToday && submitEmojiReaction(2)} 
-                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                                    hasReactedToday 
-                                                        ? 'opacity-50 cursor-not-allowed' 
+                                            <div
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(2)}
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                        ? 'opacity-50 cursor-not-allowed'
                                                         : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                                }`}
+                                                    }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚀</div>
                                                 <h1 className="font-semibold">{emojiCounts[2]}</h1>
                                             </div>
-                                            <div 
-                                                onClick={() => !hasReactedToday && submitEmojiReaction(3)} 
-                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                                    hasReactedToday 
-                                                        ? 'opacity-50 cursor-not-allowed' 
+                                            <div
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(3)}
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                        ? 'opacity-50 cursor-not-allowed'
                                                         : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                                }`}
+                                                    }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">❤️‍🔥</div>
                                                 <h1 className="font-semibold">{emojiCounts[3]}</h1>
                                             </div>
-                                            <div 
-                                                onClick={() => !hasReactedToday && submitEmojiReaction(4)} 
-                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                                    hasReactedToday 
-                                                        ? 'opacity-50 cursor-not-allowed' 
+                                            <div
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(4)}
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                        ? 'opacity-50 cursor-not-allowed'
                                                         : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                                }`}
+                                                    }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">💩</div>
                                                 <h1 className="font-semibold">{emojiCounts[4]}</h1>
                                             </div>
-                                            <div 
-                                                onClick={() => !hasReactedToday && submitEmojiReaction(5)} 
-                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                                    hasReactedToday 
-                                                        ? 'opacity-50 cursor-not-allowed' 
+                                            <div
+                                                onClick={() => !hasReactedToday && submitEmojiReaction(5)}
+                                                className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                        ? 'opacity-50 cursor-not-allowed'
                                                         : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                                }`}
+                                                    }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
                                                 <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚩</div>
@@ -587,7 +582,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     {showBurns && (
                                         <section className="mt-8 flex flex-col">
                                             <div className="flex-1">
-                                                {tokenMetadata && <BurnIntervals contractAddress={tokenMetadata.address} tokenSymbol={tokenMetadata.symbol} /> }
+                                                {tokenMetadata && <BurnIntervals contractAddress={tokenMetadata.address} tokenSymbol={tokenMetadata.symbol} />}
                                             </div>
                                             {tokenMetadata && chain && <BurnsDisplay contractAddress={tokenMetadata.address} chain={chain} />}
                                         </section>
@@ -595,9 +590,10 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 </div>
 
                                 {activeTab === "chart" && (
-                                    <div className="mb-16">
+                                    <div className="mb-16 w-full h-full">
                                         {chain && contractAddress && (
                                             <PriceActionChart
+                                                tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
                                                 chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
                                                 contractAddress={contractAddress}
                                             />
@@ -614,32 +610,32 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     <div>
                                         <div className="flex flex-col gap-2 bg-black rounded-md p-4 mb-4">
                                             <div className="flex flex-row items-center gap-2">
-                                            <img
-                                                src={`/api/${chain}/logo/${contractAddress}`}
-                                                alt={`${tokenMetadata.symbol.toUpperCase()} Logo`}
-                                                className="w-18 h-18 rounded-md object-contain flex-shrink-0"
-                                                onError={(e) => {
-                                                    (e.target as HTMLImageElement).src = '/file.svg';
-                                                    (e.target as HTMLImageElement).alt = 'Default Logo';
-                                                }}
-                                            />
-                                            <h1 className="text-2xl font-bold break-words">{tokenMetadata.name}</h1>
+                                                <img
+                                                    src={`/api/${chain}/logo/${contractAddress}`}
+                                                    alt={`${tokenMetadata.symbol.toUpperCase()} Logo`}
+                                                    className="w-18 h-18 rounded-md object-contain flex-shrink-0"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = '/file.svg';
+                                                        (e.target as HTMLImageElement).alt = 'Default Logo';
+                                                    }}
+                                                />
+                                                <h1 className="text-2xl font-bold break-words">{tokenMetadata.name}</h1>
                                             </div>
                                             {socialLinks && (
-                                               <div className="flex flex-row gap-4 mt-4 items-center text-white justify-between px-4 bg-neutral-800 p-4 rounded-lg">
-                                               <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" >
-                                                   <p className="text-sm">Website</p>
-                                               </a>
-                                               <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" >
-                                                   <p className="text-sm">X(Twitter)</p>
-                                               </a>
-                                               <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" >
-                                                   <p className="text-sm">Telegram</p>
-                                               </a>
-                                               <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" >
-                                                   <p className="text-sm">Explorer</p>
+                                                <div className="flex flex-row gap-4 mt-4 items-center text-white justify-between px-4 bg-neutral-800 p-4 rounded-lg">
+                                                    <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" >
+                                                        <p className="text-sm">Website</p>
                                                     </a>
-                                           </div>
+                                                    <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" >
+                                                        <p className="text-sm">X(Twitter)</p>
+                                                    </a>
+                                                    <a href={socialLinks.telegram} target="_blank" rel="noopener noreferrer" >
+                                                        <p className="text-sm">Telegram</p>
+                                                    </a>
+                                                    <a href={socialLinks.scan} target="_blank" rel="noopener noreferrer" >
+                                                        <p className="text-sm">Explorer</p>
+                                                    </a>
+                                                </div>
                                             )}
                                         </div>
 
@@ -719,7 +715,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             <p className="text-md">Contract Address</p>
                                             <h1 className="text-lg md:text-2xl font-bold text-orange-500 flex gap-2">
                                                 <span>{tokenData.contract}</span>
-                                                <button onClick={()=> copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
+                                                <button onClick={() => copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
                                             </h1>
                                         </div>
 
@@ -764,85 +760,81 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     <div>
                                         {chain && contractAddress && (
                                             <PriceActionChart
+                                                tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
                                                 chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
                                                 contractAddress={contractAddress}
                                             />
                                         )}
                                     </div>
-                                            {/* Emoji Section - Desktop */}
-                                <div className="flex gap-4 md:gap-8 items-center justify-center mb-4 flex-wrap">
-                                    <div 
-                                        onClick={() => !hasReactedToday && submitEmojiReaction(1)} 
-                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                            hasReactedToday 
-                                                ? 'opacity-50 cursor-not-allowed' 
-                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                        }`}
-                                        title={hasReactedToday ? 'You have already reacted today' : ''}
-                                    >
-                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🔥</div>
-                                        <h1 className="font-semibold">{emojiCounts[1]}</h1>
+                                    {/* Emoji Section - Desktop */}
+                                    <div className="flex gap-4 md:gap-8 items-center justify-center mb-4 flex-wrap">
+                                        <div
+                                            onClick={() => !hasReactedToday && submitEmojiReaction(1)}
+                                            className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                            title={hasReactedToday ? 'You have already reacted today' : ''}
+                                        >
+                                            <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🔥</div>
+                                            <h1 className="font-semibold">{emojiCounts[1]}</h1>
+                                        </div>
+                                        <div
+                                            onClick={() => !hasReactedToday && submitEmojiReaction(2)}
+                                            className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                            title={hasReactedToday ? 'You have already reacted today' : ''}
+                                        >
+                                            <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚀</div>
+                                            <h1 className="font-semibold">{emojiCounts[2]}</h1>
+                                        </div>
+                                        <div
+                                            onClick={() => !hasReactedToday && submitEmojiReaction(3)}
+                                            className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                            title={hasReactedToday ? 'You have already reacted today' : ''}
+                                        >
+                                            <div className="text-3xl md:text-4xl flex items-center justify-center h-full">❤️‍🔥</div>
+                                            <h1 className="font-semibold">{emojiCounts[3]}</h1>
+                                        </div>
+                                        <div
+                                            onClick={() => !hasReactedToday && submitEmojiReaction(4)}
+                                            className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                            title={hasReactedToday ? 'You have already reacted today' : ''}
+                                        >
+                                            <div className="text-3xl md:text-4xl flex items-center justify-center h-full">💩</div>
+                                            <h1 className="font-semibold">{emojiCounts[4]}</h1>
+                                        </div>
+                                        <div
+                                            onClick={() => !hasReactedToday && submitEmojiReaction(5)}
+                                            className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                }`}
+                                            title={hasReactedToday ? 'You have already reacted today' : ''}
+                                        >
+                                            <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚩</div>
+                                            <h1 className="font-semibold">{emojiCounts[5]}</h1>
+                                        </div>
                                     </div>
-                                    <div 
-                                        onClick={() => !hasReactedToday && submitEmojiReaction(2)} 
-                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                            hasReactedToday 
-                                                ? 'opacity-50 cursor-not-allowed' 
-                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                        }`}
-                                        title={hasReactedToday ? 'You have already reacted today' : ''}
-                                    >
-                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚀</div>
-                                        <h1 className="font-semibold">{emojiCounts[2]}</h1>
-                                    </div>
-                                    <div 
-                                        onClick={() => !hasReactedToday && submitEmojiReaction(3)} 
-                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                            hasReactedToday 
-                                                ? 'opacity-50 cursor-not-allowed' 
-                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                        }`}
-                                        title={hasReactedToday ? 'You have already reacted today' : ''}
-                                    >
-                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">❤️‍🔥</div>
-                                        <h1 className="font-semibold">{emojiCounts[3]}</h1>
-                                    </div>
-                                    <div 
-                                        onClick={() => !hasReactedToday && submitEmojiReaction(4)} 
-                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                            hasReactedToday 
-                                                ? 'opacity-50 cursor-not-allowed' 
-                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                        }`}
-                                        title={hasReactedToday ? 'You have already reacted today' : ''}
-                                    >
-                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">💩</div>
-                                        <h1 className="font-semibold">{emojiCounts[4]}</h1>
-                                    </div>
-                                    <div 
-                                        onClick={() => !hasReactedToday && submitEmojiReaction(5)} 
-                                        className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${
-                                            hasReactedToday 
-                                                ? 'opacity-50 cursor-not-allowed' 
-                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
-                                        }`}
-                                        title={hasReactedToday ? 'You have already reacted today' : ''}
-                                    >
-                                        <div className="text-3xl md:text-4xl flex items-center justify-center h-full">🚩</div>
-                                        <h1 className="font-semibold">{emojiCounts[5]}</h1>
-                                    </div>
-                                </div>
-                                {hasReactedToday && (
-                                    <p className="text-center text-sm text-gray-400 mb-4">
-                                        You have already reacted today. Come back tomorrow to react again!
-                                    </p>
-                                )}
-                                {/* <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
+                                    {hasReactedToday && (
+                                        <p className="text-center text-sm text-gray-400 mb-4">
+                                            You have already reacted today. Come back tomorrow to react again!
+                                        </p>
+                                    )}
+                                    {/* <button onClick={() => resetEmojiCounts()} className="w-full mb-16 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200">
                                     Reset All
                                 </button> */}
                                 </section>
 
-                        
+
 
                                 {/* Bottom Section: Burns (if enabled) */}
                                 {showBurns && (
