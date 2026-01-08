@@ -14,6 +14,7 @@ interface Token {
   marketCap: string | number;
   volume: string | number;
   liquidity: string | number;
+  change24h?: string | number;
 }
 
 function formatCompactNumber(value: number | string): string {
@@ -199,7 +200,7 @@ export default function Home() {
                           }}
                         />
                       </div>
-                      
+
                       {/* Token Symbol and Name */}
                       <div className="flex flex-col min-w-0 flex-1">
                         <span className="text-white font-bold text-lg whitespace-nowrap truncate">
@@ -212,10 +213,21 @@ export default function Home() {
                     </div>
 
                     {/* Right: Price */}
-                    <div className="text-right flex-shrink-0 ml-2">
+                    <div className="flex flex-col text-right flex-shrink-0 ml-2">
                       <span className="text-white font-semibold text-xl whitespace-nowrap">
                         {priceDisplay}
                       </span>
+                      {token.change24h !== 'N/A' && token.change24h !== undefined && (
+                        (() => {
+                          const change = parseFloat(String(token.change24h));
+                          const isPositive = change >= 0;
+                          return (
+                            <span className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                              {isPositive ? '+' : ''}{change.toFixed(2)}%
+                            </span>
+                          );
+                        })()
+                      )}
                     </div>
                   </div>
 
@@ -262,6 +274,9 @@ export default function Home() {
                   </th>
                   <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[120px]">
                     Price
+                  </th>
+                  <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[120px]">
+                    24H Change
                   </th>
                   <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[120px]">
                     Market Cap
@@ -326,7 +341,7 @@ export default function Home() {
                           </div>
                         </Link>
                       </td>
-                      
+
                       {/* Price column */}
                       <td className="px-5 py-4 text-sm min-w-[120px]">
                         <span className="text-white whitespace-nowrap">
@@ -341,7 +356,24 @@ export default function Home() {
                           })()}
                         </span>
                       </td>
-                      
+
+                      {/* 24h Change column */}
+                      <td className="px-5 py-4 text-sm min-w-[120px]">
+                        {token.change24h === 'N/A' || token.change24h === undefined ? (
+                          <span className="text-white whitespace-nowrap">N/A</span>
+                        ) : (
+                          (() => {
+                            const change = parseFloat(String(token.change24h));
+                            const isPositive = change >= 0;
+                            return (
+                              <span className={`whitespace-nowrap font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                {isPositive ? '+' : ''}{change.toFixed(2)}%
+                              </span>
+                            );
+                          })()
+                        )}
+                      </td>
+
                       {/* Market Cap column */}
                       <td className="px-5 py-4 text-sm min-w-[120px]">
                         <span className="text-white whitespace-nowrap">
@@ -363,7 +395,7 @@ export default function Home() {
                         </span>
                       </td>
 
-                    
+
                     </tr>
                   ))
                 )}
