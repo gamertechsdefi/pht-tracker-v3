@@ -3,18 +3,18 @@
 import { useState, useEffect } from "react";
 
 interface BurnTransaction {
-  timestamp?: string;
-  from?: string;
-  amount?: number;
+  from: string;
+  to: string;
+  amount: number;
+  timestamp: string;
+  transactionHash: string;
 }
 
 interface BurnHistoryResponse {
-  contractAddress: string;
   symbol: string;
-  name: string;
+  contractAddress: string;
+  // burnAddresses: string[]; // Not returned by API currently
   burnHistory: BurnTransaction[];
-  totalBurnEvents: number;
-  totalBurned: string;
   lastUpdated: string;
 }
 
@@ -44,16 +44,17 @@ export default function BurnsDisplay({ contractAddress }: BurnsDisplayProps) {
         console.log("Response Status:", response.status);
 
         if (!response.ok) {
-          const errorData: { message?: string } = await response.json();
+          const errorData: { error?: string; message?: string } = await response.json();
           console.error("API Error:", errorData);
-          throw new Error(errorData.message || "Failed to fetch burn transactions");
+          throw new Error(errorData.message || errorData.error || "Failed to fetch burn transactions");
         }
 
         const data: BurnHistoryResponse = await response.json();
         console.log("Burn Transactions Data:", data);
 
-        setBurns(data.burnHistory);
-        setTokenSymbol(data.symbol);
+        // Map API response to state
+        setBurns(data.burnHistory || []);
+        setTokenSymbol(data.symbol || '');
         setIsLoading(false);
       } catch (err: unknown) {
         console.error(`Fetch Error (Attempt ${attempt}):`, (err as Error).message);
@@ -78,27 +79,45 @@ export default function BurnsDisplay({ contractAddress }: BurnsDisplayProps) {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
   };
 
+  const formatAmount = (amount: number): string => {
+    // Format large numbers with commas
+    if (amount >= 1000000) {
+      return (amount / 1000000).toFixed(2) + "M";
+    } else if (amount >= 1000) {
+      return (amount / 1000).toFixed(2) + "K";
+    }
+    return amount.toFixed(2);
+  };
+
   if (isLoading) return <div className="text-center">Loading burns...</div>;
   if (error) return <div className="text-center text-red-500">Error: {error}</div>;
+  if (!burns || burns.length === 0) return <div className="text-center">No burn transactions found</div>;
 
   return (
     <div className="md:py-0 py-8">
       <h2 className="text-2xl font-bold mb-2">Recent Burns</h2>
 
       <div className="hidden md:flex md:flex-row justify-center gap-32 h-96 overflow-y-auto rounded">
-        <ul>
-          <li className="flex justify-between py-2 font-semibold border-b gap-32">
+        <ul className="w-full">
+          <li className="flex justify-between py-2 font-semibold border-b gap-8">
             <span className="text-sm">Time</span>
-            <span className="text-sm">Address</span>
+            <span className="text-sm">From Address</span>
             <span className="text-sm text-right pr-2">Amount</span>
           </li>
 
           {burns.map((burn, index) => (
-            <li key={index} className="flex justify-between gap-32 py-2 border-b">
-              <span className="text-sm">{burn.timestamp || "N/A"}</span>
-              <span className="text-sm">{truncateAddress(burn.from)}</span>
+            <li key={`${burn.transactionHash}-${index}`} className="flex justify-between gap-8 py-2 border-b hover:bg-gray-50">
+              <span className="text-sm">{burn.timestamp}</span>
+              <a
+                href={`https://bscscan.com/address/${burn.from}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline"
+              >
+                {truncateAddress(burn.from)}
+              </a>
               <span className="text-sm pr-2 text-right">
-                {burn.amount?.toFixed(2) || "N/A"} {tokenSymbol.toUpperCase()}
+                {formatAmount(burn.amount)} {tokenSymbol}
               </span>
             </li>
           ))}
@@ -108,20 +127,38 @@ export default function BurnsDisplay({ contractAddress }: BurnsDisplayProps) {
       <div className="md:hidden h-96 overflow-y-auto rounded">
         <ul>
           {burns.map((burn, index) => (
-            <li key={index} className="flex flex-col py-2 border-b">
+            <li key={`${burn.transactionHash}-${index}`} className="flex flex-col py-2 border-b gap-1">
               <div className="flex justify-between">
                 <span className="text-sm font-semibold">Time:</span>
-                <span className="text-sm">{burn.timestamp || "N/A"}</span>
+                <span className="text-sm">{burn.timestamp}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm font-semibold">Address:</span>
-                <span className="text-sm">{truncateAddress(burn.from)}</span>
+                <span className="text-sm font-semibold">From:</span>
+                <a
+                  href={`https://bscscan.com/address/${burn.from}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-white hover:underline"
+                >
+                  {truncateAddress(burn.from)}
+                </a>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm font-semibold">Amount:</span>
                 <span className="text-sm text-right">
-                  {burn.amount?.toFixed(2) || "N/A"} {tokenSymbol.toUpperCase()}
+                  {formatAmount(burn.amount)} {tokenSymbol.toUpperCase()}
                 </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm font-semibold">Tx:</span>
+                <a
+                  href={`https://bscscan.com/tx/${burn.transactionHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-orange-400 hover:underline"
+                >
+                  {truncateAddress(burn.transactionHash)}
+                </a>
               </div>
             </li>
           ))}
