@@ -310,6 +310,7 @@ export default function Header() {
                     <Link href="#" className="hover:text-neutral-700 transition-colors duration-200">Home</Link>
                     <Link href="#" className="hover:text-neutral-700 transition-colors duration-200">Burns</Link>
                     <Link href="/price2mc" className="hover:text-neutral-700 transition-colors duration-200">Price2MC</Link>
+                    <Link href="/watchlist" className="hover:text-neutral-700 transition-colors duration-200">Watchlist</Link>
                     <Link href="https://www.phoenixtoken.community" className="hover:text-neutral-700 transition-colors duration-200">Token</Link>
                 </div>
 
@@ -548,6 +549,13 @@ export default function Header() {
                         onClick={toggleMenu}
                     >
                         Price2MC
+                    </Link>
+                    <Link
+                        href="/watchlist"
+                        className="block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
+                        onClick={toggleMenu}
+                    >
+                        Watchlist
                     </Link>
                     <Link
                         href="https://www.phoenixtoken.community"

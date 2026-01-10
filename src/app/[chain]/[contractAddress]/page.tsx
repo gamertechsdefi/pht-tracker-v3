@@ -15,6 +15,8 @@ import PriceActionChart from "@/components/PriceActionChart";
 import { getTokenByAddress, isValidContractAddress, TokenMetadata } from "@/lib/tokenRegistry";
 import { useTrackActiveToken } from "@/hooks/useTrackActiveToken";
 import { useEmojiReactions } from "@/hooks/useEmojiReactions";
+import { Star } from "lucide-react";
+import WatchlistButton from "@/components/WatchlistButton";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -389,6 +391,20 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             )}
                                         </div>
 
+                                        <div className="flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
+                                            <WatchlistButton
+                                                token={{
+                                                    contract: contractAddress || "",
+                                                    chain: chain || "",
+                                                    symbol: tokenMetadata.symbol || "",
+                                                    name: tokenMetadata.name || "",
+                                                    logo: `/api/${chain}/logo/${contractAddress}`
+                                                }}
+                                                className="w-full justify-center"
+                                            />
+                                        </div>
+
+
                                         <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                             <h1>Price:</h1>
                                             <h1 className="font-medium text-lg md:text-xl">
@@ -513,8 +529,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             <div
                                                 onClick={() => !hasReactedToday && submitEmojiReaction(1)}
                                                 className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                        ? 'opacity-50 cursor-not-allowed'
-                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                     }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
@@ -524,8 +540,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             <div
                                                 onClick={() => !hasReactedToday && submitEmojiReaction(2)}
                                                 className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                        ? 'opacity-50 cursor-not-allowed'
-                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                     }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
@@ -535,8 +551,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             <div
                                                 onClick={() => !hasReactedToday && submitEmojiReaction(3)}
                                                 className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                        ? 'opacity-50 cursor-not-allowed'
-                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                     }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
@@ -546,8 +562,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             <div
                                                 onClick={() => !hasReactedToday && submitEmojiReaction(4)}
                                                 className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                        ? 'opacity-50 cursor-not-allowed'
-                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                     }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
@@ -557,8 +573,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             <div
                                                 onClick={() => !hasReactedToday && submitEmojiReaction(5)}
                                                 className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                        ? 'opacity-50 cursor-not-allowed'
-                                                        : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                    ? 'opacity-50 cursor-not-allowed'
+                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                     }`}
                                                 title={hasReactedToday ? 'You have already reacted today' : ''}
                                             >
@@ -637,6 +653,18 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                     </a>
                                                 </div>
                                             )}
+                                        </div>
+                                        <div className="flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
+                                            <WatchlistButton
+                                                token={{
+                                                    contract: contractAddress || "",
+                                                    chain: chain || "",
+                                                    symbol: tokenMetadata.symbol || "",
+                                                    name: tokenMetadata.name || "",
+                                                    logo: `/api/${chain}/logo/${contractAddress}`
+                                                }}
+                                                className="w-full justify-center"
+                                            />
                                         </div>
 
                                         <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
@@ -771,8 +799,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         <div
                                             onClick={() => !hasReactedToday && submitEmojiReaction(1)}
                                             className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                    ? 'opacity-50 cursor-not-allowed'
-                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                 }`}
                                             title={hasReactedToday ? 'You have already reacted today' : ''}
                                         >
@@ -782,8 +810,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         <div
                                             onClick={() => !hasReactedToday && submitEmojiReaction(2)}
                                             className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                    ? 'opacity-50 cursor-not-allowed'
-                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                 }`}
                                             title={hasReactedToday ? 'You have already reacted today' : ''}
                                         >
@@ -793,8 +821,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         <div
                                             onClick={() => !hasReactedToday && submitEmojiReaction(3)}
                                             className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                    ? 'opacity-50 cursor-not-allowed'
-                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                 }`}
                                             title={hasReactedToday ? 'You have already reacted today' : ''}
                                         >
@@ -804,8 +832,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         <div
                                             onClick={() => !hasReactedToday && submitEmojiReaction(4)}
                                             className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                    ? 'opacity-50 cursor-not-allowed'
-                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                 }`}
                                             title={hasReactedToday ? 'You have already reacted today' : ''}
                                         >
@@ -815,8 +843,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         <div
                                             onClick={() => !hasReactedToday && submitEmojiReaction(5)}
                                             className={`border-2 flex flex-col items-center gap-1 border-orange-500 p-3 md:p-4 aspect-square rounded-lg transition-all duration-200 ${hasReactedToday
-                                                    ? 'opacity-50 cursor-not-allowed'
-                                                    : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : 'hover:bg-orange-500 hover:bg-opacity-10 transform hover:scale-110 cursor-pointer'
                                                 }`}
                                             title={hasReactedToday ? 'You have already reacted today' : ''}
                                         >
