@@ -1,10 +1,11 @@
 "use client";
 
-
 import Header from '@/components/Header';
 import { TOKEN_REGISTRY } from '@/lib/tokenRegistry';
+import { toPng, toBlob } from 'html-to-image';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import Image from 'next/image';
 
 // Define interfaces for our data structures
 interface TokenData {
@@ -90,23 +91,22 @@ const TOKEN_LIST: { [key: string]: string } = {
   bbcat: "bsc",
   talent: "bsc",
   "p-cat": "bsc",
-    jawgular: "bsc",
-    dst: "bsc",
-    zoe: "bsc",
-    godinu: "bsc",
-    peperice: "bsc",
-    bp: "bsc",
-    lai: "bsc",
-    babydew: "bsc",
-    sat: "bsc",
-    orb: "bsc",
-    captainbnb: "bsc",
-    anndy: "bsc",
-    light: "bsc",
-
-
-
+  jawgular: "bsc",
+  dst: "bsc",
+  zoe: "bsc",
+  godinu: "bsc",
+  peperice: "bsc",
+  bp: "bsc",
+  lai: "bsc",
+  babydew: "bsc",
+  sat: "bsc",
+  orb: "bsc",
+  captainbnb: "bsc",
+  anndy: "bsc",
+  light: "bsc",
 };
+
+
 
 // Full name to symbol mapping
 const FULL_NAME_MAP: { [key: string]: string } = {
@@ -155,18 +155,18 @@ const FULL_NAME_MAP: { [key: string]: string } = {
   "talent": "Talent Token",
   "p-cat": "Persian Cat Token",
   "ZOE Token": "zoe",
-    "JAWGULAR": "jawgular",
-    "GOD INU": "godinu",
-    "Pepe Rice": "peperice",
-    "DayStar Token": "dst",
-    "Baby Priceless": "bp",
-    "LeadAI Token": "lai",
-    "BABY DEW": "babydew",
-    "SATERIA": "sat",    
-    "ORBITAL": "orb",
-    "CaptainBNB": "captainbnb",
-    "首席模因官": "anndy",
-    "Liminous Token": "ligh",
+  "JAWGULAR": "jawgular",
+  "GOD INU": "godinu",
+  "Pepe Rice": "peperice",
+  "DayStar Token": "dst",
+  "Baby Priceless": "bp",
+  "LeadAI Token": "lai",
+  "BABY DEW": "babydew",
+  "SATERIA": "sat",
+  "ORBITAL": "orb",
+  "CaptainBNB": "captainbnb",
+  "首席模因官": "anndy",
+  "Liminous Token": "ligh",
 };
 
 const TOKENS = Object.entries(TOKEN_LIST).map(([symbol, chain]) => {
@@ -194,6 +194,11 @@ const formatMarketCap = (marketCap: string | undefined): string => {
   return `$${mc.toFixed(2)}`;
 };
 
+// Helper to convert data URL to Blob
+const dataUrlToBlob = async (url: string): Promise<Blob> => {
+  return await (await fetch(url)).blob();
+};
+
 
 const PriceComparison = () => {
   const [cryptoA, setCryptoA] = useState<string>('pht');
@@ -210,6 +215,9 @@ const PriceComparison = () => {
   const [showDropdownA, setShowDropdownA] = useState(false);
   const [showDropdownB, setShowDropdownB] = useState(false);
   const [activeTab, setActiveTab] = useState<'top100' | 'meme'>('top100');
+  const comparisonRef = useRef<HTMLDivElement>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
+
 
   const fetchTokenData = useCallback(async (tokenId: string, timeframe: 'now' | 'ath' = 'now'): Promise<TokenData | null> => {
     const isPlatformToken = TOKENS.some(t => t.id === tokenId);
@@ -379,27 +387,96 @@ const PriceComparison = () => {
     return potentialPrice;
   }, []);
 
-  const handleShare = async () => {
-    if (!cryptoAData || !cryptoBData) return;
-
+  const handleDownload = async () => {
+    if (!comparisonRef.current || !cryptoAData || !cryptoBData) return;
     try {
-      const potentialPrice = calculateAdjustedPrice(cryptoAData, cryptoBData);
-      const shareData = {
-        title: `${cryptoAData.name} (${cryptoAData.symbol}) with ${cryptoBData.name}'s Market Cap`,
-        text: `If ${cryptoAData.name} had ${cryptoBData.name}'s market cap, its price would be ${potentialPrice.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 6 })}`,
-        url: window.location.href,
-      };
+      setIsCapturing(true);
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for render
 
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(shareData.text);
-        alert('Link copied to clipboard!');
-      }
+      const dataUrl = await toPng(comparisonRef.current, {
+        backgroundColor: '#404040',
+        cacheBust: true,
+      });
+
+      const link = document.createElement('a');
+      link.download = 'price-comparison.png';
+      link.href = dataUrl;
+      link.click();
+
+      setIsCapturing(false);
     } catch (err) {
-      console.error('Error sharing:', err);
+      console.error('Error downloading:', err);
+      setIsCapturing(false);
+      alert('Failed to generate image. Please try again.');
     }
   };
+
+  const handleShare = async () => {
+    if (!comparisonRef.current || !cryptoAData || !cryptoBData) return;
+
+    try {
+      setIsCapturing(true);
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const blob = await toBlob(comparisonRef.current, {
+        backgroundColor: '#262626', // bg-neutral-800
+        cacheBust: true,
+        pixelRatio: 2, // Higher quality
+      });
+
+      if (!blob) {
+        console.error('Failed to create blob');
+        setIsCapturing(false);
+        return;
+      }
+
+      const file = new File([blob], 'price-comparison.png', { type: 'image/png' });
+      const shareText = `Check out this potential price for ${cryptoAData.symbol} with ${cryptoBData.symbol}'s market cap! By Firescreener`;
+
+      const shareData = {
+        title: 'Price Comparison',
+        text: shareText,
+        files: [file]
+      };
+
+      // Always try to copy to clipboard as backup
+      try {
+        await navigator.clipboard.writeText(shareText + ' https://firescreener.com');
+      } catch (err) {
+        console.warn('Clipboard write failed', err);
+      }
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share(shareData);
+        } catch (error) {
+          if ((error as Error).name !== 'AbortError') {
+            console.error('Error sharing:', error);
+            // Fallback to manual download
+            const link = document.createElement('a');
+            link.download = 'price-comparison.png';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            alert('Share failed, but image downloaded! Text copied to clipboard.');
+          }
+        }
+      } else {
+        // Fallback to download
+        const link = document.createElement('a');
+        link.download = 'price-comparison.png';
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        alert('Sharing not supported on this device/browser. Image downloaded! Text copied to clipboard.');
+      }
+      setIsCapturing(false);
+
+    } catch (err) {
+      console.error('Error sharing:', err);
+      setIsCapturing(false);
+      alert('Error generating or sharing image.');
+    }
+  };
+
 
   const renderTokenSelect = (type: 'from' | 'to'): React.ReactElement => {
     const isFrom = type === 'from';
@@ -430,10 +507,10 @@ const PriceComparison = () => {
     );
 
     const handleSelect = (tokenId: string) => {
-  setSelectedToken(tokenId);
-  const tokenInfo = tokens.find(t => t.id === tokenId);
-  setSearchTerm(tokenInfo?.symbol || ''); // Set to symbol, not name
-  setShowDropdown(false);
+      setSelectedToken(tokenId);
+      const tokenInfo = tokens.find(t => t.id === tokenId);
+      setSearchTerm(tokenInfo?.symbol || ''); // Set to symbol, not name
+      setShowDropdown(false);
     };
 
     const handleFocus = () => {
@@ -506,6 +583,7 @@ const PriceComparison = () => {
                         Meme
                       </button>
                     </div>
+                   
                     {activeTab === 'top100' && (
                       <div>
                         {filteredTop100Tokens.map((token) => (
@@ -576,33 +654,42 @@ const PriceComparison = () => {
     const multiplier = currentPrice > 0 ? potentialPrice / currentPrice : 0;
 
     return (
-      <div className="text-center">
-        <div className="flex items-center justify-center mb-2 space-x-2">
-          {cryptoAData.image && <img src={cryptoAData.image} alt={cryptoAData.name} className="w-8 h-8 rounded-md" />}
-          <h2 className="text-xl md:text-2xl font-bold">
-            {cryptoAData.symbol} (${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })})
+      <div className="relative aspect-square flex flex-col justify-center items-center p-8 bg-neutral-800 rounded-2xl border border-neutral-700 w-full max-w-md mx-auto" ref={comparisonRef}>
+        <div className="flex items-center justify-center mb-4 space-x-3">
+          {cryptoAData.image && <img src={cryptoAData.image} alt={cryptoAData.name} className="w-12 h-12 rounded-full" crossOrigin="anonymous" />}
+        </div>
+
+        <div className="text-center mb-2">
+          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-400">
+            {cryptoAData.symbol}
           </h2>
-        </div>
-        <div className="text-xl">
-          with {cryptoBData.symbol}&apos;s {timeframe === 'ath' ? 'ATH ' : ''}market cap of
-          <span className="font-bold"> {formatMarketCap(cryptoBData.marketCap)}</span>:
+          <p className="text-sm text-neutral-400">Current: ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}</p>
         </div>
 
-        <div className="text-2xl font-bold text-green-400">
-          ${potentialPrice.toLocaleString(undefined, { minimumFractionDigits: 7 })}
+        <div className="text-center my-2 text-neutral-300 px-4">
+          at {cryptoBData.symbol}&apos;s {timeframe === 'ath' ? 'ATH ' : ''}Market Cap ({formatMarketCap(cryptoBData.marketCap)})
         </div>
 
-        <div className={`text-2xl ${percentageDifference >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-          {multiplier.toFixed(2)}x
+        <div className="text-center mt-4 mb-2">
+          <div className="text-3xl font-bold text-green-400 mb-1">
+            ${potentialPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
+          </div>
+          <div className={`text-4xl font-extrabold ${percentageDifference >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {multiplier.toFixed(2)}x
+          </div>
         </div>
 
-        <div className="text-sm text-neutral-400 mt-2">
-          {cryptoAData.symbol} needs a {percentageDifference > 0 ?
-            `${(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}% increase` :
-            `${Math.abs(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}% decrease`}
-          <br />
-          to reach {cryptoBData.name}&apos;s market cap
+        <div className="text-sm text-neutral-500 mt-4 text-center">
+          Needs {percentageDifference > 0 ?
+            `+ ${(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}%` :
+            `${(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}%`}
         </div>
+
+        {isCapturing && (
+          <div className="absolute bottom-4 right-4 flex items-center space-x-1 opacity-60">
+            <span className="text-xs font-bold text-orange-500 tracking-widest">FIRESCREENER</span>
+          </div>
+        )}
       </div>
     );
   };
@@ -665,10 +752,22 @@ const PriceComparison = () => {
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
             <button
+              onClick={handleDownload}
+              className="px-6 py-3 bg-neutral-600 hover:bg-neutral-700 rounded-lg font-medium flex items-center justify-center space-x-2"
+              disabled={isCapturing}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span>Download</span>
+            </button>
+
+            <button
               onClick={handleShare}
               className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg font-medium flex items-center justify-center space-x-2"
+              disabled={isCapturing}
             >
-              <span>Share Comparison</span>
+              <span>{isCapturing ? 'Generating...' : 'Share Comparison'}</span>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
               </svg>
@@ -684,11 +783,6 @@ const PriceComparison = () => {
             </a>
           </div>
         </div>
-
-        {/* <div className="mt-8 text-center text-sm text-neutral-400">
-          <p>Data provided by local API</p>
-          <p className="mt-1">Last updated: {new Date().toLocaleString()}</p>
-        </div> */}
       </div>
     </div>
   );
