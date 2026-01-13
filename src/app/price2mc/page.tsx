@@ -166,7 +166,8 @@ const FULL_NAME_MAP: { [key: string]: string } = {
   "ORBITAL": "orb",
   "CaptainBNB": "captainbnb",
   "首席模因官": "anndy",
-  "Liminous Token": "ligh",
+  "Liminous Token": "light",
+
 };
 
 const TOKENS = Object.entries(TOKEN_LIST).map(([symbol, chain]) => {
@@ -214,7 +215,7 @@ const PriceComparison = () => {
   const [searchTermB, setSearchTermB] = useState('');
   const [showDropdownA, setShowDropdownA] = useState(false);
   const [showDropdownB, setShowDropdownB] = useState(false);
-  const [activeTab, setActiveTab] = useState<'top100' | 'meme'>('top100');
+  const [activeTab, setActiveTab] = useState<'platform' | 'top100' | 'meme'>('platform');
   const comparisonRef = useRef<HTMLDivElement>(null);
   const [isCapturing, setIsCapturing] = useState(false);
 
@@ -569,6 +570,13 @@ const PriceComparison = () => {
                   <>
                     <div className="flex border-b border-neutral-700 sticky top-0 bg-neutral-800">
                       <button
+                        className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'platform' ? 'text-white border-b-2 border-orange-500' : 'text-neutral-400'}`}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => setActiveTab('platform')}
+                      >
+                        Platform
+                      </button>
+                      <button
                         className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'top100' ? 'text-white border-b-2 border-orange-500' : 'text-neutral-400'}`}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => setActiveTab('top100')}
@@ -583,7 +591,28 @@ const PriceComparison = () => {
                         Meme
                       </button>
                     </div>
-                   
+
+                    {activeTab === 'platform' && (
+                      <div>
+                        {filteredPlatformTokens.map((token) => (
+                          <div
+                            key={token.id}
+                            className={`px-4 py-2 hover:bg-neutral-700 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-neutral-700' : ''
+                              }`}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelect(token.id);
+                            }}
+                          >
+                            {token.image && (
+                              <img src={token.image} alt={token.name} className="w-5 h-5 mr-2 rounded-full" />
+                            )}
+                            <span className="font-medium">{token.symbol}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     {activeTab === 'top100' && (
                       <div>
                         {filteredTop100Tokens.map((token) => (
@@ -687,6 +716,7 @@ const PriceComparison = () => {
 
         {isCapturing && (
           <div className="absolute bottom-4 right-4 flex items-center space-x-1 opacity-60">
+            <Image src="/logo-fixed.png" alt="logo" width={25} height={25} className='w-6 h-auto' />
             <span className="text-xs font-bold text-orange-500 tracking-widest">FIRESCREENER</span>
           </div>
         )}
@@ -780,6 +810,7 @@ const PriceComparison = () => {
               className="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg font-medium text-center"
             >
               View {cryptoAData?.symbol}
+
             </a>
           </div>
         </div>
