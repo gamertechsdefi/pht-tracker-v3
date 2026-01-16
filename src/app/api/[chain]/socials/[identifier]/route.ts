@@ -375,6 +375,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "https://x.com/_bullnancebsc",
     telegram: "https://t.me/bullnanceBSC",
     scan: "https://scan.com/token/0x591DF09AF60366298FE31C4590a9230585D34FBd",
+  },
+  "jct": {
+    website: "https://Justcattoken.site",
+    twitter: "https://x.com/Justcatcoin",
+    telegram: "https://t.me/JustCatToken",
+    scan: "https://bscscan.com/token/0x199A88E5BFacc9eAB72913c5F05Ca75D1f30234f",
   }
 
 };
