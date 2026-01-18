@@ -233,6 +233,41 @@ const PriceComparison = () => {
         console.error(`No contract address found for platform token: ${tokenId}`);
         return null;
       }
+
+      // If fetching ATH, try CoinGecko first (Dexscreener doesn't have ATH)
+      if (timeframe === 'ath') {
+        try {
+          // Map internal chain ID to CoinGecko asset platform ID
+          // Currently only supporting BSC as per the regex filter above
+          const platformId = 'binance-smart-chain';
+
+          const response = await fetch(`https://api.coingecko.com/api/v3/coins/${platformId}/contract/${tokenMeta.address}`);
+
+          if (response.ok) {
+            const data: CoinGeckoCoinData = await response.json();
+            const athMarketCap = data.market_data.ath_market_cap?.usd;
+
+            // Only use this data if we actually got a valid ATH market cap
+            if (athMarketCap !== undefined && athMarketCap !== null) {
+              return {
+                id: tokenId,
+                symbol: data.symbol.toUpperCase(),
+                name: data.name,
+                // We use CoinGecko data for consistency if we're using their ATH
+                price: data.market_data.current_price.usd.toString(),
+                marketCap: athMarketCap.toString(),
+                volume24h: data.market_data.total_volume.usd.toString(),
+                priceChange24h: data.market_data.price_change_percentage_24h.toString(),
+                image: data.image.large,
+              };
+            }
+          }
+        } catch (err) {
+          console.warn(`Failed to fetch ATH from CoinGecko for ${tokenId}, falling back to Dexscreener`, err);
+          // Continue to Dexscreener fallback
+        }
+      }
+
       try {
         // Fetch directly from Dexscreener API using the contract address
         const url = `https://api.dexscreener.com/latest/dex/tokens/${tokenMeta.address}`;
@@ -263,26 +298,48 @@ const PriceComparison = () => {
     } else {
       // It might be a coingecko token
       try {
-        const response = await fetch(`https://api.coingecko.com/api/v3/coins/${tokenId}`);
+        // Use CoinGecko Markets API as requested
+        const response = await fetch(
+          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${tokenId}`
+        );
         if (!response.ok) {
           return null;
         }
-        const data: CoinGeckoCoinData = await response.json();
-        const athMarketCap = data.market_data.ath_market_cap?.usd;
-        const marketCap = timeframe === 'ath' && athMarketCap !== undefined && athMarketCap !== null
-          ? athMarketCap.toString()
-          : data.market_data.market_cap.usd.toString();
+
+        const dataArray = await response.json();
+        if (!Array.isArray(dataArray) || dataArray.length === 0) {
+          return null;
+        }
+
+        const data = dataArray[0]; // Take the first result
+
+        let marketCapStr = data.market_cap.toString();
+
+        if (timeframe === 'ath') {
+          // Calculate ATH Market Cap: ATH Price * Circulating Supply
+          // Note: This is "Implied ATH Market Cap" based on current supply
+          const athPrice = data.ath;
+          const supply = data.circulating_supply;
+
+          if (athPrice && supply) {
+            marketCapStr = (athPrice * supply).toString();
+          } else {
+            // Fallback if data is missing, though unlikely for top tokens
+            marketCapStr = data.market_cap.toString();
+          }
+        }
 
         return {
           id: data.id,
           symbol: data.symbol.toUpperCase(),
           name: data.name,
-          price: data.market_data.current_price.usd.toString(),
-          marketCap: marketCap,
-          volume24h: data.market_data.total_volume.usd.toString(),
-          priceChange24h: data.market_data.price_change_percentage_24h.toString(),
-          image: data.image.large,
+          price: data.current_price.toString(),
+          marketCap: marketCapStr,
+          volume24h: data.total_volume.toString(),
+          priceChange24h: data.price_change_percentage_24h.toString(),
+          image: data.image,
           isTop100: true,
+          // We don't explicitly set isMeme here, it's inferred from the list logic or defaults
         }
 
       } catch (err) {
@@ -293,17 +350,53 @@ const PriceComparison = () => {
   }, []);
 
   const fetchTokenLists = useCallback(async () => {
+    const CACHE_KEY = 'token_lists_data';
+    const CACHE_TIMESTAMP_KEY = 'token_lists_timestamp';
+    const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
+
     try {
       setLoadingTokens(true);
+
+      // Check cache first
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+
+      const now = Date.now();
+
+      if (cachedData && cachedTimestamp) {
+        const age = now - parseInt(cachedTimestamp);
+        if (age < CACHE_DURATION) {
+          console.log('Using cached token lists');
+          setTokens(JSON.parse(cachedData));
+          setLoadingTokens(false);
+          return;
+        }
+      }
+
       const platformTokens = TOKENS.map(token => ({ ...token, isTop100: false, isMeme: false }));
 
-      const response = await fetch(
-        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=200&page=1&sparkline=false'
-      );
-      if (!response.ok) {
-        throw new Error('Failed to fetch top 100 tokens from CoinGecko');
+      // Fetch Top 100
+      let top100Data: CoinGeckoMarketData[] = [];
+      try {
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false'
+        );
+        if (response.ok) {
+          top100Data = await response.json();
+        } else {
+          console.warn('Rate limit or error fetching top 100, using cache if available');
+          throw new Error('Failed to fetch top 100');
+        }
+      } catch (e) {
+        if (cachedData) {
+          console.log('Falling back to cached data due to error');
+          setTokens(JSON.parse(cachedData));
+          setLoadingTokens(false);
+          return;
+        }
+        throw e;
       }
-      const top100Data: CoinGeckoMarketData[] = await response.json();
+
       const top100Tokens = top100Data.map((coin) => ({
         id: coin.id,
         symbol: coin.symbol.toUpperCase(),
@@ -313,13 +406,22 @@ const PriceComparison = () => {
         isMeme: false,
       }));
 
-      const meme_response = await fetch(
-        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=meme-token'
-      );
-      if (!meme_response.ok) {
-        throw new Error('Failed to fetch meme tokens from CoinGecko');
+      // Fetch Meme Tokens
+      let memeData: CoinGeckoMarketData[] = [];
+      try {
+        const meme_response = await fetch(
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=meme-token&per_page=50'
+        );
+        if (meme_response.ok) {
+          memeData = await meme_response.json();
+        } else {
+          console.warn('Rate limit or error fetching meme tokens');
+        }
+      } catch (e) {
+        console.warn('Error fetching meme tokens', e);
+        // Don't fail entire app if meme tokens fail, just proceed with what we have if possible
       }
-      const memeData: CoinGeckoMarketData[] = await meme_response.json();
+
       const memeTokens = memeData.map((coin) => ({
         id: coin.id,
         symbol: coin.symbol.toUpperCase(),
@@ -337,11 +439,22 @@ const PriceComparison = () => {
 
       const allTokens = [...platformTokens, ...uniqueTop100Tokens, ...uniqueMemeTokens];
 
+      // Save to cache
+      localStorage.setItem(CACHE_KEY, JSON.stringify(allTokens));
+      localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+
       setTokens(allTokens);
 
     } catch (error) {
       console.error('Error fetching token lists:', error);
-      setError('Failed to load token lists. Please try again later.');
+      // Final fallback to cache even if error
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        console.log('Using cached data after error');
+        setTokens(JSON.parse(cachedData));
+      } else {
+        setError('Failed to load token lists. API rate limit likely reached. Please try again later.');
+      }
     } finally {
       setLoadingTokens(false);
     }
