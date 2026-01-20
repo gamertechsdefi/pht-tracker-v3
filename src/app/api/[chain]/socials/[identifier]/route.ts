@@ -295,25 +295,25 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     website: "https://www.peperice.com",
     twitter: "https://x.com/peperice_bnb",
     telegram: "https://t.me/peperice",
-    scan: "https://bscscan.com/token/0x5f3170D7A37D70FFE92a3e573ec67400b795B854",  
+    scan: "https://bscscan.com/token/0x5f3170D7A37D70FFE92a3e573ec67400b795B854",
   },
   zoe: {
     website: "https://www.zoetoken.site",
     twitter: "https://x.com/Zoe_token/",
     telegram: "https://t.me/zoetoken_zt",
-    scan: "https://bscscan.com/token/0x034437C7037317eaAbA782f2aD5B0A54cFcCf726",  
+    scan: "https://bscscan.com/token/0x034437C7037317eaAbA782f2aD5B0A54cFcCf726",
   },
   godinu: {
     website: "https://www.godinu.vip",
     twitter: "https://x.com/GodInuBSC",
     telegram: "https://t.me/godinubnb",
-    scan: "https://bscscan.com/token/0xfd8eab4F5cf3572Ae62445CAD634226DbaA37F69",  
+    scan: "https://bscscan.com/token/0xfd8eab4F5cf3572Ae62445CAD634226DbaA37F69",
   },
   lai: {
     website: "https://www.leadaitoken.com",
     twitter: "https://x.com/OfficialLeadAI",
     telegram: "https://t.me/OfficialLeadAI_BSC",
-    scan: "https://bscscan.com/token/0x90206Ad9b7d23c672cd75A633CA96b5D9e9AE8Ed",  
+    scan: "https://bscscan.com/token/0x90206Ad9b7d23c672cd75A633CA96b5D9e9AE8Ed",
   },
   babydew: {
     website: "#",
@@ -387,6 +387,12 @@ const FALLBACK_SOCIALS: Record<string, { website: string; twitter: string; teleg
     twitter: "https://x.com/RICH_SEA1",
     telegram: "https://t.me/RichSea001",
     scan: "https://bscscan.com/token/0xa98283c7e78e7604960f672b3d609d0c5e594ed0",
+  },
+  "hachiko": {
+    website: "https://www.hachiko.sbs/",
+    twitter: "https://x.com/hachikoinucto",
+    telegram: "https://t.me/hachiko_bnb_chat",
+    scan: "https://bscscan.com/token/0xf1c599e9a5fbdea408a7409c0176a2fe42c64444",
   }
 
 };
@@ -403,7 +409,7 @@ export async function GET(
       return NextResponse.json({ error: 'Missing chain or identifier' }, { status: 400 });
     }
 
-    const chainLower = chain.toLowerCase() as 'bsc' | 'sol';
+    const chainLower = chain.toLowerCase() as 'bsc' | 'sol' | 'rwa';
     const identifierLower = identifier.toLowerCase();
 
     // Determine if identifier is a contract address or symbol
@@ -428,12 +434,20 @@ export async function GET(
       }, { status: 400 });
     }
 
+    // Determine scan URL based on chain
+    let scanUrl = `https://bscscan.com/token/${tokenMetadata.address}`;
+    if (tokenMetadata.chain === 'rwa') {
+      scanUrl = `https://scan.assetchain.org/token/${tokenMetadata.address}`;
+    } else if (tokenMetadata.chain === 'sol') {
+      scanUrl = `https://solscan.io/token/${tokenMetadata.address}`;
+    }
+
     // Get social links from token metadata or fallback
     const socialLinks = tokenMetadata.socials || FALLBACK_SOCIALS[tokenMetadata.symbol] || {
       website: "https://example.com",
       twitter: "https://x.com",
       telegram: "https://t.me",
-      scan: `https://bscscan.com/token/${tokenMetadata.address}`
+      scan: scanUrl
     };
 
     return NextResponse.json(socialLinks);
