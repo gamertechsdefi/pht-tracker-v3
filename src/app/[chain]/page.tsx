@@ -133,7 +133,7 @@ function formatPrice(price: number | string): { display: string; isExponential: 
 export default function ChainPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const chain = resolvedParams.chain.toLowerCase();
-  
+
   const [tokens, setTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -143,7 +143,7 @@ export default function ChainPage({ params }: PageProps) {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Fetch all tokens
         const response = await fetch('/api/tokens');
         if (!response.ok) {
@@ -218,18 +218,14 @@ export default function ChainPage({ params }: PageProps) {
                       {/* Token Icon with Chain Badge */}
                       <div className="relative flex-shrink-0">
                         <img
-                          src={`/images/${token.chain}/token-logos/${token.address.toLowerCase()}.png`}
+                          src={`/api/${token.chain}/logo/${token.address}`}
                           alt={token.symbol}
                           width={48}
                           height={48}
                           className="rounded-full"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            if (!target.src.includes('/api/')) {
-                              target.src = `/api/${token.chain}/logo/${token.address}`;
-                            } else {
-                              target.src = '/logo.png';
-                            }
+                            target.src = '/logo.png';
                           }}
                         />
                         {/* Chain Logo Overlay */}
@@ -244,7 +240,7 @@ export default function ChainPage({ params }: PageProps) {
                           }}
                         />
                       </div>
-                      
+
                       {/* Token Symbol and Name */}
                       <div className="flex flex-col min-w-0 flex-1">
                         <span className="text-white font-bold text-lg whitespace-nowrap truncate">
@@ -317,7 +313,7 @@ export default function ChainPage({ params }: PageProps) {
                   <th className="text-md font-semibold text-white uppercase tracking-wider px-5 py-3 text-left min-w-[120px]">
                     24H Volume
                   </th>
-                
+
                 </tr>
               </thead>
               <tbody>
@@ -342,20 +338,14 @@ export default function ChainPage({ params }: PageProps) {
                           {/* Token Icon with Chain Badge */}
                           <div className="relative flex-shrink-0 mr-3">
                             <img
-                              src={`/images/${token.chain}/token-logos/${token.address.toLowerCase()}.png`}
+                              src={`/api/${token.chain}/logo/${token.address}`}
                               alt={token.symbol}
                               width={32}
                               height={32}
                               className="rounded-full"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
-                                // Try API endpoint as fallback
-                                if (!target.src.includes('/api/')) {
-                                  target.src = `/api/${token.chain}/logo/${token.address}`;
-                                } else {
-                                  // Final fallback to default logo
-                                  target.src = '/logo.png';
-                                }
+                                target.src = '/logo.png';
                               }}
                             />
                             {/* Chain Logo Overlay */}
@@ -380,7 +370,7 @@ export default function ChainPage({ params }: PageProps) {
                           </div>
                         </Link>
                       </td>
-                      
+
                       {/* Price column */}
                       <td className="px-5 py-4 text-sm min-w-[120px]">
                         <span className="text-white whitespace-nowrap">
@@ -395,7 +385,7 @@ export default function ChainPage({ params }: PageProps) {
                           })()}
                         </span>
                       </td>
-                      
+
                       {/* Market Cap column */}
                       <td className="px-5 py-4 text-sm min-w-[120px]">
                         <span className="text-white whitespace-nowrap">
@@ -416,7 +406,7 @@ export default function ChainPage({ params }: PageProps) {
                           {token.volume === 'N/A' ? 'N/A' : `$${formatMarketCap(token.volume)}`}
                         </span>
                       </td>
-                     
+
                     </tr>
                   ))
                 )}
@@ -428,8 +418,8 @@ export default function ChainPage({ params }: PageProps) {
         {/* Back to all tokens link */}
         {!loading && !error && (
           <div className="mt-6 text-center">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-orange-500 hover:text-orange-400 transition-colors duration-200 font-medium"
             >
               ← View all chains

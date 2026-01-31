@@ -391,18 +391,6 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             )}
                                         </div>
 
-                                        <div className="flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
-                                            <WatchlistButton
-                                                token={{
-                                                    contract: contractAddress || "",
-                                                    chain: chain || "",
-                                                    symbol: tokenMetadata.symbol || "",
-                                                    name: tokenMetadata.name || "",
-                                                    logo: `/api/${chain}/logo/${contractAddress}`
-                                                }}
-                                                className="w-full justify-center"
-                                            />
-                                        </div>
 
 
                                         <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
@@ -493,7 +481,21 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 chain={chain}
                                             />
                                         )}
+
+                                        <div className="mt-4 flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
+                                            <WatchlistButton
+                                                token={{
+                                                    contract: contractAddress || "",
+                                                    chain: chain || "",
+                                                    symbol: tokenMetadata.symbol || "",
+                                                    name: tokenMetadata.name || "",
+                                                    logo: `/api/${chain}/logo/${contractAddress}`
+                                                }}
+                                                className="w-full justify-center"
+                                            />
+                                        </div>
                                     </section>
+                                    
 
                                     <section className="mt-8 flex flex-col my-16">
                                         <div className="flex-1">
@@ -654,18 +656,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
-                                            <WatchlistButton
-                                                token={{
-                                                    contract: contractAddress || "",
-                                                    chain: chain || "",
-                                                    symbol: tokenMetadata.symbol || "",
-                                                    name: tokenMetadata.name || "",
-                                                    logo: `/api/${chain}/logo/${contractAddress}`
-                                                }}
-                                                className="w-full justify-center"
-                                            />
-                                        </div>
+                        
 
                                         <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                             <h1>Price:</h1>
@@ -755,6 +746,19 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 chain={chain}
                                             />
                                         )}
+
+                                        <div className="mt-4 flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
+                                            <WatchlistButton
+                                                token={{
+                                                    contract: contractAddress || "",
+                                                    chain: chain || "",
+                                                    symbol: tokenMetadata.symbol || "",
+                                                    name: tokenMetadata.name || "",
+                                                    logo: `/api/${chain}/logo/${contractAddress}`
+                                                }}
+                                                className="w-full justify-center"
+                                            />
+                                        </div>
 
                                         <div className="mt-8 space-y-4">
                                             <DataCard

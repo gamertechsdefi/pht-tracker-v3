@@ -1,8 +1,5 @@
 import { redis } from './redis';
 import { TOKEN_REGISTRY } from './tokenRegistry';
-import { downloadFile, getContentType } from './supabase';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 
 /**
  * Cache all token logos in Redis
@@ -10,9 +7,12 @@ import { join } from 'path';
  */
 export async function cacheAllLogos() {
   console.log('Starting logo caching process...');
-  let successCount = 0;
-  let failCount = 0;
+  let foundCount = 0;
+  let missingCount = 0;
   let skipCount = 0;
+
+  const imageKitUrl = process.env.IMAGE_KIT_URL || 'https://ik.imagekit.io/5j6l15rnd';
+  const fileExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
 
   for (const token of TOKEN_REGISTRY) {
     const { address, chain, symbol } = token;
@@ -20,83 +20,79 @@ export async function cacheAllLogos() {
 
     try {
       // Check if already cached
-      const cached = await redis.get(redisKey);
-      if (cached) {
-        console.log(`✓ Already cached: ${symbol} (${chain})`);
-        skipCount++;
-        continue;
+      try {
+        const cached = await redis.get(redisKey);
+        if (cached) {
+          console.log(`✓ Already cached: ${symbol} (${chain})`);
+          skipCount++;
+          // Optional: uncomment to force refresh
+          // continue; 
+        }
+      } catch (e) {
+        // ignore redis get error
       }
 
-      // Try to fetch the logo
-      let fileBuffer: Buffer | null = null;
+      // Try to fetch the logo from ImageKit
+      let buffer: Buffer | null = null;
       let contentType = 'image/png';
-      const fileExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
+
       const addressVariants = [address, address.toLowerCase()];
+      // Deduplicate variants
+      const uniqueVariants = [...new Set(addressVariants)];
 
-      // Try Supabase first
-      for (const addressVariant of addressVariants) {
+      for (const addressVariant of uniqueVariants) {
         for (const ext of fileExtensions) {
-          const filename = `${addressVariant}${ext}`;
-          fileBuffer = await downloadFile('images', `${chain}/${filename}`);
-          
-          if (fileBuffer) {
-            contentType = getContentType(filename);
-            break;
-          }
-        }
-        if (fileBuffer) break;
-      }
+          const imageUrl = `${imageKitUrl}/${chain}/${addressVariant}${ext}`;
 
-      // Try local files if not in Supabase
-      if (!fileBuffer) {
-        for (const addressVariant of addressVariants) {
-          for (const ext of fileExtensions) {
-            try {
-              const filename = `${addressVariant}${ext}`;
-              const localPath = join(process.cwd(), 'public', 'images', chain, 'token-logos', filename);
-              fileBuffer = await readFile(localPath);
-              
-              if (fileBuffer) {
-                contentType = getContentType(filename);
-                break;
-              }
-            } catch {
-              // Continue to next variant
+          try {
+            const response = await fetch(imageUrl, { method: 'GET' });
+
+            if (response.ok) {
+              const arrayBuffer = await response.arrayBuffer();
+              buffer = Buffer.from(arrayBuffer);
+              contentType = response.headers.get('content-type') || 'image/png';
+              break;
             }
+          } catch (e) {
+            // continue
           }
-          if (fileBuffer) break;
         }
+        if (buffer) break;
       }
 
-      if (fileBuffer) {
+      if (buffer) {
         // Store in Redis (TTL: 7 days)
-        const base64Buffer = fileBuffer.toString('base64');
-        await redis.setex(redisKey, 604800, {
-          buffer: base64Buffer,
-          contentType: contentType,
-        });
-        console.log(`✓ Cached: ${symbol} (${chain}) - ${fileBuffer.length} bytes`);
-        successCount++;
+        try {
+          const base64Buffer = buffer.toString('base64');
+          await redis.setex(redisKey, 604800, {
+            buffer: base64Buffer,
+            contentType: contentType,
+          });
+          console.log(`✓ Found in ImageKit: ${symbol} (${chain}) - ${buffer.length} bytes`);
+          foundCount++;
+        } catch (error) {
+          console.error(`✗ Error caching ${symbol} (${chain}):`, error);
+        }
       } else {
-        console.log(`✗ Not found: ${symbol} (${chain})`);
-        failCount++;
+        console.log(`✗ Missing in ImageKit: ${symbol} (${chain})`);
+        missingCount++;
       }
     } catch (error) {
-      console.error(`✗ Error caching ${symbol} (${chain}):`, error);
-      failCount++;
+      console.error(`✗ Error checking ${symbol} (${chain}):`, error);
+      missingCount++;
     }
   }
 
-  console.log('\n=== Caching Complete ===');
-  console.log(`✓ Cached: ${successCount}`);
-  console.log(`⊘ Skipped (already cached): ${skipCount}`);
-  console.log(`✗ Failed: ${failCount}`);
+  console.log('\n=== ImageKit Cache Check Complete ===');
+  console.log(`✓ Found/Cached: ${foundCount}`);
+  console.log(`→ Skipped (Already Cached): ${skipCount}`);
+  console.log(`✗ Missing: ${missingCount}`);
   console.log(`Total tokens: ${TOKEN_REGISTRY.length}`);
 
   return {
-    success: successCount,
+    found: foundCount,
     skipped: skipCount,
-    failed: failCount,
+    missing: missingCount,
     total: TOKEN_REGISTRY.length,
   };
 }
@@ -111,7 +107,7 @@ export async function clearLogoCache() {
   for (const token of TOKEN_REGISTRY) {
     const { address, chain } = token;
     const redisKey = `logo:${chain}:${address.toLowerCase()}`;
-    
+
     try {
       await redis.del(redisKey);
       count++;
@@ -134,7 +130,7 @@ export async function getLogoCacheStats() {
   for (const token of TOKEN_REGISTRY) {
     const { address, chain } = token;
     const redisKey = `logo:${chain}:${address.toLowerCase()}`;
-    
+
     try {
       const cached = await redis.get(redisKey);
       if (cached) {
@@ -155,3 +151,4 @@ export async function getLogoCacheStats() {
     cacheRate: ((cachedCount / TOKEN_REGISTRY.length) * 100).toFixed(2) + '%',
   };
 }
+

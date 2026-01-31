@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
         // Warm up the cache by caching all logos
         const result = await cacheAllLogos();
         return NextResponse.json({
-          message: 'Cache warming complete',
+          message: 'Supabase check complete',
           ...result,
         }, { status: 200 });
 

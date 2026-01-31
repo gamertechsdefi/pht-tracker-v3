@@ -174,18 +174,13 @@ export default function Home() {
                       {/* Token Icon with Chain Badge */}
                       <div className="relative flex-shrink-0">
                         <img
-                          src={`/images/${token.chain}/token-logos/${token.address.toLowerCase()}.png`}
+                          src={`/api/${token.chain}/logo/${token.address}`}
                           alt={token.symbol}
                           width={48}
                           height={48}
                           className="rounded-full"
                           onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            if (!target.src.includes('/api/')) {
-                              target.src = `/api/${token.chain}/logo/${token.address}`;
-                            } else {
-                              target.src = '/logo.png';
-                            }
+                            (e.target as HTMLImageElement).src = '/logo.png';
                           }}
                         />
                         {/* Chain Logo Overlay */}
@@ -305,18 +300,13 @@ export default function Home() {
                           {/* Token Icon with Chain Badge */}
                           <div className="relative flex-shrink-0 mr-3">
                             <img
-                              src={`/images/${token.chain}/token-logos/${token.address.toLowerCase()}.png`}
+                              src={`/api/${token.chain}/logo/${token.address}`}
                               alt={token.symbol}
                               width={32}
                               height={32}
                               className="rounded-full"
                               onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                if (!target.src.includes('/api/')) {
-                                  target.src = `/api/${token.chain}/logo/${token.address}`;
-                                } else {
-                                  target.src = '/logo.png';
-                                }
+                                (e.target as HTMLImageElement).src = '/logo.png';
                               }}
                             />
                             {/* Chain Logo Overlay */}

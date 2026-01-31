@@ -150,6 +150,8 @@ export default function Header() {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
+    const [isDesktopSearchFocused, setIsDesktopSearchFocused] = useState(false);
     const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false);
     const [search, setSearch] = useState<string>("");
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -231,7 +233,7 @@ export default function Header() {
 
     useEffect(() => {
         async function fetchTrendingTokens() {
-            if (!isSearchOpen) return;
+            if (!isSearchOpen && !isDesktopSearchFocused) return;
 
             setIsLoading(true);
             setError(null);
@@ -289,7 +291,7 @@ export default function Header() {
         }
 
         fetchTrendingTokens();
-    }, [isSearchOpen, sortMetric]);
+    }, [isSearchOpen, isDesktopSearchFocused, sortMetric]);
 
     return (
         <header className="sticky top-0 z-50 px-4 md:px-16 py-2 bg-white text-neutral-900">
@@ -305,13 +307,101 @@ export default function Header() {
                     FIRESCREENER
                 </Link>
 
-                {/* Desktop Menu */}
-                <div className="hidden md:flex flex-row gap-8 items-center">
-                    <Link href="#" className="hover:text-neutral-700 transition-colors duration-200">Home</Link>
-                    <Link href="#" className="hover:text-neutral-700 transition-colors duration-200">Burns</Link>
-                    <Link href="/price2mc" className="hover:text-neutral-700 transition-colors duration-200">Price2MC</Link>
-                    <Link href="/watchlist" className="hover:text-neutral-700 transition-colors duration-200">Watchlist</Link>
-                    <Link href="https://www.phoenixtoken.community" className="hover:text-neutral-700 transition-colors duration-200">Token</Link>
+                {/* Desktop Search (Center) - Replaces the old Nav Links */}
+                <div className="hidden md:flex flex-1 max-w-2xl mx-8 relative z-50">
+                    <div className="relative w-full">
+                        <div className="relative">
+                            <svg
+                                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                />
+                            </svg>
+                            <input
+                                type="text"
+                                placeholder="Search tokens (e.g., WKC or WikiCat)..."
+                                value={search}
+                                onChange={onChange}
+                                onFocus={() => setIsDesktopSearchFocused(true)}
+                                onBlur={() => setTimeout(() => setIsDesktopSearchFocused(false), 200)}
+                                className="w-full pl-10 pr-4 py-2 bg-neutral-100 text-neutral-900 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition duration-200"
+                            />
+                        </div>
+
+                        {/* Desktop Search Suggestions/Trending Dropdown */}
+                        {isDesktopSearchFocused && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-neutral-900 border border-orange-500 rounded-lg shadow-xl p-4 max-h-[80vh] overflow-y-auto w-full">
+                                {/* Suggestions */}
+                                {suggestions.length > 0 && (
+                                    <ul className="bg-neutral-800 border-2 border-orange-500 rounded-md max-h-40 overflow-y-auto mb-4">
+                                        {suggestions.map((suggestion, index) => (
+                                            <li
+                                                key={index}
+                                                onMouseDown={() => onSuggestionClick(suggestion)}
+                                                className="px-4 py-2 hover:bg-neutral-700 cursor-pointer flex justify-between items-center"
+                                            >
+                                                <div>
+                                                    <span className="font-medium text-white">{suggestion.fullName}</span>
+                                                    <span className="text-gray-400 text-sm ml-2">{suggestion.symbol.toUpperCase()}</span>
+                                                </div>
+                                                <span className="text-gray-400 text-xs uppercase">
+                                                    {TOKEN_LIST[suggestion.symbol] || "Unknown"}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+
+                                <div className="flex justify-between items-center mb-3">
+                                    <h3 className="text-lg font-semibold text-white">
+                                        Top Tokens
+                                    </h3>
+                                </div>
+
+                                {isLoading ? (
+                                    <div className="text-center py-4 text-white">Loading...</div>
+                                ) : trendingTokens.length > 0 ? (
+                                    <table className="w-full text-left text-sm">
+                                        <thead className="bg-neutral-900">
+                                            <tr>
+                                                <th className="p-3 text-white">Symbol</th>
+                                                <th className="p-3 text-white">Chain</th>
+                                                <th className="p-3 text-right text-white">24h Vol</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {trendingTokens.map((token, index) => (
+                                                <tr
+                                                    key={index}
+                                                    onMouseDown={() =>
+                                                        onSuggestionClick({ symbol: token.symbol, fullName: token.fullName })
+                                                    }
+                                                    className="border-t border-orange-500 hover:bg-neutral-700 cursor-pointer"
+                                                >
+                                                    <td className="p-3 text-white">{token.symbol.toUpperCase()}</td>
+                                                    <td className="p-3 text-gray-400">{token.chain.toUpperCase()}</td>
+                                                    <td className="p-3 text-right text-white">
+                                                        ${token.volume24h.toLocaleString()}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                ) : (
+                                    <div className="text-center py-4 text-gray-400">
+                                        No trending tokens available
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Right side buttons */}
@@ -320,11 +410,10 @@ export default function Header() {
                     <div className="relative">
                         <button
                             onClick={() => setIsChainDropdownOpen(!isChainDropdownOpen)}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition duration-200 ${
-                                activeChain 
-                                    ? 'bg-orange-100 hover:bg-orange-200 text-orange-900 border border-orange-300' 
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition duration-200 ${activeChain
+                                    ? 'bg-orange-100 hover:bg-orange-200 text-orange-900 border border-orange-300'
                                     : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
-                            }`}
+                                }`}
                             aria-label="Select Chain"
                         >
                             {activeChain && currentChainInfo.logo ? (
@@ -378,11 +467,10 @@ export default function Header() {
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-20">
                                     <Link
                                         href="/bsc"
-                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${
-                                            activeChain === 'bsc'
+                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${activeChain === 'bsc'
                                                 ? 'bg-orange-100 text-orange-900 font-semibold'
                                                 : 'hover:bg-neutral-100'
-                                        }`}
+                                            }`}
                                         onClick={() => setIsChainDropdownOpen(false)}
                                     >
                                         <Image
@@ -408,11 +496,10 @@ export default function Header() {
                                     </Link>
                                     <Link
                                         href="/rwa"
-                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${
-                                            activeChain === 'rwa'
+                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${activeChain === 'rwa'
                                                 ? 'bg-orange-100 text-orange-900 font-semibold'
                                                 : 'hover:bg-neutral-100'
-                                        }`}
+                                            }`}
                                         onClick={() => setIsChainDropdownOpen(false)}
                                     >
                                         <Image
@@ -436,15 +523,14 @@ export default function Header() {
                                             </svg>
                                         )}
                                     </Link>
-                                    
+
                                     <div className="border-t border-neutral-200 my-2"></div>
                                     <Link
                                         href="/"
-                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${
-                                            !activeChain
+                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${!activeChain
                                                 ? 'bg-orange-100 text-orange-900 font-semibold'
                                                 : 'hover:bg-neutral-100'
-                                        }`}
+                                            }`}
                                         onClick={() => setIsChainDropdownOpen(false)}
                                     >
                                         <svg
@@ -480,10 +566,10 @@ export default function Header() {
                         )}
                     </div>
 
-                    {/* Search Button */}
+                    {/* Search Button (Mobile Only) */}
                     <button
                         onClick={() => setIsSearchOpen(true)}
-                        className="flex items-center bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition duration-200"
+                        className="md:hidden flex items-center bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition duration-200"
                         aria-label="Search Tokens"
                     >
                         <svg
@@ -501,6 +587,35 @@ export default function Header() {
                             />
                         </svg>
                     </button>
+
+                    {/* Desktop Menu Dropdown */}
+                    <div className="relative hidden md:block">
+                        <button
+                            onClick={() => setIsDesktopMenuOpen(!isDesktopMenuOpen)}
+                            className="flex items-center gap-2 px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg transition duration-200"
+                        >
+                            <span className="font-medium">Menu</span>
+                            <svg className={`h-4 w-4 transition-transform ${isDesktopMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        {isDesktopMenuOpen && (
+                            <>
+                                <div className="fixed inset-0 z-10" onClick={() => setIsDesktopMenuOpen(false)} />
+                                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-20">
+                                    <Link href="#" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Home</Link>
+                                    <Link href="#" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Burns</Link>
+                                    <Link href="/price2mc" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Price2MC</Link>
+                                    <Link href="/watchlist" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Watchlist</Link>
+                                    <Link href="https://www.phoenixtoken.community" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Token</Link>
+                                    <div className="border-t border-neutral-200 my-2"></div>
+                                    <Link href="/auth/login" className="block px-4 py-2 hover:bg-neutral-100 text-orange-600 font-medium" onClick={() => setIsDesktopMenuOpen(false)}>Login</Link>
+                                    <Link href="/auth/signup" className="block px-4 py-2 hover:bg-neutral-100 text-orange-600 font-medium" onClick={() => setIsDesktopMenuOpen(false)}>Signup</Link>
+                                </div>
+                            </>
+                        )}
+                    </div>
 
                     {/* Mobile Menu Button */}
                     <button
@@ -563,6 +678,20 @@ export default function Header() {
                         onClick={toggleMenu}
                     >
                         Phoenix Token
+                    </Link>
+                    <Link
+                        href="/auth/login"
+                        className="text-orange-600 font-bold block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
+                        onClick={toggleMenu}
+                    >
+                        Login
+                    </Link>
+                    <Link
+                        href="/auth/signup"
+                        className="text-orange-600 font-bold block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
+                        onClick={toggleMenu}
+                    >
+                        Signup
                     </Link>
                 </div>
             </div>
