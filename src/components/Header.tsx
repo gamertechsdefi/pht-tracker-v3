@@ -610,8 +610,8 @@ export default function Header() {
                                     <Link href="/watchlist" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Watchlist</Link>
                                     <Link href="https://www.phoenixtoken.community" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Token</Link>
                                     <div className="border-t border-neutral-200 my-2"></div>
-                                    <Link href="/auth/login" className="block px-4 py-2 hover:bg-neutral-100 text-orange-600 font-medium" onClick={() => setIsDesktopMenuOpen(false)}>Login</Link>
-                                    <Link href="/auth/signup" className="block px-4 py-2 hover:bg-neutral-100 text-orange-600 font-medium" onClick={() => setIsDesktopMenuOpen(false)}>Signup</Link>
+                                    {/* <Link href="/auth/login" className="block px-4 py-2 hover:bg-neutral-100 text-orange-600 font-medium" onClick={() => setIsDesktopMenuOpen(false)}>Login</Link>
+                                    <Link href="/auth/signup" className="block px-4 py-2 hover:bg-neutral-100 text-orange-600 font-medium" onClick={() => setIsDesktopMenuOpen(false)}>Signup</Link> */}
                                 </div>
                             </>
                         )}
@@ -645,7 +645,7 @@ export default function Header() {
             <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} bg-white border-t border-neutral-200 mt-2`}>
                 <div className="">
                     <Link
-                        href="#"
+                        href="https://firescreener.com"
                         className="block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
                         onClick={toggleMenu}
                     >
@@ -679,7 +679,7 @@ export default function Header() {
                     >
                         Phoenix Token
                     </Link>
-                    <Link
+                    {/* <Link
                         href="/auth/login"
                         className="text-orange-600 font-bold block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
                         onClick={toggleMenu}
@@ -692,7 +692,7 @@ export default function Header() {
                         onClick={toggleMenu}
                     >
                         Signup
-                    </Link>
+                    </Link> */}
                 </div>
             </div>
 

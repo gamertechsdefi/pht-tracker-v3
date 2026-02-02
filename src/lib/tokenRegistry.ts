@@ -157,6 +157,7 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0x199A88E5BFacc9eAB72913c5F05Ca75D1f30234f", symbol: "jct", name:"JustCat Token", chain:"bsc", isBurn: false},
   { address: "0xa98283c7e78e7604960f672b3d609d0c5e594ed0", symbol: "RICH", name: "RichSea Token", chain: "bsc", isBurn: true},
   { address: "0xf1c599e9a5fbdea408a7409c0176a2fe42c64444", symbol: "hachiko", name: "Hachiko Inu", chain: "bsc", isBurn: false},
+  { address: "0x63852B25cFabFE4EaB380df29A68663656f757EA", symbol: "jiti", name: "JITI", chain: "bsc", isBurn: false},
 
   {address: "0xf20f989CAf263C513f9183B4Fed88F14Fc04c8dB", symbol: "shalom", name: "Shalom", chain: "rwa", isBurn: false },
   { address: "0x782ea82124B474f1f968262ec24FCdED39689dd5", symbol: "rvm", name: "Real World Meme", chain: "rwa", isBurn: false},
