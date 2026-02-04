@@ -68,20 +68,24 @@ function formatPrice(price: number | string): { display: string; isExponential: 
     };
   }
 
-  const priceStr = priceNum.toString();
+  // Force decimal notation to check for leading zeros (prevents scientific notation issues)
+  const priceStr = priceNum.toFixed(20);
 
-  // Check for very small numbers with many leading zeros
+  // Check for very small numbers with many leading zeros (more than 4 zeros)
   if (priceStr.includes('.')) {
     const decimalPart = priceStr.split('.')[1];
-    if (decimalPart && decimalPart.startsWith('00000')) {
+    if (decimalPart) {
       const leadingZeros = decimalPart.match(/^0+/)?.[0].length || 0;
-      const restOfNumber = decimalPart.substring(leadingZeros).substring(0, 6); // Limit to 6 digits
-      return {
-        display: '$0.',
-        isExponential: true,
-        zeros: leadingZeros,
-        rest: restOfNumber,
-      };
+      // Use exponential formatting if more than 4 leading zeros
+      if (leadingZeros > 4) {
+        const restOfNumber = decimalPart.substring(leadingZeros).substring(0, 6); // Limit to 6 digits
+        return {
+          display: '$0.',
+          isExponential: true,
+          zeros: leadingZeros,
+          rest: restOfNumber,
+        };
+      }
     }
   }
 
@@ -90,7 +94,7 @@ function formatPrice(price: number | string): { display: string; isExponential: 
   if (priceNum >= 1) {
     formattedPrice = priceNum.toFixed(2);
   } else if (priceNum >= 0.01) {
-    formattedPrice = priceNum.toFixed(4);
+    formattedPrice = priceNum.toFixed(6);
   } else {
     formattedPrice = priceNum.toFixed(8);
   }
@@ -229,32 +233,32 @@ export default function Home() {
 
                   </div>
                   {/* Metrics Row */}
-                      <div className="flex gap-2 justify-between">
-                        {/* Volume */}
-                        <div className="flex flex-row gap-1 items-center border border-orange-500 rounded-lg p-2 bg-black/50">
-                          <div className="text-orange-500 text-xs font-medium">VOL</div>
-                          <div className="text-white text-sm font-semibold">
-                            ${formatCompactNumber(token.volume)}
-                          </div>
-                        </div>
-
-                        {/* Liquidity */}
-                        <div className="flex flex-row  gap-1 items-center border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
-                          <div className="text-orange-500 text-xs font-medium">LIQ.</div>
-                          <div className="text-white text-sm font-semibold">
-                            ${formatCompactNumber(token.liquidity)}
-                          </div>
-                        </div>
-
-                        {/* Market Cap */}
-                        <div className="flex flex-flex-row gap-1 items-center border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
-                          <div className="text-orange-500 text-xs font-medium">MC</div>
-                          <div className="text-white text-sm font-semibold">
-                            ${formatCompactNumber(token.marketCap)}
-                          </div>
-                        </div>
-
+                  <div className="flex gap-2 justify-between">
+                    {/* Volume */}
+                    <div className="flex flex-row gap-1 items-center border border-orange-500 rounded-lg p-2 bg-black/50">
+                      <div className="text-orange-500 text-xs font-medium">VOL</div>
+                      <div className="text-white text-sm font-semibold">
+                        ${formatCompactNumber(token.volume)}
                       </div>
+                    </div>
+
+                    {/* Liquidity */}
+                    <div className="flex flex-row  gap-1 items-center border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                      <div className="text-orange-500 text-xs font-medium">LIQ.</div>
+                      <div className="text-white text-sm font-semibold">
+                        ${formatCompactNumber(token.liquidity)}
+                      </div>
+                    </div>
+
+                    {/* Market Cap */}
+                    <div className="flex flex-flex-row gap-1 items-center border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                      <div className="text-orange-500 text-xs font-medium">MC</div>
+                      <div className="text-white text-sm font-semibold">
+                        ${formatCompactNumber(token.marketCap)}
+                      </div>
+                    </div>
+
+                  </div>
 
                 </Link>
               );
