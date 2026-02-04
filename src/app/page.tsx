@@ -165,10 +165,10 @@ export default function Home() {
                 <Link
                   key={token.address}
                   href={`/${token.chain}/${token.address}`}
-                  className="rounded-lg p-4 border border-orange-500/30 hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20"
+                  className="rounded-lg p-2 border border-orange-500/30 hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20"
                 >
                   {/* Card Header */}
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-2">
                     {/* Left: Token Icon and Info */}
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       {/* Token Icon with Chain Badge */}
@@ -208,50 +208,54 @@ export default function Home() {
                     </div>
 
                     {/* Right: Price */}
-                    <div className="flex flex-col text-right flex-shrink-0 ml-2">
-                      <span className="text-white font-semibold text-xl whitespace-nowrap">
-                        {priceDisplay}
-                      </span>
-                      {token.change24h !== 'N/A' && token.change24h !== undefined && (
-                        (() => {
-                          const change = parseFloat(String(token.change24h));
-                          const isPositive = change >= 0;
-                          return (
-                            <span className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                              {isPositive ? '+' : ''}{change.toFixed(2)}%
-                            </span>
-                          );
-                        })()
-                      )}
+                    <div className='flex flex-col items-end'>
+                      <div className="flex flex-row items-center gap-3 text-right flex-shrink-0">
+                        <span className="text-white font-semibold text-xl whitespace-nowrap">
+                          {priceDisplay}
+                        </span>
+                        {token.change24h !== 'N/A' && token.change24h !== undefined && (
+                          (() => {
+                            const change = parseFloat(String(token.change24h));
+                            const isPositive = change >= 0;
+                            return (
+                              <span className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                {isPositive ? '+' : ''}{change.toFixed(2)}%
+                              </span>
+                            );
+                          })()
+                        )}
+                      </div>
                     </div>
-                  </div>
 
+                  </div>
                   {/* Metrics Row */}
-                  <div className="flex gap-2">
-                    {/* Volume */}
-                    <div className="flex-1 border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
-                      <div className="text-orange-500 text-xs font-medium">VOL</div>
-                      <div className="text-white text-sm font-semibold">
-                        ${formatCompactNumber(token.volume)}
-                      </div>
-                    </div>
+                      <div className="flex gap-2 justify-between">
+                        {/* Volume */}
+                        <div className="flex flex-row gap-1 items-center border border-orange-500 rounded-lg p-2 bg-black/50">
+                          <div className="text-orange-500 text-xs font-medium">VOL</div>
+                          <div className="text-white text-sm font-semibold">
+                            ${formatCompactNumber(token.volume)}
+                          </div>
+                        </div>
 
-                    {/* Liquidity */}
-                    <div className="flex-1 border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
-                      <div className="text-orange-500 text-xs font-medium">LIQ.</div>
-                      <div className="text-white text-sm font-semibold">
-                        ${formatCompactNumber(token.liquidity)}
-                      </div>
-                    </div>
+                        {/* Liquidity */}
+                        <div className="flex flex-row  gap-1 items-center border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                          <div className="text-orange-500 text-xs font-medium">LIQ.</div>
+                          <div className="text-white text-sm font-semibold">
+                            ${formatCompactNumber(token.liquidity)}
+                          </div>
+                        </div>
 
-                    {/* Market Cap */}
-                    <div className="flex-1 border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
-                      <div className="text-orange-500 text-xs font-medium">MCAP</div>
-                      <div className="text-white text-sm font-semibold">
-                        ${formatCompactNumber(token.marketCap)}
+                        {/* Market Cap */}
+                        <div className="flex flex-flex-row gap-1 items-center border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                          <div className="text-orange-500 text-xs font-medium">MC</div>
+                          <div className="text-white text-sm font-semibold">
+                            ${formatCompactNumber(token.marketCap)}
+                          </div>
+                        </div>
+
                       </div>
-                    </div>
-                  </div>
+
                 </Link>
               );
             })
