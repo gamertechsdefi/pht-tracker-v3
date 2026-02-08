@@ -97,20 +97,24 @@ function formatPrice(price: number | string): { display: string; isExponential: 
     };
   }
 
-  const priceStr = priceNum.toString();
+  // Force decimal notation to check for leading zeros (prevents scientific notation issues)
+  const priceStr = priceNum.toFixed(20);
 
-  // Check for very small numbers with many leading zeros
+  // Check for very small numbers with many leading zeros (more than 4 zeros)
   if (priceStr.includes('.')) {
     const decimalPart = priceStr.split('.')[1];
-    if (decimalPart && decimalPart.startsWith('00000')) {
+    if (decimalPart) {
       const leadingZeros = decimalPart.match(/^0+/)?.[0].length || 0;
-      const restOfNumber = decimalPart.substring(leadingZeros).substring(0, 6); // Limit to 6 digits
-      return {
-        display: '$0.',
-        isExponential: true,
-        zeros: leadingZeros,
-        rest: restOfNumber,
-      };
+      // Use exponential formatting if more than 4 leading zeros
+      if (leadingZeros > 4) {
+        const restOfNumber = decimalPart.substring(leadingZeros).substring(0, 6); // Limit to 6 digits
+        return {
+          display: '$0.',
+          isExponential: true,
+          zeros: leadingZeros,
+          rest: restOfNumber,
+        };
+      }
     }
   }
 
