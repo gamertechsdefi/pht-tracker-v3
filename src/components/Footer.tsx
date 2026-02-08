@@ -3,7 +3,7 @@ import React from 'react';
 const footerItems = [
     { label: 'Info', key: 'info' },
     { label: 'Burns', key: 'burns' },
-    { label: 'Chart', key: 'chart' },
+    // { label: 'Chart', key: 'chart' },
 ];
 
 interface FooterProps {

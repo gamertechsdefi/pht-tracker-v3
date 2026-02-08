@@ -436,7 +436,7 @@ export async function GET(
           website: data.website || "",
           twitter: data.twitter || "",
           telegram: data.telegram || "",
-          scan: data.bscscan || `https://bscscan.com/token/${data.address}`
+          scan: data.scan || ""
         });
       }
     } catch (sbError) {

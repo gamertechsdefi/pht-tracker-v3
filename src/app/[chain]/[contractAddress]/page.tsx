@@ -17,6 +17,7 @@ import { useTrackActiveToken } from "@/hooks/useTrackActiveToken";
 import { useEmojiReactions } from "@/hooks/useEmojiReactions";
 import { Star } from "lucide-react";
 import WatchlistButton from "@/components/WatchlistButton";
+import NewPriceActionChart from "@/components/NewPriceActionChart";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -44,6 +45,7 @@ interface TokenData {
     liquidity: string | number;
     profile: string;
     contract: string;
+    description: string;
 }
 
 // Define props interface
@@ -140,6 +142,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     `/api/${chainLower}/token-profile/${contractAddress}`,
                     `/api/${chainLower}/socials/${contractAddress}`,
                     `/api/${chainLower}/ca/${contractAddress}`,
+                    `/api/${chainLower}/description/${contractAddress}`,
                 ];
 
                 const responses = await Promise.all(
@@ -150,7 +153,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     )
                 );
 
-                const [metricsData, holdersData, priceData, burnsData, profileData, socialData] = responses;
+                const [metricsData, holdersData, priceData, burnsData, profileData, socialData, descriptionData] = responses;
 
                 setTokenData({
                     price: priceData?.price || "N/A",
@@ -177,6 +180,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     liquidity: priceData?.liquidity || "N/A",
                     profile: profileData?.profileImage || "N/A",
                     contract: contractAddress,
+                    description: descriptionData?.description || "N/A",
                 });
                 setSocialLinks(socialData || null);
             } catch (err: unknown) {
@@ -216,7 +220,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                 }
             }
 
-            if (leadingZeros >= 4 && integerPart === "0") {
+            if (leadingZeros > 4 && integerPart === "0") {
                 const exponent = leadingZeros;
                 const significantDigits = decimalPart.slice(significantDigitsStart).replace(/0+$/, "");
                 return { display: `0.0 ${exponent} ${significantDigits}`, isExponential: true };
@@ -269,7 +273,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
         }
     };
 
-    function formatEvmAddress(address: string, shorten: boolean = true, chars: number = 5): string {
+    function formatEvmAddress(address: string, shorten: boolean = true, chars: number = 8): string {
         // Normalize to lowercase and remove '0x' prefix if present
         const normalized = address.toLowerCase().replace(/^0x/i, '');
         if (normalized.length < 40) {
@@ -358,9 +362,22 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                         <>
                             <div className="md:hidden">
                                 {/* Info Tab */}
+
+                                {/* <div className="mb-16 w-full h-full">
+                                    {chain && contractAddress && (
+                                        <PriceActionChart
+                                            tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
+                                            chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
+                                            contractAddress={contractAddress}
+                                        />
+                                    )}
+
+                                    
+                                </div> */}
                                 <div className={activeTab === "info" ? "" : "hidden"}>
-                                    <section className="">
-                                        <div className="flex flex-col bg-black rounded-lg p-4 mb-2 justify-between md:items-end w-full">
+                                    <section className="px-2">
+                                        <div className="flex flex-col bg-white/25 rounded-lg p-4 mb-2 justify-between md:items-end w-full">
+                                        <div className="flex items-center justify-between">
                                             <div className="flex flex-row items-center gap-2 flex-1 min-w-0">
                                                 <img
                                                     src={`/api/${chain}/logo/${contractAddress}`}
@@ -371,10 +388,23 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                         (e.target as HTMLImageElement).alt = 'Default Logo';
                                                     }}
                                                 />
-                                                <h1 className="text-lg md:text-2xl font-bold break-words">{tokenMetadata.name}</h1>
+                                                <h1 className="text-2xl md:text-3xl font-bold">{tokenMetadata.symbol.toUpperCase()}</h1>
+                                            </div>
+                                             <div className="mt-4 flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
+                                            <WatchlistButton
+                                                token={{
+                                                    contract: contractAddress || "",
+                                                    chain: chain || "",
+                                                    symbol: tokenMetadata.symbol || "",
+                                                    name: tokenMetadata.name || "",
+                                                    logo: `/api/${chain}/logo/${contractAddress}`
+                                                }}
+                                                className="w-full justify-center"
+                                            />
+                                        </div>
                                             </div>
                                             {socialLinks && (
-                                                <div className="flex flex-row gap-4 mt-4 items-center justify-between px-4 bg-neutral-800 p-4 rounded-lg">
+                                                <div className="flex flex-row gap-4 mt-2 items-center justify-between px-4 bg-white text-black p-4 rounded-lg">
                                                     <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" >
                                                         <p className="text-sm">Website</p>
                                                     </a>
@@ -391,46 +421,40 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             )}
                                         </div>
 
-
-
-                                        <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                            <h1>Price:</h1>
-                                            <h1 className="font-medium text-lg md:text-xl">
-                                                ${" "}
-                                                {(() => {
-                                                    const { display, isExponential } = formatPrice(tokenData.price);
-                                                    if (!isExponential) return display;
-                                                    const [prefix, exponent, value] = display.split(" ");
-                                                    return (
-                                                        <>
-                                                            {prefix}
-                                                            <sup className={styles.superscript}>{exponent}</sup> {value}
-                                                        </>
-                                                    );
-                                                })()}
-                                            </h1>
-                                        </div>
-
-                                        <div className="mt-4 grid grid-cols-2 gap-4">
-                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                <h1>Market Cap:</h1>
-                                                <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.marketCap)}</h1>
+                                        <div className="flex flex-row items-center justify-between mb-4">
+                                            <div className="mt-4 flex flex-col rounded-md">
+                                                <h1 className="text-sm">{tokenMetadata.name}</h1>
+                                                <h1 className="font-bold text-2xl">
+                                                    ${" "}
+                                                    {(() => {
+                                                        const { display, isExponential } = formatPrice(tokenData.price);
+                                                        if (!isExponential) return display;
+                                                        const [prefix, exponent, value] = display.split(" ");
+                                                        return (
+                                                            <>
+                                                                {prefix}
+                                                                <sup className={styles.superscript}>{exponent}</sup> {value}
+                                                            </>
+                                                        );
+                                                    })()}
+                                                </h1>
                                             </div>
-                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                <h1>FDV:</h1>
-                                                <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.fdv)}</h1>
-                                            </div>
-                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                <h1>Liquidity:</h1>
-                                                <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.liquidity)}</h1>
-                                            </div>
-                                            <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
-                                                <h1>Volume:</h1>
-                                                <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.volume)}</h1>
+                                            <div className="bg-white/25 rounded-md px-4 py-2">
+                                                <h1 className="text-sm">24h Volume:</h1>
+                                                <h1 className="font-bold text-md">${formatWholeNumber(tokenData.volume)}</h1>
                                             </div>
                                         </div>
 
-                                        <div className="mt-4 flex flex-row bg-neutral-900 justify-between gap-2 items-center border-2 border-orange-500 rounded-md p-4">
+                                        {chain && contractAddress && (
+                                            <NewPriceActionChart
+                                                tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
+                                                contractAddress={contractAddress}
+                                            />
+                                        )}
+
+
+                                        <div className="mt-4 flex flex-row bg-black/35 justify-between gap-2 items-center rounded-md p-4">
                                             <div className="flex flex-col items-center">
                                                 <span className="text-xs text-gray-400">1h</span>
                                                 <span
@@ -465,40 +489,104 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col gap-2 bg-neutral-900 border-2 border-neutral-600 p-4 mt-4 rounded-xl">
+                                        
+
+
+
+                                        {/* <div className="mt-4 flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                            <h1>Price:</h1>
+                                            <h1 className="font-medium text-lg md:text-xl">
+                                                ${" "}
+                                                {(() => {
+                                                    const { display, isExponential } = formatPrice(tokenData.price);
+                                                    if (!isExponential) return display;
+                                                    const [prefix, exponent, value] = display.split(" ");
+                                                    return (
+                                                        <>
+                                                            {prefix}
+                                                            <sup className={styles.superscript}>{exponent}</sup> {value}
+                                                        </>
+                                                    );
+                                                })()}
+                                            </h1>
+                                        </div> */}
+
+                                        {/* <div className="mt-4">
+                                            <h1 className="font-bold text-xl">Description</h1>
+                                            <p>{tokenData?.description || "No description found"}</p>
+                                        </div> */}
+
+                                          <div className="flex flex-col gap-2 border border-white p-4 mt-4 rounded-xl">
                                             <p className="text-md">Contract Address</p>
-                                            <h1 className="text-lg md:text-xl font-bold text-orange-500 flex gap-2">
+                                            <h1 className="text-xl font-bold text-orange-500 flex gap-2">
                                                 <span>{formatEvmAddress(tokenData.contract)}</span>
                                                 <button onClick={() => copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
                                             </h1>
                                         </div>
 
-                                        {tokenData.contract && chain && (
-                                            <CurrencyConverter
-                                                tokenSymbol={tokenMetadata.symbol.toUpperCase()}
-                                                tokenAddress={tokenData.contract}
-                                                tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
-                                                chain={chain}
-                                            />
-                                        )}
-
-                                        <div className="mt-4 flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
-                                            <WatchlistButton
-                                                token={{
-                                                    contract: contractAddress || "",
-                                                    chain: chain || "",
-                                                    symbol: tokenMetadata.symbol || "",
-                                                    name: tokenMetadata.name || "",
-                                                    logo: `/api/${chain}/logo/${contractAddress}`
-                                                }}
-                                                className="w-full justify-center"
-                                            />
+                                        <div className="mt-4 grid grid-cols-3 gap-4">
+                                            <div className="flex flex-col items-center bg-orange-600 rounded-md p-4">
+                                                <h1 className="text-sm">MARKETCAP</h1>
+                                                <h1 className="font-bold text-lg">${formatLargeNumber(tokenData.marketCap)}</h1>
+                                            </div>
+                                            <div className="flex flex-col items-center bg-orange-600 rounded-md p-4">
+                                                <h1 className="text-sm">FDV</h1>
+                                                <h1 className="font-bold text-lg">${formatLargeNumber(tokenData.fdv)}</h1>
+                                            </div>
+                                            <div className="flex flex-col items-center bg-orange-600 rounded-md p-4">
+                                                <h1 className="text-sm">LIQUIDITY</h1>
+                                                <h1 className="font-bold text-lg">${formatLargeNumber(tokenData.liquidity)}</h1>
+                                            </div>
+                                            {/* <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
+                                                <h1>Volume:</h1>
+                                                <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.volume)}</h1>
+                                            </div> */}
                                         </div>
-                                    </section>
-                                    
+{/* 
+                                        <div className="mt-4 flex flex-row bg-neutral-900 justify-between gap-2 items-center border-2 border-orange-500 rounded-md p-4">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">1h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange1h).startsWith("-") ? "text-red-400" : "text-green-400"}`}
+                                                >
+                                                    {tokenData.priceChange1h}%
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">3h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange3h).startsWith("-") ? "text-red-500" : "text-green-500"}`}
+                                                >
+                                                    {tokenData.priceChange3h}%
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">6h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange6h).startsWith("-") ? "text-red-600" : "text-green-600"}`}
+                                                >
+                                                    {tokenData.priceChange6h}%
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-xs text-gray-400">24h</span>
+                                                <span
+                                                    className={`px-2 py-1 rounded ${String(tokenData.priceChange24h).startsWith("-") ? "text-red-700" : "text-green-700"}`}
+                                                >
+                                                    {tokenData.priceChange24h}%
+                                                </span>
+                                            </div>
+                                        </div> */}
 
-                                    <section className="mt-8 flex flex-col my-16">
-                                        <div className="flex-1">
+                                        {/* <div className="flex flex-col gap-2 bg-neutral-900 border-2 border-neutral-600 p-4 mt-4 rounded-xl">
+                                            <p className="text-md">Contract Address</p>
+                                            <h1 className="text-lg md:text-xl font-bold text-orange-500 flex gap-2">
+                                                <span>{formatEvmAddress(tokenData.contract)}</span>
+                                                <button onClick={() => copyAddress(tokenData.contract)}><FaCopy size={20} fill="#ffffff" /></button>
+                                            </h1>
+                                        </div> */}
+
+                                         <div className="flex-1">
                                             <div className="my-8 space-y-4">
                                                 <DataCard
                                                     title="Total Supply"
@@ -526,6 +614,60 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 />
                                             </div>
                                         </div>
+
+                                        {tokenData.contract && chain && (
+                                            <CurrencyConverter
+                                                tokenSymbol={tokenMetadata.symbol.toUpperCase()}
+                                                tokenAddress={tokenData.contract}
+                                                tokenLogoUrl={`/api/${chain}/logo/${contractAddress}`}
+                                                chain={chain}
+                                            />
+                                        )}
+
+                                        {/* <div className="mt-4 flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
+                                            <WatchlistButton
+                                                token={{
+                                                    contract: contractAddress || "",
+                                                    chain: chain || "",
+                                                    symbol: tokenMetadata.symbol || "",
+                                                    name: tokenMetadata.name || "",
+                                                    logo: `/api/${chain}/logo/${contractAddress}`
+                                                }}
+                                                className="w-full justify-center"
+                                            />
+                                        </div> */}
+                                    </section>
+
+
+                                    <section className="mt-8 flex flex-col my-16">
+                                        {/* <div className="flex-1">
+                                            <div className="my-8 space-y-4">
+                                                <DataCard
+                                                    title="Total Supply"
+                                                    value={formatWholeNumber(tokenData.totalSupply)}
+                                                    bg="bg-white text-black"
+                                                    image="/tSupply.png"
+                                                />
+                                                <DataCard
+                                                    title="Total Locked"
+                                                    value={formatWholeNumber(tokenData.lSupply)}
+                                                    bg="bg-blue-600"
+                                                    image="/lock-bg.png"
+                                                />
+                                                <DataCard
+                                                    title="Circulatory Supply"
+                                                    value={formatWholeNumber(tokenData.cSupply)}
+                                                    bg="bg-green-600"
+                                                    image="/cSupply-bg.png"
+                                                />
+                                                <DataCard
+                                                    title="Total Burnt"
+                                                    value={formatWholeNumber(tokenData.totalburnt)}
+                                                    bg="bg-white text-black"
+                                                    image="/burn-bg.png"
+                                                />
+                                            </div>
+                                        </div> */}
 
                                         <div className="flex gap-2 md:gap-3 items-center justify-center mb-4 flex-wrap">
                                             <div
@@ -607,17 +749,6 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     )}
                                 </div>
 
-                                {activeTab === "chart" && (
-                                    <div className="mb-16 w-full h-full">
-                                        {chain && contractAddress && (
-                                            <PriceActionChart
-                                                tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
-                                                chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
-                                                contractAddress={contractAddress}
-                                            />
-                                        )}
-                                    </div>
-                                )}
                             </div>
 
                             {/* Desktop Layout */}
@@ -656,7 +787,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 </div>
                                             )}
                                         </div>
-                        
+
 
                                         <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                             <h1>Price:</h1>
@@ -790,8 +921,16 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
                                     {/* Right Side: Chart */}
                                     <div>
-                                        {chain && contractAddress && (
+                                        {/* {chain && contractAddress && (
                                             <PriceActionChart
+                                                tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
+                                                contractAddress={contractAddress}
+                                            />
+                                        )} */}
+
+                                        {chain && contractAddress && (
+                                            <NewPriceActionChart
                                                 tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
                                                 chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
                                                 contractAddress={contractAddress}

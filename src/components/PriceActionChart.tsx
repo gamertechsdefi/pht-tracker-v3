@@ -431,7 +431,7 @@ export default function PriceActionChart({
                   if (price === 0) return '$0';
                   if (price >= 1000) return `$${price.toFixed(2)}`;
                   if (price >= 1) return `$${price.toFixed(4)}`;
-                  if (price >= 0.01) return `$${price.toFixed(6)}`;
+                  if (price >= 0.01) return `$${price.toFixed(4)}`;
                   // For very small prices, use scientific notation or more decimals
                   if (price < 0.000001) return `$${price.toExponential(2)}`;
                   return `$${price.toFixed(8)}`;
@@ -479,28 +479,12 @@ export default function PriceActionChart({
       {/* Chart.js is loaded dynamically in a useEffect */}
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      {/* <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold"> {tokenSymbol} Price Action</h3>
-        {/* <span className="text-xs text-gray-400">
+        <span className="text-xs text-gray-400">
           Source: {dataSource === "coingecko" ? "CoinGecko" : dataSource === "cryptocompare" ? "CryptoCompare" : dataSource === 'rwa' ? 'AssetChain (RWA)' : "..."}
-        </span> */}
-      </div>
-
-      {/* Timeframe selector */}
-      <div className="flex items-center gap-2 mb-4">
-        {TIMEFRAMES.map((timeframe) => (
-          <button
-            key={timeframe.days}
-            onClick={() => setSelectedTimeframe(timeframe.days)}
-            className={`px-3 py-1 text-xs rounded ${selectedTimeframe === timeframe.days
-                ? "bg-orange-500 text-white"
-                : "bg-neutral-200 text-black hover:bg-neutral-600"
-              }`}
-          >
-            {timeframe.label}
-          </button>
-        ))}
-      </div>
+        </span>
+      </div> */}
 
       {/* Chart or status */}
       {loading ? (
@@ -526,6 +510,23 @@ export default function PriceActionChart({
       ) : (
         <div className="text-center text-sm text-gray-400 py-8">No price data available.</div>
       )}
+
+      {/* Timeframe selector */}
+      <div className="flex justify-between items-center gap-2 mb-4">
+        {TIMEFRAMES.map((timeframe) => (
+          <button
+            key={timeframe.days}
+            onClick={() => setSelectedTimeframe(timeframe.days)}
+            className={`flex-1 px-3 py-1 text-xs rounded ${selectedTimeframe === timeframe.days
+              ? "bg-orange-500 text-white"
+              : "bg-neutral-200 text-black hover:bg-neutral-600"
+              }`}
+          >
+            {timeframe.label}
+          </button>
+        ))}
+      </div>
+
     </div>
   );
 }
