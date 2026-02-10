@@ -30,18 +30,31 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <script defer src="https://cloud.umami.is/script.js" data-website-id="23de30be-d6d1-4152-b10c-7442a99240ce"></script>
-        <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+        <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" async></script>
         <script dangerouslySetInnerHTML={{
           __html: `
+          console.log("OneSignal: Script starting...");
           window.OneSignalDeferred = window.OneSignalDeferred || [];
           OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.init({
-              appId: "9ad13f4d-03af-4407-b965-fe9378f378cd",
-              safari_web_id: "web.onesignal.auto.48d27e8c-5bf0-4f8f-a083-e09c208eb2cb",
-              notifyButton: {
-                enable: true,
-              },
-            });
+            console.log("OneSignal: SDK loaded, initializing...");
+            try {
+              await OneSignal.init({
+                appId: "9ad13f4d-03af-4407-b965-fe9378f378cd",
+                safari_web_id: "web.onesignal.auto.48d27e8c-5bf0-4f8f-a083-e09c208eb2cb",
+                allowLocalhostAsSecureOrigin: true,
+                serviceWorkerPath: 'OneSignalSDKWorker.js',
+                notifyButton: {
+                  enable: true,
+                  position: 'bottom-right',
+                  colors: {
+                    'circle.background': '#f97316'
+                  }
+                },
+              });
+              console.log("OneSignal: Initialization complete.");
+            } catch (err) {
+              console.error("OneSignal: Initialization failed", err);
+            }
           });
         `}} />
       </head>
