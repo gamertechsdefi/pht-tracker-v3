@@ -608,6 +608,7 @@ export default function Header() {
                                     <Link href="#" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Burns</Link>
                                     <Link href="/price2mc" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Price2MC</Link>
                                     <Link href="/watchlist" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Watchlist</Link>
+                                    <Link href="/alerts" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Alerts</Link>
                                     <Link href="https://www.phoenixtoken.community" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Token</Link>
                                     <div className="border-t border-neutral-200 my-2"></div>
                                     {/* <Link href="/auth/login" className="block px-4 py-2 hover:bg-neutral-100 text-orange-600 font-medium" onClick={() => setIsDesktopMenuOpen(false)}>Login</Link>
@@ -671,6 +672,13 @@ export default function Header() {
                         onClick={toggleMenu}
                     >
                         Watchlist
+                    </Link>
+                    <Link 
+                        href="/alerts" 
+                        className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" 
+                        onClick={() => setIsDesktopMenuOpen(false)}
+                    >
+                        Alerts
                     </Link>
                     <Link
                         href="https://www.phoenixtoken.community"

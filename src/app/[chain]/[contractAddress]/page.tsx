@@ -18,6 +18,8 @@ import { useEmojiReactions } from "@/hooks/useEmojiReactions";
 import { Star } from "lucide-react";
 import WatchlistButton from "@/components/WatchlistButton";
 import NewPriceActionChart from "@/components/NewPriceActionChart";
+import PriceAlertButton from "@/components/PriceAlertButton";
+
 
 // Define types for token data and intervals
 interface TokenData {
@@ -392,6 +394,16 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </div>
                                              <div className="mt-4 flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
                                             <WatchlistButton
+                                                token={{
+                                                    contract: contractAddress || "",
+                                                    chain: chain || "",
+                                                    symbol: tokenMetadata.symbol || "",
+                                                    name: tokenMetadata.name || "",
+                                                    logo: `/api/${chain}/logo/${contractAddress}`
+                                                }}
+                                                className="w-full justify-center"
+                                            />
+                                            <PriceAlertButton
                                                 token={{
                                                     contract: contractAddress || "",
                                                     chain: chain || "",
