@@ -62,17 +62,22 @@ export default function PriceAlertButton({
     };
 
     const handleSaveAlert = async () => {
-        // Check if notification is allowed
-        const isPermissionGranted = OneSignal.Notifications.permission;
+        // Check if OneSignal is initialized and permission is granted
+        if (typeof window !== 'undefined' && window.OneSignal) {
+            const isPermissionGranted = OneSignal.Notifications.permission;
 
-        if (!isPermissionGranted) {
-            const result = await OneSignal.Slidedown.promptPush();
+            if (!isPermissionGranted) {
+                // Trigger slidedown
+                await OneSignal.Slidedown.promptPush();
 
-            // If still not granted after prompt, show message and don't save
-            if (!OneSignal.Notifications.permission) {
-                alert('Please allow notifications to receive price alerts.');
+                // Explain to user
+                alert('Notification permission is required to receive price alerts. Please click "Allow" in the notification prompt and then click "Save Alert" again.');
                 return;
             }
+        } else {
+            console.warn('OneSignal not initialized');
+            // If OneSignal isn't ready, we might still want to allow saving if the user is on a device that doesn't support push
+            // But for this app, push is a requirement for alerts.
         }
 
         const newAlert = {

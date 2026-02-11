@@ -110,44 +110,7 @@ export default function Home() {
   const [tokens, setTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Ensure this code runs only on the client side
-    if (typeof window !== 'undefined') {
-      OneSignal.init({
-        appId: '9ad13f4d-03af-4407-b965-fe9378f378cd',
-        setInitialized: true,
-        serviceWorkerParam: {
-          scope: "/onesignal"
-        },
-        slidedown: {
-          enabled: true,
-          prompt: {
-            type: "push",
-          },
-          delay: {
-            pageViews: 1,
-            timeDelay: 5,
-          },
-          autoPrompt: true,
-          text: {
-            actionMessage: "Allow notifications to get price alerts and new listings early",
-            acceptButton: "Allow",
-            cancelButton: "No Thanks",
-          },
-          // prompts: {
-          //   push: true,
-          // },
-        },
 
-        serviceWorkerPath: "/onesignal/OneSignalSDKWorker.js",
-        // safari_web_id: "web.onesignal.auto.48d27e8c-5bf0-4f8f-a083-e09c208eb2cb",
-        // notifyButton: {
-        //   enable: true,
-        // } as any,
-        allowLocalhostAsSecureOrigin: true,
-      });
-    }
-  }, []);
 
   useEffect(() => {
     async function fetchTokens() {
