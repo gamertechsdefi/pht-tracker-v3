@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FaBell } from 'react-icons/fa';
+import OneSignal from 'react-onesignal';
 
 interface Token {
     contract: string;
@@ -60,7 +61,20 @@ export default function PriceAlertButton({
         setShowModal(true);
     };
 
-    const handleSaveAlert = () => {
+    const handleSaveAlert = async () => {
+        // Check if notification is allowed
+        const isPermissionGranted = OneSignal.Notifications.permission;
+
+        if (!isPermissionGranted) {
+            const result = await OneSignal.Slidedown.promptPush();
+
+            // If still not granted after prompt, show message and don't save
+            if (!OneSignal.Notifications.permission) {
+                alert('Please allow notifications to receive price alerts.');
+                return;
+            }
+        }
+
         const newAlert = {
             id: `${token.contract}-${token.chain}-${Date.now()}`,
             token: {
