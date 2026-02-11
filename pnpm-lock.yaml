@@ -74,6 +74,9 @@ importers:
       react-icons:
         specifier: ^5.5.0
         version: 5.5.0(react@19.2.3)
+      react-onesignal:
+        specifier: ^3.4.6
+        version: 3.4.6
       redis:
         specifier: ^5.9.0
         version: 5.9.0
@@ -2549,6 +2552,10 @@ packages:
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
+
+  react-onesignal@3.4.6:
+    resolution: {integrity: sha512-Jxr5GMdHssaZBVeWjhwn4ImqP5qcc8ekrSIVYrvetlf+7UNn9zUrXFFcAoWGi1BRru/4UcDEB+lOaBEPJVI1yw==}
+    engines: {node: '>=14', npm: '>=6'}
 
   react@19.2.3:
     resolution: {integrity: sha512-Ku/hhYbVjOQnXDZFv2+RibmLFGwFdeeKHFcOTlrt7xplBnya5OGn/hIRDsqDiSUcfORsDC7MPxwork8jBwsIWA==}
@@ -5747,6 +5754,8 @@ snapshots:
       react: 19.2.3
 
   react-is@16.13.1: {}
+
+  react-onesignal@3.4.6: {}
 
   react@19.2.3: {}
 
