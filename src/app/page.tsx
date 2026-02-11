@@ -121,6 +121,13 @@ export default function Home() {
         },
         slidedown: {
           enabled: true,
+          prompt: {
+            type: "push",
+          },
+          delay: {
+            pageViews: 1,
+            timeDelay: 5,
+          },
           autoPrompt: true,
           text: {
             actionMessage: "Allow notifications to get price alerts and new listings early",
