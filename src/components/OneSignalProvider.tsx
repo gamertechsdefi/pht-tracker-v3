@@ -13,7 +13,7 @@ export default function OneSignalProvider({ children }: { children: React.ReactN
                         appId: '9ad13f4d-03af-4407-b965-fe9378f378cd',
                         // setInitialized: true,
                         serviceWorkerParam: {
-                            scope: "/"
+                            scope: "/onesignal"
                         },
                         slidedown: {
                             enabled: true,
@@ -31,7 +31,7 @@ export default function OneSignalProvider({ children }: { children: React.ReactN
                                 cancelButton: "No Thanks",
                             },
                         },
-                        serviceWorkerPath: "/OneSignalSDKWorker.js",
+                        serviceWorkerPath: "/onesignal/OneSignalSDKWorker.js",
                         allowLocalhostAsSecureOrigin: true,
                     });
                     console.log("OneSignal: Initialized successfully");
