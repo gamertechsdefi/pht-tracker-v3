@@ -121,9 +121,9 @@ export default function Home() {
         },
         serviceWorkerPath: "/onesignal/OneSignalSDKWorker.js",  
         // safari_web_id: "web.onesignal.auto.48d27e8c-5bf0-4f8f-a083-e09c208eb2cb",
-        notifyButton: {
-          enable: true,
-        } as any,
+        // notifyButton: {
+        //   enable: true,
+        // } as any,
         allowLocalhostAsSecureOrigin: true,
       });
     }
