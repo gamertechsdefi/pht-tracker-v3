@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoPlus, ChainId } from '@goplus/sdk-node';
+import { GoPlus } from '@goplus/sdk-node';
 import { isValidContractAddress } from '@/lib/tokenRegistry';
 
 // Map internal chain names to GoPlus Chain IDs
