@@ -85,7 +85,7 @@ export async function sendPriceAlert(alert: PriceAlertPayload): Promise<{ succes
     return sendNotificationToAll({
         title: `${direction} ${alert.tokenSymbol} Price Alert`,
         message: `${alert.tokenSymbol} is ${changeText} ${Math.abs(alert.percentageChange).toFixed(2)}%! Current price: $${alert.currentPrice.toFixed(8)}`,
-        url: `https://firescreener.com/${alert.chain}/${alert.tokenAddress}`,
+        url: `https://https://firescreener-v0-git-ui-update-gamertechsdefis-projects.vercel.app//${alert.chain}/${alert.tokenAddress}`,
         icon: '/favicon.ico',
         data: {
             type: 'price_alert',
@@ -108,7 +108,7 @@ export async function sendNewListing(listing: NewListingPayload): Promise<{ succ
     return sendNotificationToAll({
         title: `🔥 New Token Listed: ${listing.tokenSymbol}`,
         message: `${listing.tokenName} (${listing.tokenSymbol}) is now available on ${listing.chain.toUpperCase()}${priceText}`,
-        url: `https://firescreener.com/${listing.chain}/${listing.tokenAddress}`,
+        url: `https://https://firescreener-v0-git-ui-update-gamertechsdefis-projects.vercel.app//${listing.chain}/${listing.tokenAddress}`,
         icon: '/favicon.ico',
         data: {
             type: 'new_listing',

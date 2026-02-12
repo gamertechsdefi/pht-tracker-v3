@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendPriceAlert, sendNewListing, sendNotificationToAll, type PriceAlertPayload, type NewListingPayload, type NotificationPayload } from '@/lib/onesignal';
+import { sendPriceAlert, sendNewListing, sendNotificationToAll, type PriceAlertPayload, type NewListingPayload, type NotificationPayload } from '@/services/onesignal.service';
 
 export async function POST(req: NextRequest) {
     try {
