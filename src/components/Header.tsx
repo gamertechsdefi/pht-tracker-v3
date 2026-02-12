@@ -604,7 +604,7 @@ export default function Header() {
                             <>
                                 <div className="fixed inset-0 z-10" onClick={() => setIsDesktopMenuOpen(false)} />
                                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-20">
-                                    <Link href="#" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Home</Link>
+                                    <Link href="/" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Home</Link>
                                     <Link href="#" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Burns</Link>
                                     <Link href="/price2mc" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Price2MC</Link>
                                     <Link href="/watchlist" className="block px-4 py-2 hover:bg-neutral-100 text-neutral-900" onClick={() => setIsDesktopMenuOpen(false)}>Watchlist</Link>
@@ -646,7 +646,7 @@ export default function Header() {
             <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} bg-white border-t border-neutral-200 mt-2`}>
                 <div className="">
                     <Link
-                        href="https://firescreener.com"
+                        href="/"
                         className="block px-3 py-2 rounded-md text-base text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
                         onClick={toggleMenu}
                     >

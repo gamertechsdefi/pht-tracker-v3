@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
+import { toast } from "react-hot-toast";
 import DataCard from "@/components/DataCard";
 import BurnsDisplay from "@/components/BurnHistory";
 import BurnIntervals from "@/components/BurnIntervals";
@@ -302,11 +303,10 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
     async function copyAddress(address: string): Promise<void> {
         try {
             await navigator.clipboard.writeText(address);
-
-            alert('Address copied to clipboard!');
+            toast.success('Address copied to clipboard!');
         } catch (error) {
             console.error('Failed to copy address:', error);
-            alert('Failed to copy address. Please try again.');
+            toast.error('Failed to copy address. Please try again.');
         }
     }
 
@@ -379,41 +379,41 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                 <div className={activeTab === "info" ? "" : "hidden"}>
                                     <section className="px-2">
                                         <div className="flex flex-col bg-white/25 rounded-lg p-4 mb-2 justify-between md:items-end w-full">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex flex-row items-center gap-2 flex-1 min-w-0">
-                                                <img
-                                                    src={`/api/${chain}/logo/${contractAddress}`}
-                                                    alt={`${tokenMetadata.symbol.toUpperCase()} Logo`}
-                                                    className="w-15 h-15 rounded-md object-contain flex-shrink-0"
-                                                    onError={(e) => {
-                                                        (e.target as HTMLImageElement).src = '/file.svg';
-                                                        (e.target as HTMLImageElement).alt = 'Default Logo';
-                                                    }}
-                                                />
-                                                <h1 className="text-2xl md:text-3xl font-bold">{tokenMetadata.symbol.toUpperCase()}</h1>
-                                            </div>
-                                             <div className="mt-4 flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
-                                            <WatchlistButton
-                                                token={{
-                                                    contract: contractAddress || "",
-                                                    chain: chain || "",
-                                                    symbol: tokenMetadata.symbol || "",
-                                                    name: tokenMetadata.name || "",
-                                                    logo: `/api/${chain}/logo/${contractAddress}`
-                                                }}
-                                                className="w-full justify-center"
-                                            />
-                                            <PriceAlertButton
-                                                token={{
-                                                    contract: contractAddress || "",
-                                                    chain: chain || "",
-                                                    symbol: tokenMetadata.symbol || "",
-                                                    name: tokenMetadata.name || "",
-                                                    logo: `/api/${chain}/logo/${contractAddress}`
-                                                }}
-                                                className="w-full justify-center"
-                                            />
-                                        </div>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex flex-row items-center gap-2 flex-1 min-w-0">
+                                                    <img
+                                                        src={`/api/${chain}/logo/${contractAddress}`}
+                                                        alt={`${tokenMetadata.symbol.toUpperCase()} Logo`}
+                                                        className="w-15 h-15 rounded-md object-contain flex-shrink-0"
+                                                        onError={(e) => {
+                                                            (e.target as HTMLImageElement).src = '/file.svg';
+                                                            (e.target as HTMLImageElement).alt = 'Default Logo';
+                                                        }}
+                                                    />
+                                                    <h1 className="text-2xl md:text-3xl font-bold">{tokenMetadata.symbol.toUpperCase()}</h1>
+                                                </div>
+                                                <div className="mt-4 flex gap-2 items-center bg-neutral-900 mb-4 rounded-md p-2">
+                                                    <WatchlistButton
+                                                        token={{
+                                                            contract: contractAddress || "",
+                                                            chain: chain || "",
+                                                            symbol: tokenMetadata.symbol || "",
+                                                            name: tokenMetadata.name || "",
+                                                            logo: `/api/${chain}/logo/${contractAddress}`
+                                                        }}
+                                                        className="w-full justify-center"
+                                                    />
+                                                    <PriceAlertButton
+                                                        token={{
+                                                            contract: contractAddress || "",
+                                                            chain: chain || "",
+                                                            symbol: tokenMetadata.symbol || "",
+                                                            name: tokenMetadata.name || "",
+                                                            logo: `/api/${chain}/logo/${contractAddress}`
+                                                        }}
+                                                        className="w-full justify-center"
+                                                    />
+                                                </div>
                                             </div>
                                             {socialLinks && (
                                                 <div className="flex flex-row gap-4 mt-2 items-center justify-between px-4 bg-white text-black p-4 rounded-lg">
@@ -501,7 +501,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </div>
                                         </div>
 
-                                        
+
 
 
 
@@ -528,7 +528,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             <p>{tokenData?.description || "No description found"}</p>
                                         </div> */}
 
-                                          <div className="flex flex-col gap-2 border border-white p-4 mt-4 rounded-xl">
+                                        <div className="flex flex-col gap-2 border border-white p-4 mt-4 rounded-xl">
                                             <p className="text-md">Contract Address</p>
                                             <h1 className="text-xl font-bold text-orange-500 flex gap-2">
                                                 <span>{formatEvmAddress(tokenData.contract)}</span>
@@ -554,7 +554,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.volume)}</h1>
                                             </div> */}
                                         </div>
-{/* 
+                                        {/* 
                                         <div className="mt-4 flex flex-row bg-neutral-900 justify-between gap-2 items-center border-2 border-orange-500 rounded-md p-4">
                                             <div className="flex flex-col items-center">
                                                 <span className="text-xs text-gray-400">1h</span>
@@ -598,7 +598,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             </h1>
                                         </div> */}
 
-                                         <div className="flex-1">
+                                        <div className="flex-1">
                                             <div className="my-8 space-y-4">
                                                 <DataCard
                                                     title="Total Supply"

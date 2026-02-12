@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FaBell } from 'react-icons/fa';
 import OneSignal from 'react-onesignal';
+import { toast } from 'react-hot-toast';
 
 interface Token {
     contract: string;
@@ -68,7 +69,7 @@ export default function PriceAlertButton({
                 const isPermissionGranted = OneSignal.Notifications?.permission;
 
                 if (isPermissionGranted === undefined) {
-                    alert('Notifications are still loading. Please wait a second and try again.');
+                    toast.loading('Notifications are still loading. Please wait...', { id: 'loading-notif', duration: 2000 });
                     return;
                 }
 
@@ -76,13 +77,39 @@ export default function PriceAlertButton({
                     // Trigger slidedown
                     await OneSignal.Slidedown.promptPush();
 
-                    // Explain to user
-                    alert('Notification permission is required to receive price alerts. Please "Allow" notifications and then click "Save Alert" again.');
+                    // Explain to user with a custom toast
+                    toast((t) => (
+                        <div className="flex flex-col gap-2">
+                            <span className="font-medium">
+                                Notification permission is required for price alerts.
+                            </span>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        OneSignal.Slidedown.promptPush();
+                                        toast.dismiss(t.id);
+                                    }}
+                                    className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-semibold"
+                                >
+                                    Enable
+                                </button>
+                                <button
+                                    onClick={() => toast.dismiss(t.id)}
+                                    className="text-neutral-500 px-2 py-1 text-xs"
+                                >
+                                    Later
+                                </button>
+                            </div>
+                        </div>
+                    ), {
+                        duration: 6000,
+                        id: 'notif-required',
+                    });
                     return;
                 }
             } catch (error) {
                 console.error('Error checking OneSignal permission:', error);
-                alert('Notification system error. Please refresh the page.');
+                toast.error('Notification system error. Please refresh.');
                 return;
             }
         }
@@ -120,10 +147,18 @@ export default function PriceAlertButton({
             });
             setShowModal(false);
 
+            toast.success(`Alert set for ${token.symbol.toUpperCase()}!`, {
+                icon: '🔔',
+                style: {
+                    borderRadius: '10px',
+                    background: '#333',
+                    color: '#fff',
+                },
+            });
             console.log('Alert saved:', newAlert);
         } catch (error) {
             console.error('Failed to save alert:', error);
-            alert('Failed to save alert. Please try again.');
+            toast.error('Failed to save alert. Please try again.');
         }
     };
 

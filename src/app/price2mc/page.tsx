@@ -3,6 +3,7 @@
 import Header from '@/components/Header';
 import { TOKEN_REGISTRY } from '@/lib/tokenRegistry';
 import { toPng, toBlob } from 'html-to-image';
+import { toast } from 'react-hot-toast';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
@@ -521,7 +522,7 @@ const PriceComparison = () => {
     } catch (err) {
       console.error('Error downloading:', err);
       setIsCapturing(false);
-      alert('Failed to generate image. Please try again.');
+      toast.error('Failed to generate image. Please try again.');
     }
   };
 
@@ -541,6 +542,7 @@ const PriceComparison = () => {
       if (!blob) {
         console.error('Failed to create blob');
         setIsCapturing(false);
+        toast.error('Failed to generate image blob');
         return;
       }
 
@@ -563,6 +565,7 @@ const PriceComparison = () => {
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share(shareData);
+          toast.success('Shared successfully!');
         } catch (error) {
           if ((error as Error).name !== 'AbortError') {
             console.error('Error sharing:', error);
@@ -571,7 +574,10 @@ const PriceComparison = () => {
             link.download = 'price-comparison.png';
             link.href = URL.createObjectURL(blob);
             link.click();
-            alert('Share failed, but image downloaded! Text copied to clipboard.');
+            toast.success('Share failed, but image downloaded! Text copied to clipboard.', {
+              duration: 5000,
+              icon: '📥'
+            });
           }
         }
       } else {
@@ -580,14 +586,17 @@ const PriceComparison = () => {
         link.download = 'price-comparison.png';
         link.href = URL.createObjectURL(blob);
         link.click();
-        alert('Sharing not supported on this device/browser. Image downloaded! Text copied to clipboard.');
+        toast.success('Sharing not supported on this device/browser. Image downloaded! Text copied to clipboard.', {
+          duration: 5000,
+          icon: '📋'
+        });
       }
       setIsCapturing(false);
 
     } catch (err) {
       console.error('Error sharing:', err);
       setIsCapturing(false);
-      alert('Error generating or sharing image.');
+      toast.error('Error generating or sharing image.');
     }
   };
 

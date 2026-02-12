@@ -3,6 +3,7 @@ import { Nunito } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import OneSignalProvider from "@/components/OneSignalProvider";
+import { Toaster } from "react-hot-toast";
 
 // const spaceGrotesk = Space_Grotesk({
 //   variable: "--font-space-grotesk",
@@ -35,6 +36,7 @@ export default function RootLayout({
         <script defer src="https://cloud.umami.is/script.js" data-website-id="23de30be-d6d1-4152-b10c-7442a99240ce"></script>
       </head>
       <body className={`${nunito.variable} antialiased`} >
+        <Toaster position="top-right" />
         <OneSignalProvider>
           {children}
         </OneSignalProvider>
