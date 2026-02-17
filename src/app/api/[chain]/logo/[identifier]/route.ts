@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCldImageUrl } from 'next-cloudinary';
 import { getTokenByAddress, getTokenBySymbol, isValidContractAddress } from "@/lib/tokenRegistry";
 import { redis } from "@/lib/redis";
+import path from 'path';
+import fs from 'fs';
 
 interface RouteParams {
   chain: string;
@@ -46,8 +49,6 @@ export async function GET(
 
     const contractAddress = tokenMetadata.address;
 
-    // ImageKit configuration
-    const imageKitUrl = process.env.IMAGE_KIT_URL || 'https://ik.imagekit.io/5j6l15rnd';
     const fileExtensions = [".png", ".jpg", ".jpeg", ".webp"];
 
     // Try both checksummed and lowercase address variants
@@ -57,38 +58,59 @@ export async function GET(
 
     for (const addressVariant of uniqueVariants) {
       for (const ext of fileExtensions) {
-        const imageUrl = `${imageKitUrl}/${chainLower}/${addressVariant}${ext}`;
+        // 1. Try fetching from local public folder
+        const localFilePath = path.join(process.cwd(), 'public', 'images', chainLower, 'token-logos', `${addressVariant}${ext}`);
+
+        if (fs.existsSync(localFilePath)) {
+          console.log(`Found local logo at: ${localFilePath}`);
+          const fileBuffer = fs.readFileSync(localFilePath);
+          const contentType = ext === '.png' ? 'image/png' :
+            ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' :
+              ext === '.webp' ? 'image/webp' : 'application/octet-stream';
+
+          return new NextResponse(fileBuffer, {
+            headers: {
+              "Content-Type": contentType,
+              "Cache-Control": "public, max-age=86400, must-revalidate",
+              "Content-Length": fileBuffer.length.toString(),
+              "X-Cache": "HIT",
+            },
+          });
+        }
+
+        // 2. Try fetching from Cloudinary (Commented out)
+        /*
+        // format: remove the dot
+        const format = ext.replace('.', '');
+
+        const cloudinaryUrl = getCldImageUrl({
+          src: `${chainLower}/${addressVariant}${ext}`,  
+          
+        });
 
         try {
-          // Fetch image from ImageKit
-          const response = await fetch(imageUrl, {
-            method: 'GET',
-            // cache: 'no-store' // Ensure we get fresh content if needed, though usually default is fine
-          });
+          const response = await fetch(cloudinaryUrl, { method: 'GET' });
 
           if (response.ok) {
             const arrayBuffer = await response.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
             const contentType = response.headers.get('content-type') || 'image/png';
 
-            console.log(`Found logo at: ${imageUrl}`);
+            console.log(`Found logo at: ${cloudinaryUrl}`);
 
             return new NextResponse(buffer as unknown as BodyInit, {
               headers: {
                 "Content-Type": contentType,
-                "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0",
-                "Surrogate-Control": "no-store",
+                "Cache-Control": "public, max-age=86400, must-revalidate",
                 "Content-Length": buffer.length.toString(),
-                "X-Cache": "MISS", // Indicating it was fetched from upstream
+                "X-Cache": "HIT",
               },
             });
           }
         } catch (error) {
-          console.warn(`Failed to fetch from ${imageUrl}:`, error);
-          // Continue to next variant/extension
+          console.warn(`Error processing ${cloudinaryUrl}:`, error);
         }
+        */
       }
     }
 

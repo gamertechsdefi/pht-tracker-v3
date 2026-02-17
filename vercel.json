@@ -7,6 +7,19 @@
     {
       "path": "/api/workers/refresh-cache",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "headers": [
+        {
+          "source": "/(.*)\\.(jpg|jpeg|png|gif|webp|svg|ico)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=31536000, immutable"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
