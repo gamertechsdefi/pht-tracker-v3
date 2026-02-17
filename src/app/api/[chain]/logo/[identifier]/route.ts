@@ -1,127 +1,120 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCldImageUrl } from 'next-cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import { getTokenByAddress, getTokenBySymbol, isValidContractAddress } from "@/lib/tokenRegistry";
-import { redis } from "@/lib/redis";
-import path from 'path';
-import fs from 'fs';
 
-interface RouteParams {
-  chain: string;
-  identifier: string;
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Global cache (persists during development hot reloads)
+const globalForCache = global as unknown as {
+  logoCache: Map<string, { buffer: ArrayBuffer; contentType: string; expiry: number }>;
+};
+
+if (!globalForCache.logoCache) {
+  globalForCache.logoCache = new Map();
+}
+
+const localCache = globalForCache.logoCache;
+
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+async function getLogoBuffer(chain: string, address: string) {
+  const cacheKey = `logo:${chain}:${address.toLowerCase()}`;
+  const now = Date.now();
+
+  // 1. Server in-memory cache hit
+  const cached = localCache.get(cacheKey);
+  if (cached && cached.expiry > now) {
+    console.log(`[CACHE HIT] ${chain}/${address}`);
+    return cached;
+  }
+
+  // 2. Search latest image on Cloudinary
+  try {
+    const result = await cloudinary.search
+      .expression(`folder:${chain} AND public_id:${chain}/${address}_*`)
+      .sort_by('created_at', 'desc')
+      .max_results(1)
+      .execute();
+
+    if (result.resources?.length > 0) {
+      const imageUrl = result.resources[0].secure_url;
+
+      const res = await fetch(imageUrl);
+      if (!res.ok) throw new Error(`Failed to fetch image`);
+
+      const contentType = res.headers.get('content-type') || 'image/png';
+      const buffer = await res.arrayBuffer();
+
+      // Cache it
+      localCache.set(cacheKey, {
+        buffer,
+        contentType,
+        expiry: now + CACHE_TTL,
+      });
+
+      console.log(`[CACHE MISS] Fetched & cached ${chain}/${address}`);
+      return { buffer, contentType };
+    }
+  } catch (err) {
+    console.error("Cloudinary logo fetch error:", err);
+  }
+
+  return null;
 }
 
 export async function GET(
   _req: NextRequest,
-  context: { params: Promise<RouteParams> }
-): Promise<NextResponse> {
+  context: { params: Promise<{ chain: string; identifier: string }> }
+) {
   try {
-    const params = await context.params;
-    const { chain, identifier } = params;
+    const { chain, identifier } = await context.params;
 
     if (!chain || !identifier) {
-      return NextResponse.json({ error: 'Missing chain or identifier' }, { status: 400 });
+      return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
     }
 
     const chainLower = chain.toLowerCase() as 'bsc' | 'sol' | 'rwa';
     const identifierLower = identifier.toLowerCase();
 
-    // Determine if identifier is a contract address or symbol
-    let tokenMetadata;
+    let tokenMetadata = null;
 
     if (isValidContractAddress(identifierLower, chainLower)) {
-      // It's a contract address
       tokenMetadata = getTokenByAddress(identifierLower);
     } else {
-      // It's a symbol - specify chain to avoid conflicts with duplicate symbols
       tokenMetadata = getTokenBySymbol(identifierLower, chainLower);
     }
 
     if (!tokenMetadata) {
-      return NextResponse.json({ error: 'Token not found' }, { status: 404 });
-    }
-
-    // Verify chain matches
-    if (tokenMetadata.chain !== chainLower) {
-      return NextResponse.json({
-        error: `Token is on ${tokenMetadata.chain.toUpperCase()}, not ${chainLower.toUpperCase()}`
-      }, { status: 400 });
-    }
-
-    const contractAddress = tokenMetadata.address;
-
-    const fileExtensions = [".png", ".jpg", ".jpeg", ".webp"];
-
-    // Try both checksummed and lowercase address variants
-    const addressVariants = [contractAddress, contractAddress.toLowerCase()];
-    // Deduplicate variants
-    const uniqueVariants = [...new Set(addressVariants)];
-
-    for (const addressVariant of uniqueVariants) {
-      for (const ext of fileExtensions) {
-        // 1. Try fetching from local public folder
-        const localFilePath = path.join(process.cwd(), 'public', 'images', chainLower, 'token-logos', `${addressVariant}${ext}`);
-
-        if (fs.existsSync(localFilePath)) {
-          console.log(`Found local logo at: ${localFilePath}`);
-          const fileBuffer = fs.readFileSync(localFilePath);
-          const contentType = ext === '.png' ? 'image/png' :
-            ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' :
-              ext === '.webp' ? 'image/webp' : 'application/octet-stream';
-
-          return new NextResponse(fileBuffer, {
-            headers: {
-              "Content-Type": contentType,
-              "Cache-Control": "public, max-age=86400, must-revalidate",
-              "Content-Length": fileBuffer.length.toString(),
-              "X-Cache": "HIT",
-            },
-          });
-        }
-
-        // 2. Try fetching from Cloudinary (Commented out)
-        /*
-        // format: remove the dot
-        const format = ext.replace('.', '');
-
-        const cloudinaryUrl = getCldImageUrl({
-          src: `${chainLower}/${addressVariant}${ext}`,  
-          
-        });
-
-        try {
-          const response = await fetch(cloudinaryUrl, { method: 'GET' });
-
-          if (response.ok) {
-            const arrayBuffer = await response.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            const contentType = response.headers.get('content-type') || 'image/png';
-
-            console.log(`Found logo at: ${cloudinaryUrl}`);
-
-            return new NextResponse(buffer as unknown as BodyInit, {
-              headers: {
-                "Content-Type": contentType,
-                "Cache-Control": "public, max-age=86400, must-revalidate",
-                "Content-Length": buffer.length.toString(),
-                "X-Cache": "HIT",
-              },
-            });
-          }
-        } catch (error) {
-          console.warn(`Error processing ${cloudinaryUrl}:`, error);
-        }
-        */
+      if (!isValidContractAddress(identifierLower, chainLower)) {
+        return NextResponse.json({ error: "Token not found" }, { status: 404 });
       }
+    } else if (tokenMetadata.chain !== chainLower) {
+      return NextResponse.json(
+        { error: `Token exists on ${tokenMetadata.chain.toUpperCase()}` },
+        { status: 400 }
+      );
     }
 
-    console.log(`Logo not found for token ${contractAddress} on chain ${chainLower}`);
-    return NextResponse.json({ error: "Logo not found for this token" }, { status: 404 });
+    const contractAddress = tokenMetadata?.address ?? identifierLower;
 
+    const logoData = await getLogoBuffer(chainLower, contractAddress);
+
+    if (logoData) {
+      return new NextResponse(logoData.buffer, {
+        headers: {
+          "Content-Type": logoData.contentType,
+          "Cache-Control": "public, max-age=86400, immutable",
+        },
+      });
+    }
+
+    return NextResponse.json({ error: "Logo not found" }, { status: 404 });
   } catch (error) {
-    console.error('Logo API Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch logo' },
-      { status: 500 }
-    );
+    console.error("Logo API Error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
