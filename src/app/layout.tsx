@@ -17,8 +17,8 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "FireScreener",
-  description: "Built by a meme, powered by purpose. Track tokens burns, charts trends, and unlock AI insights, all in one blazing dashboard.",
+  title: "FireScreener - Token Analytics Platform",
+  description: "First Community Token Analytics Platform. Built by a meme, powered by purpose.  Track tokens burns, charts trends, and unlock AI insights, all in one blazing dashboard, on FireScreener",
 };
 
 export default function RootLayout({
