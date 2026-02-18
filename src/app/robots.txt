@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /[chain]/
+Disallow: /[chain]/[contractAddress]/
+Disallow: /price2mc/
+Disallow: /watchlist/
+Disallow: /burns/
+Disallow: /
+Disallow: /error
+Disallow: /auth/signup/
+Disallow: /auth/login/
+
+Sitemap: https://www.firescreener.com/sitemap.xml

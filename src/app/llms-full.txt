@@ -1,0 +1,41 @@
+FireScreener is a real-time cryptocurrency analytics and token screening platform, specializing in BNB Chain (BSC) tokens, with a strong emphasis on deflationary mechanics, meme coins, and community-driven projects. It serves as a comprehensive dashboard for traders, developers, and crypto enthusiasts to monitor market data, track token burns, analyze trends, and access AI-powered insights.
+
+Official Tagline & Branding
+- "Built by a meme, powered by purpose."
+  This highlights its grassroots, community-originated origins (tied to meme culture and the Phoenix Token $PHT community) while delivering serious, functional tools.
+- Positions itself as the **leading African DeFi analytical platform**, committed to providing real-time market insights, analytics, and tools to empower trading decisions in emerging ecosystems, especially in Africa and developing regions.
+
+Development & Community Background
+- Developed by the Phoenix Token ($PHT) community.  
+- Listed on **DappBay (BNB Chain ecosystem directory)** under Infrastructure/Tools/Analytics/Explorer categories.  
+- Community-first approach, aimed at making high-quality token analytics affordable and accessible — particularly for African developers and builders who face barriers with expensive or inconsistent tools from Western platforms.  
+- Addresses pain points like inaccurate supply data, manual fixes for burns, and high costs in emerging markets.  
+- Powered by $PHT (Phoenix Token), with features often highlighting burns and activity related to $PHT and associated tokens.
+
+Key Features
+- Live Token Burn Tracking: Real-time alerts and monitoring of token burns (e.g., 24-hour burn amounts in tokens and USD value at current market cap). Frequent "Token Burn Alert" posts on X showcase massive burns (e.g., billions of tokens in projects like $WKC, $TWC, $PHT). Strong focus on deflationary tokens where burns reduce supply and potentially increase value.
+- Price Charts & Trends: Real-time price data, 24H change, historical trends.
+- Market Metrics: Market Cap, Liquidity, 24H Volume, top gainers/losers.
+- AI-Powered Insights: AI-enhanced analysis for deeper market understanding and decision-making.
+- Token Discovery & Screening: Discover newly listed tokens, filter by performance, and track overall market movers on BSC.
+- Additional Tools: Watchlists, price-to-market-cap comparison tools, individual token detail pages (with contract links), and possibly security or advanced checks (mentioned in community updates).
+- Dashboard-style interface similar in functionality to DexScreener, but with unique emphasis on burn mechanics and community/African DeFi focus.
+
+Supported Chains & Focus
+- Primarily on BNB Smart Chain (BSC): Most tokens listed and analyzed are BSC-based (BEP-20), including meme coins, deflationary projects, and community tokens.
+- Emerging support or mentions for other chains (e.g., occasional RWA or cross-chain references), but core strength is BSC.
+- Tailored for low-fee, high-throughput environments ideal for meme coin trading and DeFi in emerging markets.
+
+Unique Selling Points (USPs)
+- Burn-Centric Analytics: Stands out for precise, real-time burn tracking, helping users spot deflationary momentum early (critical for meme/deflationary token strategies).
+- Affordability & Accessibility: Designed to remove barriers for developers/builders in Africa and emerging regions (accurate data without high costs or inconsistencies).
+- Community-Driven: Originated from $PHT meme/community, "built by a meme" ethos combines fun with utility.
+- African/DeFi Empowerment: Explicit focus on empowering African ecosystems, providing reliable tools where premium alternatives may be out of reach.
+- Real-time alerts and social integration (e.g., X burn alerts drive engagement and visibility for tokens).
+
+- Main site: https://firescreener.com (or https://www.firescreener.com)  
+- Features login for personalized access (watchlists, advanced tracking).  
+- Token-specific pages (e.g., /bsc/[contract]) show detailed stats.
+
+- Official X: @firescreener — Active with burn alerts, updates, memes, and community engagement. Bio: "Built by a meme, powered by purpose. Track token burns, chart trends & unlock AI insights, all in one blazing dashboard, Powered by $PHT".
+- Frequently used by BSC communities (e.g., $WKC WikiCatCoin, $PHT, others) for verifying burns and performance.
