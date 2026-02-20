@@ -33,6 +33,19 @@ interface CryptoCompareResponse {
   Message?: string;
 }
 
+interface SupabaseAnalysisResponse {
+  priceChart: {
+    candles: Array<{
+      time: number; // timestamp in seconds
+      open: number;
+      high: number;
+      low: number;
+      close: number;
+      volume: number;
+    }>;
+  };
+}
+
 const TIMEFRAMES = [
   { label: "1D", days: 1 },
   { label: "7D", days: 7 },
@@ -185,6 +198,46 @@ export default function PriceActionChart({
       // Otherwise, can't parse
       throw new Error('Unrecognized RWA price data format');
     }
+
+    // Fetch from Supabase Token Analysis API
+    async function fetchFromSupabase(signal: AbortSignal): Promise<{ prices: number[]; labels: string[] }> {
+      let timeframeParam = '1y'; // Default
+      if (selectedTimeframe <= 1) timeframeParam = '1d';
+      else if (selectedTimeframe <= 7) timeframeParam = '7d';
+      else if (selectedTimeframe <= 30) timeframeParam = '30d';
+      else if (selectedTimeframe <= 90) timeframeParam = '3m';
+
+      const url = `https://enpdzndcjxlzupmxpmms.supabase.co/functions/v1/token-analysis-api?chain=${chain}&token=${contractAddress}&timeframe=${timeframeParam}`;
+      console.log('Fetching from Supabase:', url);
+
+      const resp = await fetch(url, { signal });
+      if (!resp.ok) {
+        throw new Error(`Supabase API failed: ${resp.status}`);
+      }
+
+      const json = (await resp.json()) as SupabaseAnalysisResponse;
+      if (!json.priceChart?.candles || json.priceChart.candles.length === 0) {
+        throw new Error('No price data from Supabase');
+      }
+
+      const prices: number[] = [];
+      const labels: string[] = [];
+
+      json.priceChart.candles.forEach((candle) => {
+        prices.push(candle.close);
+        const date = new Date(candle.time * 1000); // Standardize to ms
+        let timeLabel: string;
+        if (selectedTimeframe <= 1) {
+          timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+          timeLabel = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        }
+        labels.push(timeLabel);
+      });
+
+      return { prices, labels };
+    }
+
     // Fetch from CoinGecko
     async function fetchFromCoinGecko(signal: AbortSignal): Promise<{ prices: number[]; labels: string[] }> {
       console.log('Fetching from CoinGecko:', coingeckoUrl);
@@ -332,7 +385,18 @@ export default function PriceActionChart({
           }
         }
 
-        // Try CoinGecko first
+        // Try Supabase Token Analysis API first (Primary Source)
+        try {
+          const supabaseData = await fetchFromSupabase(signal);
+          console.log('Supabase data loaded:', supabaseData.prices.length, 'points');
+          setData(supabaseData);
+          cacheRef.current.set(key, { ...supabaseData, ts: Date.now() });
+          return;
+        } catch (sbError) {
+          console.warn('Supabase API failed, falling back to CoinGecko:', sbError);
+        }
+
+        // Try CoinGecko second
         try {
           const coinGeckoData = await fetchFromCoinGecko(signal);
           console.log('CoinGecko data loaded:', coinGeckoData.prices.length, 'points');

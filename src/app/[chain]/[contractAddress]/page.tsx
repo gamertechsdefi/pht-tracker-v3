@@ -20,6 +20,7 @@ import WatchlistButton from "@/components/WatchlistButton";
 import NewPriceActionChart from "@/components/NewPriceActionChart";
 import SecurityAnalysis from "@/components/GoPlusAnalysis";
 import HoneypotAnalysis from "@/components/HoneypotAnalysis";
+import LiquidityLocker from "@/components/LiquidityLocker";
 
 // Define types for token data and intervals
 interface TokenData {
@@ -48,6 +49,7 @@ interface TokenData {
     profile: string;
     contract: string;
     description: string;
+    holdersCount: string | number;
 }
 
 // Define props interface
@@ -145,6 +147,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     `/api/${chainLower}/socials/${contractAddress}`,
                     `/api/${chainLower}/ca/${contractAddress}`,
                     `/api/${chainLower}/description/${contractAddress}`,
+                    `/api/${chainLower}/holders/${contractAddress}`,
                 ];
 
                 const responses = await Promise.all(
@@ -155,7 +158,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     )
                 );
 
-                const [metricsData, holdersData, priceData, burnsData, profileData, socialData, descriptionData] = responses;
+                const [metricsData, holdersData, priceData, burnsData, profileData, socialData, , descriptionData, holdersCount] = responses;
 
                 setTokenData({
                     price: priceData?.price || "N/A",
@@ -183,6 +186,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     profile: profileData?.profileImage || "N/A",
                     contract: contractAddress,
                     description: descriptionData?.description || "N/A",
+                    holdersCount: holdersCount?.holder_count || "N/A",
                 });
                 setSocialLinks(socialData || null);
             } catch (err: unknown) {
@@ -540,12 +544,23 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                                 <h1 className="font-bold text-lg">${formatLargeNumber(tokenData.liquidity)}</h1>
                                             </div>
 
-                                            
+                                            <div className="flex flex-col items-center bg-orange-600 rounded-md p-4">
+                                                <h1 className="text-sm">HOLDERS</h1>
+                                                <h1 className="font-bold text-lg">{formatWholeNumber(tokenData.holdersCount)}</h1>
+                                            </div>
+
+
                                             {/* <div className="flex flex-col items-center border-2 border-orange-500 rounded-md p-4">
                                                 <h1>Volume:</h1>
                                                 <h1 className="font-medium text-lg md:text-xl">${formatLargeNumber(tokenData.volume)}</h1>
                                             </div> */}
                                         </div>
+
+                                        {chain && contractAddress && (
+                                            <div className="mt-3">
+                                                <LiquidityLocker chain={chain} contractAddress={contractAddress} />
+                                            </div>
+                                        )}
                                         {/* 
                                         <div className="mt-4 flex flex-row bg-neutral-900 justify-between gap-2 items-center border-2 border-orange-500 rounded-md p-4">
                                             <div className="flex flex-col items-center">
@@ -592,11 +607,11 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
                                         {chain && contractAddress && (
                                             <>
-                                            <div className="mt-8 flex flex-col border-2 border-orange-500 p-4 rounded-xl gap-2">
-                                                <h1 className="text-xl font-bold">SECURITY ANALYSIS</h1>
-                                                <SecurityAnalysis chain={chain} contractAddress={contractAddress} />
-                                                <HoneypotAnalysis chain={chain} contractAddress={contractAddress} />
-                                            </div>
+                                                <div className="mt-8 flex flex-col border-2 border-orange-500 p-4 rounded-xl gap-2">
+                                                    <h1 className="text-xl font-bold">SECURITY ANALYSIS</h1>
+                                                    <SecurityAnalysis chain={chain} contractAddress={contractAddress} />
+                                                    <HoneypotAnalysis chain={chain} contractAddress={contractAddress} />
+                                                </div>
                                             </>
                                         )}
 
@@ -906,7 +921,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                         </div>
 
                                         <div className="mt-8 space-y-4">
-                                           
+
                                             <DataCard
                                                 title="Total Supply"
                                                 value={formatWholeNumber(tokenData.totalSupply)}
@@ -952,13 +967,16 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                             />
                                         )}
 
-                                          {chain && contractAddress && (
+                                        {chain && contractAddress && (
                                             <>
-                                            <div className="mt-8 flex flex-col border-2 border-orange-500 p-4 rounded-xl gap-2">
-                                                <h1 className="text-xl font-bold">SECURITY ANALYSIS</h1>
-                                                <SecurityAnalysis chain={chain} contractAddress={contractAddress} />
-                                                <HoneypotAnalysis chain={chain} contractAddress={contractAddress} />
-                                            </div>
+                                                <div className="mt-8 flex flex-col border-2 border-orange-500 p-4 rounded-xl gap-2">
+                                                    <div className="flex items-center justify-between flex-wrap gap-2">
+                                                        <h1 className="text-xl font-bold">SECURITY ANALYSIS</h1>
+                                                        <LiquidityLocker chain={chain} contractAddress={contractAddress} />
+                                                    </div>
+                                                    <SecurityAnalysis chain={chain} contractAddress={contractAddress} />
+                                                    <HoneypotAnalysis chain={chain} contractAddress={contractAddress} />
+                                                </div>
                                             </>
                                         )}
                                     </div>
