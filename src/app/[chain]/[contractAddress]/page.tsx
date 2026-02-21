@@ -26,7 +26,6 @@ import SecurityAnalysis from "@/components/GoPlusAnalysis";
 import HoneypotAnalysis from "@/components/HoneypotAnalysis";
 import LiquidityLocker from "@/components/LiquidityLocker";
 import TokenInfo from "@/components/TokenInfo";
-import TxnsInfo from "@/components/TxnsInfo";
 import VolumeTxnsInfo from "@/components/VolumeTxnsInfo";
 
 // Define types for token data and intervals
