@@ -21,8 +21,8 @@ interface SecurityData {
 }
 
 interface LiquidityLockerProps {
-    chain: string;
-    contractAddress: string;
+    chain: string | null;
+    contractAddress: string | null;
 }
 
 const LiquidityLocker: React.FC<LiquidityLockerProps> = ({ chain, contractAddress }) => {
@@ -31,8 +31,7 @@ const LiquidityLocker: React.FC<LiquidityLockerProps> = ({ chain, contractAddres
     const [open, setOpen] = useState(false);
     const popoverRef = useRef<HTMLDivElement>(null);
 
-    // Only render for BSC
-    if (chain !== "bsc") return null;
+    if (!chain || !contractAddress || chain !== "bsc") return null;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -107,14 +106,14 @@ const LiquidityLocker: React.FC<LiquidityLockerProps> = ({ chain, contractAddres
         <div className="relative w-fit" ref={popoverRef}>
             <button
                 onClick={() => setOpen((v) => !v)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-semibold transition-all duration-200 hover:brightness-110 ${colorClass}`}
+                className={`flex items-center gap-2 p-2 rounded-lg border text-xs font-semibold transition-all duration-200 hover:brightness-110 ${colorClass}`}
             >
-                <LockIcon size={13} />
-                <span>LP {roundedPct}% Locked</span>
-                <ChevronDown
+                <LockIcon size={10} className="w-4 h-auto md:w-3 " />
+                {/* <span className="md:hidden">LP {roundedPct}% Locked</span> */}
+                {/* <ChevronDown
                     size={12}
                     className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-                />
+                /> */}
             </button>
 
             {/* Popover */}

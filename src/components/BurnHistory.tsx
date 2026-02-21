@@ -112,7 +112,7 @@ export default function BurnsDisplay({ contractAddress }: BurnsDisplayProps) {
                 href={`https://bscscan.com/address/${burn.from}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-orange-500 hover:underline"
               >
                 {truncateAddress(burn.from)}
               </a>
@@ -145,7 +145,7 @@ export default function BurnsDisplay({ contractAddress }: BurnsDisplayProps) {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm font-semibold">Amount:</span>
-                <span className="text-sm text-right">
+                <span className="text-sm text-orange-500 text-right">
                   {formatAmount(burn.amount)} {tokenSymbol.toUpperCase()}
                 </span>
               </div>
@@ -155,7 +155,7 @@ export default function BurnsDisplay({ contractAddress }: BurnsDisplayProps) {
                   href={`https://bscscan.com/tx/${burn.transactionHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-orange-400 hover:underline"
+                  className="text-sm text-white hover:underline"
                 >
                   {truncateAddress(burn.transactionHash)}
                 </a>

@@ -16,6 +16,15 @@ interface Volume {
   h24?: string;
 }
 
+interface TxnsH24 {
+  buys?: number;
+  sells?: number;
+}
+
+interface Txns {
+  h24?: string | number | TxnsH24;
+}
+
 interface Liquidity {
   usd?: string;
 }
@@ -27,6 +36,7 @@ interface TokenPair {
   volume?: Volume;
   priceChange?: PriceChange;
   liquidity?: Liquidity;
+  txns?: Txns;
 }
 
 interface DexScreenerResponse {
@@ -45,6 +55,9 @@ interface TokenPriceResponse {
   change3h: string;
   change1h: string;
   liquidity: string;
+  txns: string;
+  txnsBuys?: string;
+  txnsSells?: string;
 }
 
 interface ErrorResponse {
@@ -109,6 +122,20 @@ export async function GET(
     // Get the first pair (usually the most liquid one)
     const pair = data.pairs[0];
 
+    // DexScreener txns.h24 can be: number (total) or { buys, sells }
+    const h24Txns = pair.txns?.h24;
+    let txnsTotal = "0";
+    let txnsBuys: string | undefined;
+    let txnsSells: string | undefined;
+    if (typeof h24Txns === "object" && h24Txns !== null && "buys" in h24Txns) {
+      const obj = h24Txns as TxnsH24;
+      txnsBuys = String(obj.buys ?? 0);
+      txnsSells = String(obj.sells ?? 0);
+      txnsTotal = String((obj.buys ?? 0) + (obj.sells ?? 0));
+    } else if (typeof h24Txns === "number" || typeof h24Txns === "string") {
+      txnsTotal = String(h24Txns);
+    }
+
     const tokenPriceData: TokenPriceResponse = {
       token: tokenMetadata.symbol.toUpperCase(),
       contractAddress: contractAddress,
@@ -121,6 +148,9 @@ export async function GET(
       change3h: pair.priceChange?.h3 || "0",
       change1h: pair.priceChange?.h1 || "0",
       liquidity: pair.liquidity?.usd || "0",
+      txns: txnsTotal,
+      ...(txnsBuys !== undefined && { txnsBuys }),
+      ...(txnsSells !== undefined && { txnsSells }),
     };
 
     return NextResponse.json(tokenPriceData);
