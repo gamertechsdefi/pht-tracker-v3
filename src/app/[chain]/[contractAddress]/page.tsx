@@ -649,14 +649,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                       <VolumeTxnsInfo chain={chain} contractAddress={contractAddress} />
                     </div>
 
-                    {chain && contractAddress && (
-                      <div className="mt-3">
-                        <LiquidityLocker
-                          chain={chain}
-                          contractAddress={contractAddress}
-                        />
-                      </div>
-                    )}
+              
                     {/* 
                                         <div className="mt-4 flex flex-row bg-neutral-900 justify-between gap-2 items-center border-2 border-orange-500 rounded-md p-4">
                                             <div className="flex flex-col items-center">
