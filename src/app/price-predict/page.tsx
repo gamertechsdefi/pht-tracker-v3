@@ -203,7 +203,7 @@ const dataUrlToBlob = async (url: string): Promise<Blob> => {
 
 const PriceComparison = () => {
   const [cryptoA, setCryptoA] = useState<string>('pht');
-  const [cryptoB, setCryptoB] = useState<string>('btc');
+  const [cryptoB, setCryptoB] = useState<string>('wkc');
   const [cryptoAData, setCryptoAData] = useState<TokenData | null>(null);
   const [cryptoBData, setCryptoBData] = useState<TokenData | null>(null);
   const [tokens, setTokens] = useState<TokenData[]>([]);
@@ -508,7 +508,7 @@ const PriceComparison = () => {
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for render
 
       const dataUrl = await toPng(comparisonRef.current, {
-        backgroundColor: '#404040',
+        backgroundColor: '#FF6600',
         cacheBust: true,
       });
 
@@ -533,9 +533,9 @@ const PriceComparison = () => {
       await new Promise(resolve => setTimeout(resolve, 100));
 
       const blob = await toBlob(comparisonRef.current, {
-        backgroundColor: '#262626', // bg-neutral-800
+        backgroundColor: '#FF6600',
         cacheBust: true,
-        pixelRatio: 2, // Higher quality
+        pixelRatio: 2,
       });
 
       if (!blob) {
@@ -637,7 +637,7 @@ const PriceComparison = () => {
         <div className="relative">
           <input
             type="text"
-            className="w-full bg-neutral-800 border border-neutral-700 rounded-md py-2 pl-3 pr-10 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="w-full bg-white/10 border border-white/20 rounded-lg py-2 pl-3 pr-10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#FF7F27] focus:border-transparent"
             placeholder={loadingTokens ? 'Loading tokens...' : `Search ${type === 'from' ? 'Token A' : 'Token B'}`}
             value={showDropdown ? searchTerm : selectedTokenData?.symbol || ''}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -645,7 +645,7 @@ const PriceComparison = () => {
             onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
             disabled={loadingTokens}
           />
-          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-neutral-400">
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white/60">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
@@ -653,18 +653,18 @@ const PriceComparison = () => {
         </div>
 
         {showDropdown && (
-          <div className="absolute z-10 mt-1 w-full bg-neutral-800 rounded-md shadow-lg max-h-96 overflow-auto">
+          <div className="absolute z-20 mt-1 w-full bg-[#3d0a00] border border-white/20 rounded-lg shadow-xl max-h-96 overflow-auto">
             {filteredPlatformTokens.length === 0 && filteredTop100Tokens.length === 0 && filteredMemeTokens.length === 0 ? (
-              <div className="px-4 py-2 text-neutral-400">No tokens found</div>
+              <div className="px-4 py-2 text-white/60">No tokens found</div>
             ) : (
               <div>
                 {type === 'from' && filteredPlatformTokens.length > 0 && (
                   <div>
-                    <div className="px-4 py-2 text-xs font-medium text-neutral-400 uppercase tracking-wider">Platform Tokens</div>
+                    <div className="px-4 py-2 text-xs font-medium text-white/60 uppercase tracking-wider">Platform Tokens</div>
                     {filteredPlatformTokens.map((token) => (
                       <div
                         key={token.id}
-                        className={`px-4 py-2 hover:bg-neutral-700 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-neutral-700' : ''
+                        className={`px-4 py-2 hover:bg-white/10 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-white/15' : ''
                           }`}
                         onMouseDown={(e) => {
                           e.preventDefault();
@@ -674,30 +674,30 @@ const PriceComparison = () => {
                         {token.image && (
                           <img src={token.image} alt={token.name} className="w-5 h-5 mr-2 rounded-full" />
                         )}
-                        <span className="font-medium">{token.symbol}</span>
+                        <span className="font-medium text-white">{token.symbol}</span>
                       </div>
                     ))}
                   </div>
                 )}
                 {type === 'to' && (
                   <>
-                    <div className="flex border-b border-neutral-700 sticky top-0 bg-neutral-800">
+                    <div className="flex border-b border-white/20 sticky top-0 bg-[#3d0a00]">
                       <button
-                        className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'platform' ? 'text-white border-b-2 border-orange-500' : 'text-neutral-400'}`}
+                        className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'platform' ? 'text-white border-b-2 border-[#FF7F27]' : 'text-white/60'}`}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => setActiveTab('platform')}
                       >
                         Platform
                       </button>
                       <button
-                        className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'top100' ? 'text-white border-b-2 border-orange-500' : 'text-neutral-400'}`}
+                        className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'top100' ? 'text-white border-b-2 border-[#FF7F27]' : 'text-white/60'}`}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => setActiveTab('top100')}
                       >
                         Top 100
                       </button>
                       <button
-                        className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'meme' ? 'text-white border-b-2 border-orange-500' : 'text-neutral-400'}`}
+                        className={`flex-1 px-4 py-2 text-sm font-medium ${activeTab === 'meme' ? 'text-white border-b-2 border-[#FF7F27]' : 'text-white/60'}`}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => setActiveTab('meme')}
                       >
@@ -710,7 +710,7 @@ const PriceComparison = () => {
                         {filteredPlatformTokens.map((token) => (
                           <div
                             key={token.id}
-                            className={`px-4 py-2 hover:bg-neutral-700 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-neutral-700' : ''
+                            className={`px-4 py-2 hover:bg-white/10 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-white/15' : ''
                               }`}
                             onMouseDown={(e) => {
                               e.preventDefault();
@@ -720,7 +720,7 @@ const PriceComparison = () => {
                             {token.image && (
                               <img src={token.image} alt={token.name} className="w-5 h-5 mr-2 rounded-full" />
                             )}
-                            <span className="font-medium">{token.symbol}</span>
+                            <span className="font-medium text-white">{token.symbol}</span>
                           </div>
                         ))}
                       </div>
@@ -731,7 +731,7 @@ const PriceComparison = () => {
                         {filteredTop100Tokens.map((token) => (
                           <div
                             key={token.id}
-                            className={`px-4 py-2 hover:bg-neutral-700 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-neutral-700' : ''
+                            className={`px-4 py-2 hover:bg-white/10 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-white/15' : ''
                               }`}
                             onMouseDown={(e) => {
                               e.preventDefault();
@@ -741,7 +741,7 @@ const PriceComparison = () => {
                             {token.image && (
                               <img src={token.image} alt={token.name} className="w-5 h-5 mr-2 rounded-full" />
                             )}
-                            <span className="font-medium">{token.symbol}</span>
+                            <span className="font-medium text-white">{token.symbol}</span>
                           </div>
                         ))}
                       </div>
@@ -751,7 +751,7 @@ const PriceComparison = () => {
                         {filteredMemeTokens.map((token) => (
                           <div
                             key={token.id}
-                            className={`px-4 py-2 hover:bg-neutral-700 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-neutral-700' : ''
+                            className={`px-4 py-2 hover:bg-white/10 cursor-pointer flex items-center ${selectedTokenId === token.id ? 'bg-white/15' : ''
                               }`}
                             onMouseDown={(e) => {
                               e.preventDefault();
@@ -761,7 +761,7 @@ const PriceComparison = () => {
                             {token.image && (
                               <img src={token.image} alt={token.name} className="w-5 h-5 mr-2 rounded-full" />
                             )}
-                            <span className="font-medium">{token.symbol}</span>
+                            <span className="font-medium text-white">{token.symbol}</span>
                           </div>
                         ))}
                       </div>
@@ -778,59 +778,92 @@ const PriceComparison = () => {
 
   const renderComparison = (): React.ReactElement => {
     if (loading || loadingTokens) {
-      return <div className="text-center py-8">Loading token data...</div>;
+      return (
+        <div className="text-center py-12 text-white">
+          Loading token data...
+        </div>
+      );
     }
 
     if (error) {
-      return <div className="text-center text-red-500 py-8">{error}</div>;
+      return <div className="text-center text-red-300 py-12">{error}</div>;
     }
 
     if (!cryptoAData || !cryptoBData) {
-      return <div className="text-center text-neutral-400 py-8">Select tokens to compare</div>;
+      return (
+        <div className="text-center text-white/80 py-12">
+          Select tokens to compare
+        </div>
+      );
     }
 
     const currentPrice = parseFloat(cryptoAData.price || '0');
     const potentialPrice = calculateAdjustedPrice(cryptoAData, cryptoBData);
-    const priceDifference = potentialPrice - currentPrice;
-    const percentageDifference = currentPrice > 0 ? (priceDifference / currentPrice) * 100 : 0;
     const multiplier = currentPrice > 0 ? potentialPrice / currentPrice : 0;
 
     return (
-      <div className="relative aspect-square flex flex-col justify-center items-center p-8 bg-neutral-800 rounded-2xl border border-neutral-700 w-full max-w-md mx-auto" ref={comparisonRef}>
-        <div className="flex items-center justify-center mb-4 space-x-3">
-          {cryptoAData.image && <img src={cryptoAData.image} alt={cryptoAData.name} className="w-12 h-12 rounded-full" crossOrigin="anonymous" />}
+      <div className="flex flex-col items-center w-full" ref={comparisonRef}>
+        {/* Token A box */}
+        <div className="w-full rounded-xl bg-black/30 px-4 py-3 mb-3">
+          <p className="font-bold text-white text-base md:text-lg">
+            {cryptoAData.symbol} ({cryptoAData.name})
+          </p>
+          <p className="text-white/90 text-sm">
+            Price: ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}, Market Cap: {formatMarketCap(cryptoAData.marketCap)}
+          </p>
         </div>
 
-        <div className="text-center mb-2">
-          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-400">
-            {cryptoAData.symbol}
-          </h2>
-          <p className="text-sm text-neutral-400">Current: ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}</p>
+        <p className="text-white font-medium my-2">Compare with</p>
+
+        {/* Token B box */}
+        <div className="w-full rounded-xl bg-black/30 px-4 py-3 mb-4">
+          <p className="font-bold text-white text-base md:text-lg">
+            {cryptoBData.symbol} ({cryptoBData.name})
+          </p>
+          <p className="text-white/90 text-sm">
+            (Price: ${parseFloat(cryptoBData.price || '0').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}, Market Cap {formatMarketCap(cryptoBData.marketCap)})
+          </p>
         </div>
 
-        <div className="text-center my-2 text-neutral-300 px-4">
-          at {cryptoBData.symbol}&apos;s {timeframe === 'ath' ? 'ATH ' : ''}Market Cap ({formatMarketCap(cryptoBData.marketCap)})
-        </div>
+        {/* Prediction result */}
+        <p className="text-white/95 text-sm md:text-base mb-1">
+          ${cryptoAData.symbol} AT ${cryptoBData.symbol} MARKETCAP
+        </p>
+        <p className="text-white text-3xl md:text-5xl font-bold mb-1">
+          ${potentialPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </p>
+        <p className="text-white text-2xl md:text-4xl font-bold mb-6">
+          {multiplier.toFixed(1)}X
+        </p>
 
-        <div className="text-center mt-4 mb-2">
-          <div className="text-3xl font-bold text-green-400 mb-1">
-            ${potentialPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
-          </div>
-          <div className={`text-4xl font-extrabold ${percentageDifference >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {multiplier.toFixed(2)}x
-          </div>
-        </div>
-
-        <div className="text-sm text-neutral-500 mt-4 text-center">
-          Needs {percentageDifference > 0 ?
-            `+ ${(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}%` :
-            `${(percentageDifference).toLocaleString(undefined, { maximumFractionDigits: 0 })}%`}
+        {/* Current MC / ATH toggle inside card */}
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setTimeframe('now')}
+            className={`px-5 py-2.5 rounded-xl font-semibold text-sm ${timeframe === 'now'
+              ? 'bg-white text-[#FF7F27]'
+              : 'bg-white/20 text-white'
+              }`}
+          >
+            Current MC
+          </button>
+          <button
+            type="button"
+            onClick={() => setTimeframe('ath')}
+            className={`px-5 py-2.5 rounded-xl font-semibold text-sm ${timeframe === 'ath'
+              ? 'bg-white text-[#FF7F27]'
+              : 'bg-white/20 text-white'
+              }`}
+          >
+            ATH
+          </button>
         </div>
 
         {isCapturing && (
           <div className="absolute bottom-4 right-4 flex items-center space-x-1 opacity-60">
-            <Image src="/logo-fixed.png" alt="logo" width={25} height={25} className='w-6 h-auto' />
-            <span className="text-xs font-bold text-orange-500 tracking-widest">FIRESCREENER</span>
+            <Image src="/logo-fixed.png" alt="logo" width={25} height={25} className="w-6 h-auto" />
+            <span className="text-xs font-bold text-white tracking-widest">FIRESCREENER</span>
           </div>
         )}
       </div>
@@ -840,63 +873,52 @@ const PriceComparison = () => {
   return (
     <div className="min-h-screen text-white">
       <Header />
-      <div className="max-w-5xl mx-auto p-4 md:p-8">
-        <h1 className="text-4xl pt-8 font-bold text-center mb-8 bg-gradient-to-b from-orange-500 to-red-600 text-transparent bg-clip-text">
-          PRICE & INCREASE TOOL
+      <div className="max-w-lg mx-auto px-4 py-6 md:py-8">
+        {/* Header */}
+        <h1 className="text-4xl md:text-5xl uppercase font-bold text-center mb-2" style={{ color: '#FF7F27' }}>
+          Price Predict
         </h1>
+        <p className="text-white/90 text-center text-sm md:text-base mb-8">
+          Get token&apos;s futuristic price by checking it&apos;s futuristic marketcap of other tokens
+        </p>
 
-        <div className="bg-neutral-800 rounded-xl p-6 shadow-lg">
-          <div className="flex flex-row gap-6 mb-8">
-            <div className="w-full md:w-1/2">
-              <h2 className="text-sm md:text-lg font-semibold mb-3">Select Token</h2>
-              {renderTokenSelect('from')}
-              {cryptoAData && (
-                <div className="mt-2 text-sm text-neutral-400">
-                  Current Market Cap: {formatMarketCap(cryptoAData.marketCap)}
-                </div>
-              )}
-            </div>
-
-            <div className="w-full md:w-1/2">
-              <h2 className="text-sm md:text-lg font-semibold mb-3">Compare With</h2>
-              {renderTokenSelect('to')}
-              {cryptoBData && (
-                <div className="mt-2 text-sm text-neutral-400">
-                  Current Market Cap: {formatMarketCap(cryptoBData.marketCap)}
-                </div>
-              )}
-            </div>
+        {/* Token selectors - compact row above card */}
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-2 sm:items-center mb-4">
+          <div className="flex-1 min-w-0">
+            <span className="text-white/70 text-xs block mb-1">Token</span>
+            {renderTokenSelect('from')}
           </div>
-
-          <div className="bg-neutral-700 rounded-lg p-6">
-            {renderComparison()}
+          <span className="text-white/80 text-sm text-center hidden sm:block">vs</span>
+          <div className="flex-1 min-w-0">
+            <span className="text-white/70 text-xs block mb-1">Compare with</span>
+            {renderTokenSelect('to')}
           </div>
+        </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+        {/* Main orange prediction card */}
+        <div
+          className="rounded-2xl p-6 md:p-8 relative"
+          style={{ backgroundColor: '#FF6600' }}
+        >
+          {renderComparison()}
+        </div>
+
+        {/* Action buttons - white bg, below card */}
+        <div className="mt-6 flex flex-col gap-3">
+          <div className="flex gap-3 justify-center">
             <button
-              onClick={() => setTimeframe('now')}
-              className={`px-6 py-3 rounded-lg font-medium ${timeframe === 'now'
-                ? 'bg-orange-600 text-white'
-                : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
-                }`}
+              onClick={handleShare}
+              className="flex-1 max-w-[140px] px-4 py-3 bg-white text-black rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
+              disabled={isCapturing}
             >
-              Current Price
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+              </svg>
+              <span>{isCapturing ? '...' : 'Share'}</span>
             </button>
-            <button
-              onClick={() => setTimeframe('ath')}
-              className={`px-6 py-3 rounded-lg font-medium ${timeframe === 'ath'
-                ? 'bg-orange-600 text-white'
-                : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
-                }`}
-            >
-              All-Time High
-            </button>
-          </div>
-
-          <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
             <button
               onClick={handleDownload}
-              className="px-6 py-3 bg-neutral-600 hover:bg-neutral-700 rounded-lg font-medium flex items-center justify-center space-x-2"
+              className="flex-1 max-w-[140px] px-4 py-3 bg-white text-black rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
               disabled={isCapturing}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -904,28 +926,15 @@ const PriceComparison = () => {
               </svg>
               <span>Download</span>
             </button>
-
-            <button
-              onClick={handleShare}
-              className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg font-medium flex items-center justify-center space-x-2"
-              disabled={isCapturing}
-            >
-              <span>{isCapturing ? 'Generating...' : 'Share Comparison'}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
-              </svg>
-            </button>
-
-            <a
-              href={`/bsc/${cryptoA}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg font-medium text-center"
-            >
-              View {cryptoAData?.symbol}
-
-            </a>
           </div>
+          <a
+            href={`/bsc/${cryptoA}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3 bg-white text-black rounded-xl font-semibold text-center hover:bg-gray-100 transition-colors"
+          >
+            View {cryptoAData?.symbol ?? 'PHT'}
+          </a>
         </div>
       </div>
     </div>
