@@ -81,7 +81,7 @@ export async function GET(
       return NextResponse.json({ error: 'Missing chain or identifier' }, { status: 400 });
     }
 
-    const chainLower = chain.toLowerCase() as 'bsc' | 'sol';
+    const chainLower = chain.toLowerCase() as 'bsc' | 'sol' | 'eth';
     const identifierLower = identifier.toLowerCase();
     
     // Determine if identifier is a contract address or symbol

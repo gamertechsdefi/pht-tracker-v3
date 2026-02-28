@@ -60,32 +60,44 @@ export default function VolumeTxnsInfo({ chain, contractAddress }: VolumeTxnsInf
   const [txnsData, setTxnsData] = useState<TxnsData | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!chain || !contractAddress) return;
-    if (chain.toLowerCase() !== "bsc") {
-      setVolumeData(null);
-      setTxnsData(null);
-      return;
-    }
-    setLoading(true);
-    Promise.all([
-      fetch(`/api/${chain}/volume/${contractAddress}`).then((r) =>
-        r.ok ? r.json() : null
-      ),
-      fetch(`/api/${chain}/token-price/${contractAddress}`).then((r) =>
-        r.ok ? r.json() : null
-      ),
-    ])
-      .then(([vol, txns]) => {
-        setVolumeData(vol);
-        setTxnsData(txns);
-      })
-      .catch(() => {
-        setVolumeData(null);
-        setTxnsData(null);
-      })
-      .finally(() => setLoading(false));
-  }, [chain, contractAddress]);
+  const supportedChains = ["bsc", "eth", "solana", /* etc */];
+const isChain = supportedChains.includes(chain ?? "");
+
+useEffect(() => {
+  if (!chain || !contractAddress) {
+    setVolumeData(null);
+    setTxnsData(null);
+    return;
+  }
+
+  // Temporary guard – remove once fixed
+  if (!["bsc", "eth", "sol"].includes(chain)) return;
+
+  setLoading(true);
+  setVolumeData(null);
+  setTxnsData(null);
+
+  Promise.all([
+    fetch(`/api/${chain}/volume/${contractAddress}`).catch(err => ({ failed: true, error: err })),
+    fetch(`/api/${chain}/token-price/${contractAddress}`).catch(err => ({ failed: true, error: err })),
+  ])
+    .then(async ([volRes, priceRes]) => {
+      const results = await Promise.all([
+        volRes instanceof Response && volRes.ok ? volRes.json().catch(() => null) : null,
+        priceRes instanceof Response && priceRes.ok ? priceRes.json().catch(() => null) : null,
+      ]);
+
+      console.log("Volume fetch result:", volRes, results[0]);
+      console.log("Txns/Price fetch result:", priceRes, results[1]);
+
+      setVolumeData(results[0] ?? null);
+      setTxnsData(results[1] ?? null);
+    })
+    .catch(err => {
+      console.error("Fetch pipeline failed:", err);
+    })
+    .finally(() => setLoading(false));
+}, [chain, contractAddress]);
 
   if (loading) {
     return (

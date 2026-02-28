@@ -43,17 +43,17 @@ export default function TokenInfo({ chain, contractAddress }: TokenInfoProps) {
     const [loading, setLoading] = useState(false);
     const [honeypotOpen, setHoneypotOpen] = useState(false);
 
-    const isBsc = chain === "bsc";
+    const isChain = chain === "bsc" || "eth";
 
     useEffect(() => {
-        if (!isBsc || !contractAddress) return;
+        if (!isChain || !contractAddress) return;
         setLoading(true);
         fetch(`/api/${chain}/security/${contractAddress}`)
             .then((r) => (r.ok ? r.json() : null))
             .then((d) => setData(d))
             .catch(() => setData(null))
             .finally(() => setLoading(false));
-    }, [chain, contractAddress, isBsc]);
+    }, [chain, contractAddress, isChain]);
 
     // ── helpers ────────────────────────────────────────────────────────────────
     const bool = (v?: string) => v === "1";
@@ -125,7 +125,7 @@ export default function TokenInfo({ chain, contractAddress }: TokenInfoProps) {
             {/* (These stay visible even when not BSC / not loaded) */}
 
             {/* ── GoPlus Security section (BSC only) ── */}
-            {isBsc && (
+            {isChain && (
                 <>
                     {loading && (
                         <div className="flex flex-col gap-1 animate-pulse mt-2">

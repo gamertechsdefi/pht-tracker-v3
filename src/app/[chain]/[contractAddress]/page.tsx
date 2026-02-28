@@ -116,7 +116,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
         return;
       }
 
-      const chainLower = chain.toLowerCase() as "bsc" | "sol" | "rwa";
+      const chainLower = chain.toLowerCase() as "bsc" | "sol" | "rwa" | "eth";
 
       // Validate contract address format
       if (!isValidContractAddress(contractAddress, chainLower)) {
@@ -423,7 +423,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                                     {chain && contractAddress && (
                                         <PriceActionChart
                                             tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
-                                            chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
+                                            chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa' | "eth "}
                                             contractAddress={contractAddress}
                                         />
                                     )}
@@ -531,7 +531,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     {chain && contractAddress && (
                       <NewPriceActionChart
                         tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
-                        chain={chain.toLowerCase() as "bsc" | "sol" | "rwa"}
+                        chain={chain.toLowerCase() as "bsc" | "sol" | "rwa" | "eth"}
                         contractAddress={contractAddress}
                       />
                     )}
@@ -646,7 +646,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     </div>
 
                     <div className="mt-4 flex flex-col gap-4">
-                      <VolumeTxnsInfo chain={chain} contractAddress={contractAddress} />
+                      <VolumeTxnsInfo chain={chain?.toLowerCase() as "bsc" | "eth"} contractAddress={contractAddress} />
                     </div>
 
               
@@ -957,14 +957,14 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
 
                     <div className="mb-4">
                       <TokenInfo
-                        chain={chain}
+                        chain={chain?.toLowerCase() as "bsc" | "eth"}
                         contractAddress={contractAddress}
                       />
                     </div>
 
                     <div className="flex flex-col justify-center gap-4">
                       <VolumeTxnsInfo
-                        chain={chain}
+                        chain={chain?.toLowerCase() as "bsc" | "eth"}
                         contractAddress={contractAddress}
                       />
                     </div>
@@ -1036,7 +1036,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     {/* {chain && contractAddress && (
                                             <PriceActionChart
                                                 tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
-                                                chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa'}
+                                                chain={chain.toLowerCase() as 'bsc' | 'sol' | 'rwa' | "eth"}
                                                 contractAddress={contractAddress}
                                             />
                                         )} */}
@@ -1095,7 +1095,8 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                           <h1 className="font-bold text-base">
                             ${formatLargeNumber(tokenData.liquidity)}
                           </h1>
-                          <LiquidityLocker chain={chain} contractAddress={contractAddress}/>
+                          <LiquidityLocker chain={chain?.toLowerCase() as "bsc" | "eth"} 
+                          contractAddress={contractAddress}/>
                         </div>
                       </div>
                       {/* Volume */}
@@ -1156,7 +1157,7 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                     {chain && contractAddress && (
                       <NewPriceActionChart
                         tokenSymbol={tokenMetadata?.symbol?.toUpperCase() || ""}
-                        chain={chain.toLowerCase() as "bsc" | "sol" | "rwa"}
+                        chain={chain.toLowerCase() as "bsc" | "sol" | "rwa" | "eth"}
                         contractAddress={contractAddress}
                       />
                     )}

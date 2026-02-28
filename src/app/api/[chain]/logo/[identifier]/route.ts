@@ -154,7 +154,7 @@ export async function GET(
       return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
     }
 
-    const chainLower = chain.toLowerCase() as 'bsc' | 'sol' | 'rwa';
+    const chainLower = chain.toLowerCase() as 'bsc' | 'sol' | 'rwa' | 'eth';
     const identifierLower = identifier.toLowerCase();
 
     let tokenMetadata = null;

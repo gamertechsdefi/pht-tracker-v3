@@ -31,7 +31,9 @@ const LiquidityLocker: React.FC<LiquidityLockerProps> = ({ chain, contractAddres
     const [open, setOpen] = useState(false);
     const popoverRef = useRef<HTMLDivElement>(null);
 
-    if (!chain || !contractAddress || chain !== "bsc") return null;
+    const isChain = chain === "bsc" || "eth";
+
+    if (!isChain || !contractAddress) return null;
 
     useEffect(() => {
         const fetchData = async () => {

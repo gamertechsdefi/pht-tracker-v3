@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createChart, ColorType, IChartApi, Time, ISeriesApi, CandlestickSeries, CrosshairMode } from 'lightweight-charts';
 
-type SupportedChain = "bsc" | "sol" | "rwa";
+type SupportedChain = "bsc" | "sol" | "rwa" | "eth";
 
 interface PriceActionChartProps {
     chain: SupportedChain;
@@ -59,11 +59,11 @@ const TIMEFRAMES = [
 ] as const;
 
 function getPlatformId(chain: SupportedChain): string {
-    return chain === "bsc" ? "binance-smart-chain" : "solana";
+    return chain === "bsc" ? "binance-smart-chain" : "ethereum" ;
 }
 
 function getSymbolFromChain(chain: SupportedChain): string {
-    return chain === "bsc" ? "BNB" : "SOL";
+    return chain === "bsc" ? "BNB" : "eth";
 }
 
 function getHistoEndpoint(days: number): string {
@@ -360,7 +360,7 @@ export default function PriceActionChart({
             // 1. Determine network
             let network = '';
             if (chain === 'bsc') network = 'bsc';
-            else if (chain === 'sol') network = 'solana';
+            else if (chain === 'eth') network = 'ethereum';
             else {
                 throw new Error('GeckoTerminal not supported for this chain');
             }
@@ -451,7 +451,7 @@ export default function PriceActionChart({
             // 1. Map Chain
             let chainHex = '';
             if (chain === 'bsc') chainHex = 'bsc';
-            else if (chain === 'sol') chainHex = 'solana';
+            else if (chain === 'eth') chainHex = 'ethereum';
             else throw new Error('Moralis not supported for this chain');
 
             // 2. Get Pair Address
@@ -595,7 +595,7 @@ export default function PriceActionChart({
                     }
                 }
 
-                // Try GeckoTerminal first for BSC/SOL (High resolution OHLC)
+                // Try GeckoTerminal first for BSC/ETH (High resolution OHLC)
                 try {
                     const geckoTerminalData = await fetchFromGeckoTerminal(signal);
                     console.log('GeckoTerminal data loaded:', geckoTerminalData.length, 'candlesticks');

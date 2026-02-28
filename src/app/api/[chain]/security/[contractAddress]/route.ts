@@ -9,7 +9,8 @@ import { isValidContractAddress } from '@/lib/tokenRegistry';
 const CHAIN_ID_MAP: Record<string, string> = {
     'bsc': '56',
     'sol': 'solana',
-    'rwa': '56', // Default to BSC if RWA is on BSC or not specifically supported
+    'rwa': '56', 
+    'eth': '1',
 };
 
 interface RouteParams {
@@ -36,7 +37,7 @@ export async function GET(
         }
 
         // Validate address format
-        if (!isValidContractAddress(contractAddress, chainLower as 'bsc' | 'sol' | 'rwa')) {
+        if (!isValidContractAddress(contractAddress, chainLower as 'bsc' | 'sol' | 'rwa' | 'eth')) {
             return NextResponse.json({ error: 'Invalid contract address format' }, { status: 400 });
         }
 

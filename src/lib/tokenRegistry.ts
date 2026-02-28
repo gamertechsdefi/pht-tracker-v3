@@ -13,7 +13,7 @@ export interface TokenMetadata {
   address: string;
   symbol: string;
   name: string;
-  chain: 'bsc' | 'sol' | 'rwa';
+  chain: 'bsc' | 'sol' | 'rwa' | 'eth';
   decimals?: number;
   socials?: SocialLinks;
   isBurn?: boolean;
@@ -167,6 +167,8 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0x7923C0f6FA3d1BA6EAFCAedAaD93e737Fd22FC4F", symbol: "cNGN", name: "cNGN", chain: "rwa", isBurn: false},
   {address: "0xbe231A8492487aAe6096278A97050FAe6B9d5BEc", symbol: "weth", name: "Wrapped Ether", chain: "rwa", isBurn: false},
 
+  {address: "0x4200000623d0242cccd4e907008583dcb4af6472", symbol: "estee", name: "SHIBSTEE", chain: "eth", isBurn: false},
+
 ];
 
 // Utility functions for token lookups
@@ -176,7 +178,7 @@ export function getTokenByAddress(address: string): TokenMetadata | undefined {
   );
 }
 
-export function getTokenBySymbol(symbol: string, chain?: 'bsc' | 'sol' | 'rwa'): TokenMetadata | undefined {
+export function getTokenBySymbol(symbol: string, chain?: 'bsc' | 'sol' | 'rwa' | 'eth'): TokenMetadata | undefined {
   const tokens = TOKEN_REGISTRY.filter(token =>
     token.symbol.toLowerCase() === symbol.toLowerCase() &&
     (chain ? token.chain === chain : true)
@@ -196,15 +198,20 @@ export function getTokensBySymbol(symbol: string): TokenMetadata[] {
   );
 }
 
-export function getTokensByChain(chain: 'bsc' | 'sol'| 'rwa'): TokenMetadata[] {
+export function getTokensByChain(chain: 'bsc' | 'sol'| 'rwa' | 'eth'): TokenMetadata[] {
   return TOKEN_REGISTRY.filter(token => token.chain === chain);
 }
 
-export function isValidContractAddress(address: string, chain: 'bsc' | 'sol' | 'rwa'): boolean {
+export function isValidContractAddress(address: string, chain: 'bsc' | 'sol' | 'rwa' | 'eth'): boolean {
   if (chain === 'bsc') {
     // EVM address validation: 42 characters, starts with 0x, followed by 40 hex characters
     return /^0x[a-fA-F0-9]{40}$/.test(address);
-  } else if (chain === 'sol') {
+  }
+  if (chain === 'eth') {
+    // EVM address validation: 42 characters, starts with 0x, followed by 40 hex characters
+    return /^0x[a-fA-F0-9]{40}$/.test(address);
+  }
+   else if (chain === 'sol') {
     // Solana address validation: 32-44 characters, base58 encoded
     return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
   }

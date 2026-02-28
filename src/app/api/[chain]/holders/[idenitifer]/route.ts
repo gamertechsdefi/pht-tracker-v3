@@ -5,6 +5,7 @@ const CHAIN_ID_MAP: Record<string, string> = {
     'bsc': '56',
     'sol': 'solana',
     'rwa': '56',
+    'eth': '1',
 };
 
 interface RouteParams {
@@ -30,7 +31,7 @@ export async function GET(
             return NextResponse.json({ error: `Chain ${chain} not supported` }, { status: 400 });
         }
 
-        if (!isValidContractAddress(contractAddress, chainLower as 'bsc' | 'sol' | 'rwa')) {
+        if (!isValidContractAddress(contractAddress, chainLower as 'bsc' | 'sol' | 'rwa' | 'eth')) {
             return NextResponse.json({ error: 'Invalid contract address' }, { status: 400 });
         }
 

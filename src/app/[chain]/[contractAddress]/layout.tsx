@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // If not found by address, try by symbol with chain filter
   if (!token) {
-    token = getTokenBySymbol(contractAddress, chain as 'bsc' | 'sol' | 'rwa');
+    token = getTokenBySymbol(contractAddress, chain as 'bsc' | 'sol' | 'rwa' | 'eth');
   }
 
   // Default metadata if token not found
