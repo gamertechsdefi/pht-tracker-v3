@@ -164,6 +164,7 @@ export default function Header() {
     const getActiveChain = (): string | null => {
         const path = pathname?.toLowerCase() || '';
         if (path.startsWith('/bsc')) return 'bsc';
+        if (path.startsWith('/eth')) return 'eth';
         if (path.startsWith('/rwa')) return 'rwa';
         if (path.startsWith('/sol')) return 'sol';
         return null; // Home page or other routes
@@ -175,7 +176,8 @@ export default function Header() {
     const getChainInfo = (chain: string | null) => {
         if (!chain) return { name: 'All Chains', logo: null };
         const chainInfo: { [key: string]: { name: string; logo: string } } = {
-            bsc: { name: 'BSC Chain', logo: '/bsc-logo.png' },
+            bsc: { name: 'BSC', logo: '/bsc-logo.png' },
+            eth: { name: 'Ethereum', logo: '/eth-logo.png' },
             rwa: { name: 'RWA Chain', logo: '/rwa-logo.png' },
             sol: { name: 'Solana', logo: '/sol-logo.png' },
         };
@@ -479,8 +481,37 @@ export default function Header() {
                                             width={24}
                                             height={24}
                                         />
-                                        <span className="text-sm font-medium">BSC Chain</span>
+                                        <span className="text-sm font-medium">BSC</span>
                                         {activeChain === 'bsc' && (
+                                            <svg
+                                                className="h-4 w-4 ml-auto text-orange-600"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        )}
+                                    </Link>
+                                    <Link
+                                        href="/eth"
+                                        className={`flex items-center gap-3 px-4 py-2 transition-colors duration-200 ${activeChain === 'bsc'
+                                                ? 'bg-orange-100 text-orange-900 font-semibold'
+                                                : 'hover:bg-neutral-100'
+                                            }`}
+                                        onClick={() => setIsChainDropdownOpen(false)}
+                                    >
+                                        <Image
+                                            src="/eth-logo.png"
+                                            alt="ETH"
+                                            width={24}
+                                            height={24}
+                                        />
+                                        <span className="text-sm font-medium">ETH</span>
+                                        {activeChain === 'eth' && (
                                             <svg
                                                 className="h-4 w-4 ml-auto text-orange-600"
                                                 fill="currentColor"

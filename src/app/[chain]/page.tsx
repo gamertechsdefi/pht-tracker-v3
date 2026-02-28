@@ -420,7 +420,7 @@ export default function ChainPage({ params }: PageProps) {
         </div>
 
         {/* Back to all tokens link */}
-        {!loading && !error && (
+        {/* {!loading && !error && (
           <div className="mt-6 text-center">
             <Link
               href="/"
@@ -429,7 +429,7 @@ export default function ChainPage({ params }: PageProps) {
               ← View all chains
             </Link>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
