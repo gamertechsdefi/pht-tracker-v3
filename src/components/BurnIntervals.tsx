@@ -188,9 +188,9 @@ export default function BurnIntervals({ contractAddress, tokenSymbol }: BurnInte
               <span className="font-semibold text-lg md:text-xl text-red-500">{usdValue}</span>
             </p>
           </div>
-          <div className="text-xs text-gray-500 mt-2">
+          {/* <div className="text-xs text-gray-500 mt-2">
             Last updated: {data.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : "N/A"}
-          </div>
+          </div> */}
         </>
       )}
     </div>
