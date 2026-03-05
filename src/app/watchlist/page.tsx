@@ -171,8 +171,8 @@ export default function WatchlistPage() {
     return (
         <div className="container mx-auto min-h-screen flex flex-col">
             <Header />
-            <div className="px-4 pt-8 flex-1">
-                <div className="flex justify-between items-center mb-6">
+            <div className="px-3 pt-8 flex-1">
+                <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold text-white">My Watchlist</h1>
                 </div>
 
@@ -184,7 +184,7 @@ export default function WatchlistPage() {
                 ) : (
                     <>
                         {/* Mobile: Card Layout */}
-                        <div className="md:hidden flex flex-col gap-4">
+                        <div className="md:hidden flex flex-col gap-2">
                             {loading ? (
                                 <div className="flex items-center justify-center py-20">
                                     <div className="text-center">
