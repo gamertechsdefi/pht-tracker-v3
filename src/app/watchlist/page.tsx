@@ -234,13 +234,13 @@ export default function WatchlistPage() {
                                                 >
                                                     <Link
                                                         href={`/${token.chain}/${token.address}`}
-                                                        className="block p-4"
+                                                        className="flex flex-col p-2"
                                                         draggable={false}
                                                     >
                                                         {/* Card Header */}
-                                                        <div className="flex items-center justify-between mb-4">
+                                                        <div className="flex items-center justify-between mb-2">
                                                             {/* Left: Token Icon and Info */}
-                                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                            <div className="flex items-center gap-2 flex-1 min-w-0">
                                                                 {/* Token Icon with Chain Badge */}
                                                                 <div className="relative flex-shrink-0">
                                                                     <img
@@ -297,9 +297,9 @@ export default function WatchlistPage() {
                                                         </div>
 
                                                         {/* Metrics Row */}
-                                                        <div className="flex gap-2">
+                                                        <div className="flex flex-row justify-between items-center">
                                                             {/* Volume */}
-                                                            <div className="flex-1 border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                                                            <div className="flex flex-row items-center border border-orange-500 rounded-lg px-2 py-2 bg-black/50">
                                                                 <div className="text-orange-500 text-xs font-medium">VOL</div>
                                                                 <div className="text-white text-sm font-semibold">
                                                                     ${formatCompactNumber(token.volume)}
@@ -307,7 +307,7 @@ export default function WatchlistPage() {
                                                             </div>
 
                                                             {/* Liquidity */}
-                                                            <div className="flex-1 border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                                                            <div className="flex flex-row items-center border border-orange-500 rounded-lg px-2 py-2 bg-black/50">
                                                                 <div className="text-orange-500 text-xs font-medium">LIQ.</div>
                                                                 <div className="text-white text-sm font-semibold">
                                                                     ${formatCompactNumber(token.liquidity)}
@@ -315,7 +315,7 @@ export default function WatchlistPage() {
                                                             </div>
 
                                                             {/* Market Cap */}
-                                                            <div className="flex-1 border border-orange-500 rounded-lg px-3 py-2 bg-black/50">
+                                                            <div className="flex flex-row items-center border border-orange-500 rounded-lg px-2 py-2 bg-black/50">
                                                                 <div className="text-orange-500 text-xs font-medium">MCAP</div>
                                                                 <div className="text-white text-sm font-semibold">
                                                                     ${formatCompactNumber(token.marketCap)}
