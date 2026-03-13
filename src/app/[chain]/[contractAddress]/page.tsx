@@ -953,7 +953,42 @@ export default function TokenPage({ params: paramsPromise }: TokenPageProps) {
                           {tokenMetadata.symbol}
                         </h1>
                       </div>
+
+                      {socialLinks && (
+                        <div className="flex flex-row gap-4 mt-2 items-center justify-between px-4 bg-white text-black p-4 rounded-lg">
+                          <a
+                            href={socialLinks.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <p className="text-sm">Website</p>
+                          </a>
+                          <a
+                            href={socialLinks.twitter}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <p className="text-sm">X(Twitter)</p>
+                          </a>
+                          <a
+                            href={socialLinks.telegram}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <p className="text-sm">Telegram</p>
+                          </a>
+                          <a
+                            href={socialLinks.scan}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <p className="text-sm">Explorer</p>
+                          </a>
+                        </div>
+                      )}
+
                     </div>
+
 
                     <div className="mb-4">
                       <TokenInfo

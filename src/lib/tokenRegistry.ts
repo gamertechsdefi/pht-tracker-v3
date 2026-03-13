@@ -159,6 +159,7 @@ export const TOKEN_REGISTRY: TokenMetadata[] = [
   { address: "0xf1c599e9a5fbdea408a7409c0176a2fe42c64444", symbol: "hachiko", name: "Hachiko Inu", chain: "bsc", isBurn: false},
   { address: "0x63852B25cFabFE4EaB380df29A68663656f757EA", symbol: "jiti", name: "JITI", chain: "bsc", isBurn: false},
   { address: "0xc269d59a0D608EA0bd672F2F4616C372d8554444", symbol: "ClipX", name: "ClipX", chain: "bsc", isBurn: false},
+  { address: "0x103c164727572D7A0BE8021F3d9274F0eB9F4CF8", symbol: "NEKO", name: "Nekomeow", chain:"bsc", isBurn: false},
 
   {address: "0xf20f989CAf263C513f9183B4Fed88F14Fc04c8dB", symbol: "shalom", name: "Shalom", chain: "rwa", isBurn: false },
   { address: "0x782ea82124B474f1f968262ec24FCdED39689dd5", symbol: "rvm", name: "Real World Meme", chain: "rwa", isBurn: false},
